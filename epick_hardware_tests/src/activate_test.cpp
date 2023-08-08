@@ -40,7 +40,7 @@ constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 2000;
 
-int main(int argc, char* argv[])
+int main()
 {
   try
   {
@@ -81,23 +81,7 @@ int main(int argc, char* argv[])
     serial_interface->write(request);
     auto response = serial_interface->read(8);
 
-    //    auto command_interface =
-    //        std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
-
-    //    bool connected = command_interface->connect();
-    //    if (!connected)
-    //    {
-    //      std::cout << "Gripper not connected";
-    //      return 1;
-    //    }
-
-    //    std::cout << "Deactivating gripper...\n";
-    //    command_interface->deactivate();
-
-    //    std::cout << "Activating gripper...\n";
-    //    command_interface->activate();
-
-    //    std::cout << "Gripper successfully activated.\n";
+    std::cout << "Gripper successfully activated.\n";
   }
   catch (const serial::IOException& e)
   {
