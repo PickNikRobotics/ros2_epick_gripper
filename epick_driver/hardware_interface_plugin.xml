@@ -1,0 +1,7 @@
+<library path="epick_driver">
+    <class name="epick_driver/EpickGripperHardwareInterface" type="epick_driver::EpickGripperHardwareInterface" base_class_type="hardware_interface::SystemInterface">
+        <description>
+            ROS2 hardware interface for the Robotiq EPick gripper.
+        </description>
+    </class>
+</library>

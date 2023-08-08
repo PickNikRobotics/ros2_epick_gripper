@@ -1,0 +1,18 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  industrial_ci:
+    strategy:
+      matrix:
+        env:
+          - { ROS_DISTRO: humble, ROS_REPO: testing }
+          - { ROS_DISTRO: humble, ROS_REPO: main }
+    env:
+      UPSTREAM_WORKSPACE: ros2_robotiq_gripper.humble.repos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: "ros-industrial/industrial_ci@master"
+        env: ${{matrix.env}}
