@@ -26,8 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_command_interface.hpp"
-#include "epick_driver/default_serial_interface.hpp"
+#include "serial/serial.h"
 
 #include <thread>
 #include <chrono>
@@ -38,16 +37,14 @@
 constexpr auto kSlaveAddress = 0x09;
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
-constexpr auto kTimeout = 2000;
 
 int main()
 {
   try
   {
-    auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
-    serial_interface->set_port(kComPort);
-    serial_interface->set_baudrate(kBaudRate);
-    serial_interface->set_timeout(kTimeout);
+    auto serial_interface = std::make_unique<serial::Serial>();
+    serial_interface->setPort(kComPort);
+    serial_interface->setBaudrate(kBaudRate);
 
     // clang-format off
     const std::vector<uint8_t> request{
@@ -71,15 +68,29 @@ int main()
     // clang-format on
 
     serial_interface->open();
-    bool open = serial_interface->is_open();
+    bool open = serial_interface->isOpen();
     if (!open)
     {
       std::cout << "Gripper not connected";
       return 1;
     }
 
+    std::cout << "Gripper connected. Sending command...";
+
     serial_interface->write(request);
-    auto response = serial_interface->read(8);
+
+    std::cout << "Reading response...";
+
+    std::vector<uint8_t> response;
+    size_t response_size = 8;
+    size_t num_bytes_read = serial_interface->read(response, response_size);
+
+    if (num_bytes_read != response_size)
+    {
+      const auto error_msg =
+          "Requested " + std::to_string(response_size) + " bytes, but only got " + std::to_string(num_bytes_read);
+      THROW(serial::IOException, error_msg.c_str());
+    }
 
     std::cout << "Gripper successfully activated.\n";
   }
