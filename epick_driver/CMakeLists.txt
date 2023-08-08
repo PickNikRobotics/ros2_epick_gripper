@@ -32,16 +32,20 @@ add_library(
     epick_driver
     SHARED
     include/epick_driver/command_interface.hpp
+    include/epick_driver/command_interface_factory.hpp
     include/epick_driver/crc_utils.hpp
     include/epick_driver/data_utils.hpp
     include/epick_driver/default_command_interface.hpp
+    include/epick_driver/default_command_interface_factory.hpp
     include/epick_driver/default_serial_interface.hpp
     include/epick_driver/epick_gripper_hardware_interface.hpp
     include/epick_driver/serial_interface.hpp
+    include/epick_driver/visibility_control.hpp
     src/epick_gripper_hardware_interface.cpp
     src/crc_utils.cpp
     src/data_utils.cpp
     src/default_command_interface.cpp
+    src/default_command_interface_factory.cpp
     src/default_serial_interface.cpp
 )
 target_include_directories(

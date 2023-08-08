@@ -28,9 +28,105 @@
 
 #include "epick_driver/epick_gripper_hardware_interface.hpp"
 
+#include "epick_driver/default_command_interface_factory.hpp"
+
+#include <rclcpp/logging.hpp>
+
 namespace epick_driver
 {
+const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
+
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
+{
+  command_interface_factory_ = std::make_unique<DefaultCommandInterfaceFactory>();
+}
+
+// This constructor is use for testing only.
+EpickGripperHardwareInterface::EpickGripperHardwareInterface(
+    std::unique_ptr<CommandInterfaceFactory> command_interface_factory)
+  : command_interface_factory_{ std::move(command_interface_factory) }
+{
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& info)
+{
+  RCLCPP_DEBUG(kLogger, "on_init");
+  try
+  {
+    // Store hardware info for later use.
+
+    if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS)
+    {
+      return CallbackReturn::ERROR;
+    }
+
+    // TODO: initialize all required structures.
+
+    command_interface_ = command_interface_factory_->create(info);
+    return CallbackReturn::SUCCESS;
+  }
+  catch (const std::exception& ex)
+  {
+    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    return CallbackReturn::ERROR;
+  }
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickGripperHardwareInterface::on_configure(const rclcpp_lifecycle::State& previous_state)
+{
+  RCLCPP_DEBUG(kLogger, "on_configure");
+  try
+  {
+    if (hardware_interface::SystemInterface::on_configure(previous_state) != CallbackReturn::SUCCESS)
+    {
+      return CallbackReturn::ERROR;
+    }
+
+    // Open the serial port and handshake.
+    command_interface_->connect();
+
+    // TODO: send some command to verify that the hardware is responding.
+  }
+  catch (const std::exception& ex)
+  {
+    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    return CallbackReturn::ERROR;
+  }
+}
+
+std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::export_state_interfaces()
+{
+}
+
+std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface::export_command_interfaces()
+{
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickGripperHardwareInterface::on_activate(const rclcpp_lifecycle::State& previous_state)
+{
+  RCLCPP_DEBUG(kLogger, "on_activate");
+  return CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickGripperHardwareInterface::on_deactivate(const rclcpp_lifecycle::State& previous_state)
+{
+  RCLCPP_DEBUG(kLogger, "on_deactivate");
+  return hardware_interface::CallbackReturn::SUCCESS;
+}
+
+hardware_interface::return_type EpickGripperHardwareInterface::read(const rclcpp::Time& time,
+                                                                    const rclcpp::Duration& period)
+{
+}
+
+hardware_interface::return_type EpickGripperHardwareInterface::write(const rclcpp::Time& time,
+                                                                     const rclcpp::Duration& period)
 {
 }
 }  // namespace epick_driver
