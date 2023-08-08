@@ -29,6 +29,7 @@
 #include "epick_driver/epick_gripper_hardware_interface.hpp"
 
 #include "epick_driver/default_command_interface_factory.hpp"
+#include "serial/serial.h"
 
 #include <rclcpp/logging.hpp>
 
@@ -64,12 +65,12 @@ EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& i
     // TODO: initialize all required structures.
 
     command_interface_ = command_interface_factory_->create(info);
+
     return CallbackReturn::SUCCESS;
   }
-  catch (const std::exception& ex)
+  catch (const std::exception& e)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    RCLCPP_ERROR(kLogger, "Cannot initialize the Robotiq EPick gripper: %s", e.what());
     return CallbackReturn::ERROR;
   }
 }
@@ -86,37 +87,62 @@ EpickGripperHardwareInterface::on_configure(const rclcpp_lifecycle::State& previ
     }
 
     // Open the serial port and handshake.
-    command_interface_->connect();
-
-    // TODO: send some command to verify that the hardware is responding.
+    bool connected = command_interface_->connect();
+    if (!connected)
+    {
+      RCLCPP_ERROR(kLogger, "Cannot connect to the Robotiq EPick gripper");
+      return CallbackReturn::ERROR;
+    }
   }
-  catch (const std::exception& ex)
+  catch (const std::exception& e)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    RCLCPP_ERROR(kLogger, "Cannot configure the Robotiq EPick gripper: %s", e.what());
     return CallbackReturn::ERROR;
   }
 }
 
 std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::export_state_interfaces()
 {
+  // TODO: create a join with a value that can be 1 (gripper closed) or 2 (gripper open).
 }
 
 std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface::export_command_interfaces()
 {
+  // TODO: create a join with a value that can be 1 (gripper closed) or 2 (gripper open).
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-EpickGripperHardwareInterface::on_activate(const rclcpp_lifecycle::State& previous_state)
+EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
 {
   RCLCPP_DEBUG(kLogger, "on_activate");
+  try
+  {
+    command_interface_->deactivate();
+    command_interface_->activate();
+  }
+  catch (const serial::IOException& e)
+  {
+    RCLCPP_FATAL(kLogger, "Failed to activate the Robotiq EPick gripper: %s", e.what());
+    return CallbackReturn::ERROR;
+  }
+  RCLCPP_INFO(kLogger, "Robotiq EPick Gripper successfully activated!");
   return CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-EpickGripperHardwareInterface::on_deactivate(const rclcpp_lifecycle::State& previous_state)
+EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
 {
   RCLCPP_DEBUG(kLogger, "on_deactivate");
+  try
+  {
+    command_interface_->deactivate();
+  }
+  catch (const std::exception& e)
+  {
+    RCLCPP_ERROR(kLogger, "Failed to deactivate the Robotiq EPick gripper: %s", e.what());
+    return CallbackReturn::ERROR;
+  }
+  RCLCPP_INFO(kLogger, "Robotiq EPick Gripper successfully deactivated!");
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
