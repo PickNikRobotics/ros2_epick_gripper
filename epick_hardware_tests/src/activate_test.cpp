@@ -36,7 +36,7 @@
 #include <iostream>
 
 constexpr auto kSlaveAddress = 0x09;
-constexpr auto kComPort = "/tmp/ttyVUSB0";
+constexpr auto kComPort = "/tmp/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 2000;
 
