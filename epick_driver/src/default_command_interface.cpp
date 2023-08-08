@@ -84,8 +84,8 @@ void DefaultCommandInterface::disconnect()
 void DefaultCommandInterface::activate()
 {
   // Set rACT to 1, clear all other registers.
-  const auto request = createWriteCommand(kActionRequestRegisterAddress, { 0x0100, 0x0000, 0x0000 });
-
+  const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+                                     kActionRequestRegisterAddress, { 0x0100, 0x0000, 0x0000 });
   try
   {
     serial_interface_->write(request);
@@ -101,7 +101,8 @@ void DefaultCommandInterface::activate()
 void DefaultCommandInterface::deactivate()
 {
   // Clear all registers.
-  const auto request = createWriteCommand(kActionRequestRegisterAddress, { 0x0000, 0x0000, 0x0000 });
+  const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+                                     kActionRequestRegisterAddress, { 0x0000, 0x0000, 0x0000 });
   try
   {
     serial_interface_->write(request);
@@ -138,18 +139,15 @@ void DefaultCommandInterface::get_status()
 {
 }
 
-std::vector<uint8_t> DefaultCommandInterface::createReadCommand(uint16_t first_register_address, uint8_t num_registers)
-{
-}
-
-std::vector<uint8_t> DefaultCommandInterface::createWriteCommand(uint16_t first_register_address,
-                                                                 const std::vector<uint16_t>& data)
+std::vector<uint8_t> DefaultCommandInterface::createCommand(uint8_t slave_address, uint8_t function_code,
+                                                            uint16_t first_register_address,
+                                                            const std::vector<uint16_t>& data)
 {
   uint16_t num_registers = data.size();
   uint8_t num_bytes = 2 * num_registers;
 
-  std::vector<uint8_t> cmd = { slave_address_,
-                               static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+  std::vector<uint8_t> cmd = { slave_address,
+                               function_code,
                                data_utils::get_msb(first_register_address),
                                data_utils::get_lsb(first_register_address),
                                data_utils::get_msb(num_registers),
