@@ -36,7 +36,7 @@
 #include <iostream>
 
 constexpr auto kSlaveAddress = 0x09;
-constexpr auto kComPort = "/tmp/ttyUSB0";
+constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 2000;
 
@@ -49,23 +49,55 @@ int main(int argc, char* argv[])
     serial_interface->set_baudrate(kBaudRate);
     serial_interface->set_timeout(kTimeout);
 
-    auto command_interface =
-        std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
+    // clang-format off
+    const std::vector<uint8_t> request{
+      kSlaveAddress,
+      0x16, // Function code.
+      // Address of the first requested register - MSB, LSB.
+      0x03, 0xE8,
+      // Number of registers requested - MSB, LSB.
+      0x00, 0x03,
+      // Number of data bytes to follow.
+      0x06,
+      // Value written in the first register - MSB, LSB.
+      0x01, 0x00,
+      // Value written in the second register - MSB, LSB.
+      0x00, 0x00,
+      // Value written in the third register - MSB, LSB.
+      0x00, 0x00,
+      // CRC-16
+      0x7A, 0xE9
+    };
+    // clang-format on
 
-    bool connected = command_interface->connect();
-    if (!connected)
+    serial_interface->open();
+    bool open = serial_interface->is_open();
+    if (!open)
     {
       std::cout << "Gripper not connected";
       return 1;
     }
 
-    std::cout << "Deactivating gripper...\n";
-    command_interface->deactivate();
+    serial_interface->write(request);
+    auto response = serial_interface->read(8);
 
-    std::cout << "Activating gripper...\n";
-    command_interface->activate();
+    //    auto command_interface =
+    //        std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
 
-    std::cout << "Gripper successfully activated.\n";
+    //    bool connected = command_interface->connect();
+    //    if (!connected)
+    //    {
+    //      std::cout << "Gripper not connected";
+    //      return 1;
+    //    }
+
+    //    std::cout << "Deactivating gripper...\n";
+    //    command_interface->deactivate();
+
+    //    std::cout << "Activating gripper...\n";
+    //    command_interface->activate();
+
+    //    std::cout << "Gripper successfully activated.\n";
   }
   catch (const serial::IOException& e)
   {
