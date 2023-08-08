@@ -71,15 +71,15 @@ int main()
     bool open = serial_interface->isOpen();
     if (!open)
     {
-      std::cout << "Gripper not connected";
+      std::cout << "Gripper not connected" << std::endl;;
       return 1;
     }
 
-    std::cout << "Gripper connected. Sending command...";
+    std::cout << "Gripper connected. Sending command..." << std::endl;
 
     serial_interface->write(request);
 
-    std::cout << "Reading response...";
+    std::cout << "Reading response..." << std::endl;;
 
     std::vector<uint8_t> response;
     size_t response_size = 8;
@@ -87,12 +87,11 @@ int main()
 
     if (num_bytes_read != response_size)
     {
-      const auto error_msg =
-          "Requested " + std::to_string(response_size) + " bytes, but only got " + std::to_string(num_bytes_read);
-      THROW(serial::IOException, error_msg.c_str());
+      std::cout << "Requested " + std::to_string(response_size) + " bytes, but only got " + std::to_string(num_bytes_read) << std::endl;
+      return 1;
     }
 
-    std::cout << "Gripper successfully activated.\n";
+    std::cout << "Gripper successfully activated." << std::endl;;
   }
   catch (const serial::IOException& e)
   {
