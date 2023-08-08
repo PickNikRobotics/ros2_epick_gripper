@@ -32,9 +32,8 @@
 #include <vector>
 #include <iostream>
 
-constexpr auto kSlaveAddress = 0x09;
 constexpr auto kComPort = "/dev/ttyUSB0";
-constexpr auto kBaudRate = 115200;
+constexpr auto kBaudRate = 9600;
 
 int main()
 {
@@ -74,7 +73,6 @@ int main()
     }
 
     std::cout << "Gripper successfully activated." << std::endl;
-    ;
   }
   catch (const serial::IOException& e)
   {
