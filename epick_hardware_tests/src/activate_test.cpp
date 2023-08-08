@@ -28,11 +28,10 @@
 
 #include "serial/serial.h"
 
-#include <thread>
-#include <chrono>
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <thread>
 
 constexpr auto kSlaveAddress = 0x09;
 constexpr auto kComPort = "/dev/ttyUSB0";
@@ -78,6 +77,7 @@ int main()
     std::cout << "Gripper connected. Sending command..." << std::endl;
 
     serial_interface->write(request);
+    serial_interface->flush();
 
     std::cout << "Reading response..." << std::endl;;
 

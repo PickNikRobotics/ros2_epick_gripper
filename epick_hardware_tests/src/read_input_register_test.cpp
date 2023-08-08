@@ -28,8 +28,6 @@
 
 #include "serial/serial.h"
 
-#include <thread>
-#include <chrono>
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -60,9 +58,9 @@ int main()
     std::cout << "Gripper connected. Sending command..." << std::endl;
 
     serial_interface->write(request);
+    serial_interface->flush();
 
     std::cout << "Reading response..." << std::endl;
-    ;
 
     std::vector<uint8_t> response;
     size_t num_bytes_read = serial_interface->read(response, expected_response.size());
