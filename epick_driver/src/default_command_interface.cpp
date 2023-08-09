@@ -296,7 +296,7 @@ void DefaultCommandInterface::get_status()
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto response = serial_interface_->read(response_size);
 
-    std::cout << data_utils::to_hex(response);
+    std::cout << data_utils::to_hex(response) << std::endl;
   }
   catch (const serial::IOException& e)
   {
