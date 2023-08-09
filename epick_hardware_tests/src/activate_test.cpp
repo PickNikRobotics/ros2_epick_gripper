@@ -53,15 +53,13 @@ int main()
     };
 
     // Set pressure level.
-    std::vector<uint8_t> set_pressure_level_request {
-      0x09, 0x10, 0x03, 0xE9, 0x00, 0x02, 0x04, 0x00, 0x19, 0x0A, 0x23
-    };
+    std::vector<uint8_t> set_pressure_level_request{ 0x09, 0x10, 0x03, 0xE9, 0x00, 0x02, 0x04, 0x00, 0x19, 0x0A, 0x23 };
 
     auto request = activate_request;
 
     // The CRC-16 is correct, I've checked many times with available examples and
     // online tools.
-    auto crc16 = epick_driver::crc_utils::computeCRC(request);
+    auto crc16 = epick_driver::crc_utils::compute_crc(request);
     request.push_back(epick_driver::data_utils::get_msb(crc16));
     request.push_back(epick_driver::data_utils::get_lsb(crc16));
 

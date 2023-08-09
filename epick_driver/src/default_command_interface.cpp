@@ -158,8 +158,8 @@ std::vector<uint8_t> DefaultCommandInterface::createCommand(uint8_t slave_addres
     cmd.push_back(data_utils::get_msb(byte));
     cmd.push_back(data_utils::get_lsb(byte));
   }
-
-  auto crc = crc_utils::computeCRC(cmd);
+  
+  auto crc = crc_utils::compute_crc(cmd);
   cmd.push_back(data_utils::get_msb(crc));
   cmd.push_back(data_utils::get_lsb(crc));
 

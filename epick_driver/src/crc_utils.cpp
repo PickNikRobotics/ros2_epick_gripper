@@ -114,14 +114,14 @@ constexpr std::array<uint8_t, 256> kCRCLoTable = {
 };
 // clang-format on
 
-uint16_t computeCRC(const std::vector<uint8_t>& cmd)
+uint16_t compute_crc(const std::vector<uint8_t>& cmd)
 {
   uint16_t crc_hi = 0x00FF;
   uint16_t crc_lo = 0x00FF;
 
-  for (auto byte : cmd)
+  for (uint8_t byte : cmd)
   {
-    std::size_t index = crc_lo ^ byte;
+    uint8_t index = crc_lo ^ byte;
     crc_lo = crc_hi ^ kCRCHiTable[index];
     crc_hi = kCRCLoTable[index];
   }

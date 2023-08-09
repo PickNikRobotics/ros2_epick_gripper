@@ -38,5 +38,5 @@ namespace epick_driver::crc_utils
  * @param data The data to compute the CRC for.
  * @return A 16-bits CRC.
  */
-uint16_t computeCRC(const std::vector<uint8_t>& data);
+uint16_t compute_crc(const std::vector<uint8_t>& data);
 }  // namespace epick_driver::crc_utils
