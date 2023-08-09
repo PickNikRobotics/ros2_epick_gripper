@@ -27,15 +27,17 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include "serial/serial.h"
+#include "epick_driver/crc_utils.hpp"
+#include "epick_driver/data_utils.hpp"
 
 #include <memory>
 #include <vector>
 #include <iostream>
 #include <thread>
+#include <chrono>
 
-constexpr auto kSlaveAddress = 0x09;
 constexpr auto kComPort = "/dev/ttyUSB0";
-constexpr auto kBaudRate = 9600;
+constexpr auto kBaudRate = 115200;
 
 int main()
 {
@@ -45,53 +47,57 @@ int main()
     serial_interface->setPort(kComPort);
     serial_interface->setBaudrate(kBaudRate);
 
-    // clang-format off
-    const std::vector<uint8_t> request{
-      kSlaveAddress,
-      0x16, // Function code.
-      // Address of the first requested register - MSB, LSB.
-      0x03, 0xE8,
-      // Number of registers requested - MSB, LSB.
-      0x00, 0x03,
-      // Number of data bytes to follow.
-      0x06,
-      // Value written in the first register - MSB, LSB.
-      0x01, 0x00,
-      // Value written in the second register - MSB, LSB.
-      0x00, 0x00,
-      // Value written in the third register - MSB, LSB.
-      0x00, 0x00,
-      // CRC-16
-      0x7A, 0xE9
+    // Activate.
+    std::vector<uint8_t> activate_request{
+      0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00
     };
-    // clang-format on
+
+    // Set pressure level.
+    std::vector<uint8_t> set_pressure_level_request {
+      0x09, 0x10, 0x03, 0xE9, 0x00, 0x02, 0x04, 0x00, 0x19, 0x0A, 0x23
+    };
+
+    auto request = activate_request;
+
+    // The CRC-16 is correct, I've checked many times with available examples and
+    // online tools.
+    auto crc16 = epick_driver::crc_utils::computeCRC(request);
+    request.push_back(epick_driver::data_utils::get_msb(crc16));
+    request.push_back(epick_driver::data_utils::get_lsb(crc16));
+
+    std::cout << "Request: " << epick_driver::data_utils::to_hex(request) << std::endl;
 
     serial_interface->open();
     bool open = serial_interface->isOpen();
     if (!open)
     {
-      std::cout << "Gripper not connected" << std::endl;;
+      std::cout << "Gripper not connected" << std::endl;
       return 1;
     }
 
-    std::cout << "Gripper connected. Sending command..." << std::endl;
+    std::cout << "Gripper connected." << std::endl;
+    std::cout << "Sending request..." << std::endl;
 
     serial_interface->write(request);
     serial_interface->flush();
 
-    std::cout << "Reading response..." << std::endl;;
+    std::cout << "Reading response..." << std::endl;
 
     std::vector<uint8_t> response;
     size_t response_size = 8;
     size_t num_bytes_read = serial_interface->read(response, response_size);
 
+    std::cout << "Response received: " << epick_driver::data_utils::to_hex(response) << std::endl;
+
     if (num_bytes_read != response_size)
     {
-      std::cout << "Requested " + std::to_string(response_size) + " bytes, but only got " + std::to_string(num_bytes_read) << std::endl;
+      std::cout
+          << "Requested " + std::to_string(response_size) + " bytes, but only got " + std::to_string(num_bytes_read)
+          << std::endl;
       return 1;
     }
 
-    std::cout << "Gripper successfully activated." << std::endl;;
+    std::cout << "Gripper successfully activated." << std::endl;
   }
   catch (const serial::IOException& e)
   {
