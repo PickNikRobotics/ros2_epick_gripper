@@ -31,6 +31,8 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 // This is a very basic test to check if the gripper is correctly wired.
 // We send an activation request and await for an expected response.
@@ -65,6 +67,8 @@ int main()
 
     serial_interface->write(activate_request);
     serial_interface->flush();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Test
 
     std::cout << "Reading response..." << std::endl;
 
