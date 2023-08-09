@@ -57,7 +57,6 @@ std::vector<uint8_t> DefaultSerialInterface::read(size_t size)
 {
   std::vector<uint8_t> data;
   size_t num_bytes_read = serial_->read(data, size);
-
   if (num_bytes_read != size)
   {
     const auto error_msg =
@@ -70,12 +69,12 @@ std::vector<uint8_t> DefaultSerialInterface::read(size_t size)
 
 void DefaultSerialInterface::write(const std::vector<uint8_t>& data)
 {
-  std::size_t write_size = serial_->write(data);
+  std::size_t num_bytes_written = serial_->write(data);
   serial_->flush();
-  if (write_size != data.size())
+  if (num_bytes_written != data.size())
   {
-    const auto error_msg =
-        "Attempted to write " + std::to_string(data.size()) + " bytes, but only wrote " + std::to_string(write_size);
+    const auto error_msg = "Attempted to write " + std::to_string(data.size()) + " bytes, but only wrote " +
+                           std::to_string(num_bytes_written);
     THROW(serial::IOException, error_msg.c_str());
   }
 }

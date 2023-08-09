@@ -26,64 +26,52 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "serial/serial.h"
+#include "epick_driver/default_command_interface.hpp"
+#include "epick_driver/default_serial_interface.hpp"
 
 #include <memory>
 #include <vector>
 #include <iostream>
 
-// This is a very basic test to check if the gripper is correctly wired.
-// We send an activation request and await for an expected response.
-
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
+constexpr auto kSlaveAddress = 0x09;
 
 int main()
 {
   try
   {
-    auto serial_interface = std::make_unique<serial::Serial>();
-    serial_interface->setPort(kComPort);
-    serial_interface->setBaudrate(kBaudRate);
+    auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
+    serial_interface->set_port(kComPort);
+    serial_interface->set_baudrate(kBaudRate);
 
-    std::vector<uint8_t> activate_request{ 0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
-    std::vector<uint8_t> expected_response{ 0x09, 0x10, 0x03, 0xe8, 0x00, 0x03, 0x01, 0x30 };
+    auto command_interface =
+        std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
 
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
-    serial_interface->open();
-    bool open = serial_interface->isOpen();
-    if (!open)
+    bool connected = command_interface->connect();
+    if (!connected)
     {
-      std::cout << "Gripper not connected" << std::endl;
+      std::cout << "The gripper is not connected" << std::endl;
       return 1;
     }
 
-    std::cout << "Gripper connected." << std::endl;
-    std::cout << "Sending request..." << std::endl;
+    std::cout << "The gripper is connected." << std::endl;
+    std::cout << "Activating the gripper..." << std::endl;
 
-    serial_interface->write(activate_request);
-    serial_interface->flush();
+    command_interface->activate();
 
-    std::cout << "Reading response..." << std::endl;
+    std::cout << "The gripper is activated." << std::endl;
+    std::cout << "Reading the gripper status..." << std::endl;
 
-    std::vector<uint8_t> response;
-    serial_interface->read(response, expected_response.size());
+    command_interface->get_status();
 
-    if (response.size() != expected_response.size())
-    {
-      std::cout << "Requested " + std::to_string(expected_response.size()) + " bytes, but only got " +
-                       std::to_string(response.size())
-                << std::endl;
-      return 1;
-    }
-
-    std::cout << "Gripper successfully activated." << std::endl;
+    std::cout << "Status retrieved." << std::endl;
   }
   catch (const serial::IOException& e)
   {
-    std::cout << "Failed to communicating with the Gripper:" << e.what();
+    std::cout << "Failed to communicating with the gripper:" << e.what();
     return 1;
   }
 

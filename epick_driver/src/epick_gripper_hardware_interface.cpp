@@ -62,8 +62,6 @@ EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& i
       return CallbackReturn::ERROR;
     }
 
-    // TODO: initialize all required structures.
-
     command_interface_ = command_interface_factory_->create(info);
 
     return CallbackReturn::SUCCESS;

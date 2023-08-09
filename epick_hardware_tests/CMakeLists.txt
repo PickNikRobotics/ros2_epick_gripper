@@ -29,11 +29,17 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   serial
 )
 
-add_executable(activate_test src/activate_test.cpp)
-target_include_directories(activate_test
+add_executable(connection_test src/connection_test.cpp)
+target_include_directories(connection_test
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(activate_test epick_driver::epick_driver)
-ament_target_dependencies(activate_test epick_driver)
+target_link_libraries(connection_test epick_driver::epick_driver)
+ament_target_dependencies(connection_test epick_driver)
+
+add_executable(get_status_test src/get_status_test.cpp)
+target_include_directories(get_status_test
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(get_status_test epick_driver::epick_driver)
+ament_target_dependencies(get_status_test epick_driver)
 
 add_executable(read_input_register_test src/read_input_register_test.cpp)
 target_include_directories(read_input_register_test

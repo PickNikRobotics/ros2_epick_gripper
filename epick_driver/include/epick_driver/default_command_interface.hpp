@@ -36,6 +36,7 @@
 
 namespace epick_driver
 {
+
 class DefaultCommandInterface : public CommandInterface
 {
 public:
