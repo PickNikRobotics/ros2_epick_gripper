@@ -31,8 +31,6 @@
 #include <memory>
 #include <vector>
 #include <iostream>
-#include <thread>
-#include <chrono>
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
