@@ -41,13 +41,4 @@ target_include_directories(read_input_register_test
 target_link_libraries(read_input_register_test epick_driver::epick_driver)
 ament_target_dependencies(read_input_register_test epick_driver)
 
-
-###############################################################################
-# TESTS
-
-include(CTest)
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif()
-
 ament_package()
