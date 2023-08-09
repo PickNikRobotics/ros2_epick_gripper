@@ -32,13 +32,12 @@
 #include <vector>
 #include <iostream>
 
+// This is a very basic test to check if the gripper is correctly wired.
+// We send an activation request and await for an expected response.
+
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 
-/**
- * This is a very basic test to check if the gripper is correctly wired.
- * We send an activation request and await for an expected response.
- */
 int main()
 {
   try
@@ -51,7 +50,7 @@ int main()
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
     std::vector<uint8_t> expected_response{ 0x09, 0x10, 0x03, 0xe8, 0x00, 0x03, 0x01, 0x30 };
 
-    std::cout << "Checking if the gipper is connected to /dev/ttyUSB0..." << std::endl;
+    std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
     serial_interface->open();
     bool open = serial_interface->isOpen();
