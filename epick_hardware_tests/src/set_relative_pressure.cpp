@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
     driver->set_relative_pressure(-100.0);
 
-    std::cout << "Pressure set." << std::endl;
+    std::cout << "Pressure set to" << pressure << "kPa." << std::endl;
   }
   catch (const serial::IOException& e)
   {
