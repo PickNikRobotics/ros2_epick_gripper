@@ -39,6 +39,7 @@
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
+constexpr auto kTimeout = 500;
 
 int main()
 {
@@ -47,6 +48,9 @@ int main()
     auto serial_interface = std::make_unique<serial::Serial>();
     serial_interface->setPort(kComPort);
     serial_interface->setBaudrate(kBaudRate);
+
+    serial::Timeout timeout = serial::Timeout::simpleTimeout(kTimeout);
+    serial_interface->setTimeout(timeout);
 
     std::vector<uint8_t> activate_request{ 0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01,
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
@@ -68,19 +72,25 @@ int main()
     serial_interface->write(activate_request);
     serial_interface->flush();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Test
-
     std::cout << "Reading response..." << std::endl;
 
+    // Wait until data is available or a timeout occurs.
     std::vector<uint8_t> response;
-    serial_interface->read(response, expected_response.size());
-
-    if (response.size() != expected_response.size())
+    if (serial_interface->waitReadable())
     {
-      std::cout << "Requested " + std::to_string(expected_response.size()) + " bytes, but only got " +
-                       std::to_string(response.size())
-                << std::endl;
-      return 1;
+      // Further wait for the transmission time of expected bytes.
+      serial_interface->waitByteTimes(expected_response.size());
+      serial_interface->read(response, expected_response.size());
+    }
+    else
+    {
+      if (response.size() != expected_response.size())
+      {
+        std::cout << "Requested " + std::to_string(expected_response.size()) + " bytes, but only got " +
+                         std::to_string(response.size())
+                  << std::endl;
+        return 1;
+      }
     }
 
     std::cout << "The gripper is successfully activated." << std::endl;
