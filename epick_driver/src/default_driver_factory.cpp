@@ -26,10 +26,10 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_command_interface_factory.hpp"
+#include "epick_driver/default_driver_factory.hpp"
 
-#include "epick_driver/default_command_interface.hpp"
-#include "epick_driver/default_serial_interface.hpp"
+#include "epick_driver/default_driver.hpp"
+#include "epick_driver/default_serial.hpp"
 
 #include <rclcpp/logging.hpp>
 
@@ -39,8 +39,8 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("DefaultCommandInterfaceFactory");
 
-std::unique_ptr<epick_driver::CommandInterface>
-epick_driver::DefaultCommandInterfaceFactory::create(const hardware_interface::HardwareInfo& info)
+std::unique_ptr<epick_driver::Driver>
+epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info)
 {
   std::string usb_port = info.hardware_parameters.at("connection.usb_port");
   RCLCPP_INFO(kLogger, "connection.usb_port: %s", usb_port.c_str());
@@ -73,12 +73,12 @@ epick_driver::DefaultCommandInterfaceFactory::create(const hardware_interface::H
   double drop_action_timeout = std::stod(info.hardware_parameters.at("release.action_timeout"));
   RCLCPP_INFO(kLogger, "release.action_timeout: %f", drop_action_timeout);
 
-  auto serial_interface = std::make_unique<DefaultSerialInterface>();
+  auto serial_interface = std::make_unique<DefaultSerial>();
   serial_interface->set_port(usb_port);
   serial_interface->set_baudrate(baud_rate);
   serial_interface->set_timeout(timeout_ms);
 
-  auto command_interface = std::make_unique<DefaultCommandInterface>(std::move(serial_interface), slave_address);
+  auto command_interface = std::make_unique<DefaultDriver>(std::move(serial_interface), slave_address);
   command_interface->set_mode();
   command_interface->set_release_time();
   // TODO: set all relevant parameters.

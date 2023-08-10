@@ -28,17 +28,27 @@
 
 #pragma once
 
-#include <epick_driver/command_interface.hpp>
-
+#include <epick_driver/driver_factory.hpp>
+#include <epick_driver/default_driver_factory.hpp>
 #include <hardware_interface/hardware_info.hpp>
 
 #include <memory>
 
 namespace epick_driver
 {
-class CommandInterfaceFactory
+/**
+ * This class is used to create a default command interface to interact with the hardware.
+ */
+class DefaultDriverFactory : public DriverFactory
 {
 public:
-  virtual std::unique_ptr<CommandInterface> create(const hardware_interface::HardwareInfo& info) = 0;
+  DefaultDriverFactory() = default;
+
+  /**
+   * @brief Create a command interface.
+   * @param info The hardware information.
+   * @return A default interface to interact with the hardware.
+   */
+  std::unique_ptr<Driver> create(const hardware_interface::HardwareInfo& info);
 };
 }  // namespace epick_driver

@@ -28,46 +28,17 @@
 
 #pragma once
 
-#include <epick_driver/serial_interface.hpp>
+#include <epick_driver/driver.hpp>
+
+#include <hardware_interface/hardware_info.hpp>
+
 #include <memory>
-
-#include "serial/serial.h"
-
-namespace serial
-{
-class Serial;
-}
 
 namespace epick_driver
 {
-class DefaultSerialInterface : public SerialInterface
+class DriverFactory
 {
 public:
-  /**
-   * Creates a Serial object to send and receive bytes to and from the serial
-   * port.
-   */
-  DefaultSerialInterface();
-
-  void open() override;
-
-  [[nodiscard]] bool is_open() const override;
-
-  void close() override;
-
-  [[nodiscard]] std::vector<uint8_t> read(size_t size = 1) override;
-  void write(const std::vector<uint8_t>& data) override;
-
-  void set_port(const std::string& port) override;
-  [[nodiscard]] std::string get_port() const override;
-
-  void set_timeout(uint32_t timeout_ms) override;
-  [[nodiscard]] uint32_t get_timeout() const override;
-
-  void set_baudrate(uint32_t baudrate) override;
-  [[nodiscard]] uint32_t get_baudrate() const override;
-
-private:
-  std::unique_ptr<serial::Serial> serial_ = nullptr;
+  virtual std::unique_ptr<Driver> create(const hardware_interface::HardwareInfo& info) = 0;
 };
 }  // namespace epick_driver

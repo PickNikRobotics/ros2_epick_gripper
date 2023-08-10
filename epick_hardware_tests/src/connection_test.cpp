@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_serial_interface.hpp"
+#include "epick_driver/default_serial.hpp"
 
 #include <memory>
 #include <vector>
@@ -43,10 +43,10 @@ int main()
 {
   try
   {
-    auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
-    serial_interface->set_port(kComPort);
-    serial_interface->set_baudrate(kBaudRate);
-    serial_interface->set_timeout(kTimeout);
+    auto serial = std::make_unique<epick_driver::DefaultSerial>();
+    serial->set_port(kComPort);
+    serial->set_baudrate(kBaudRate);
+    serial->set_timeout(kTimeout);
 
     std::vector<uint8_t> activate_request{ 0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01,
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
@@ -54,8 +54,8 @@ int main()
 
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
-    serial_interface->open();
-    bool open = serial_interface->is_open();
+    serial->open();
+    bool open = serial->is_open();
     if (!open)
     {
       std::cout << "The gripper is not connected" << std::endl;
@@ -65,11 +65,11 @@ int main()
     std::cout << "The gripper is connected." << std::endl;
     std::cout << "Sending request..." << std::endl;
 
-    serial_interface->write(activate_request);
+    serial->write(activate_request);
 
     std::cout << "Reading response..." << std::endl;
 
-    std::vector<uint8_t> response = serial_interface->read(expected_response.size());
+    std::vector<uint8_t> response = serial->read(expected_response.size());
 
     std::cout << "The gripper is successfully activated." << std::endl;
   }

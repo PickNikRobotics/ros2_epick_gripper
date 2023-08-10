@@ -28,52 +28,36 @@
 
 #pragma once
 
-#include "epick_driver/command_interface.hpp"
-#include "epick_driver/serial_interface.hpp"
-
-#include <functional>
-#include <memory>
+#include <string>
 
 namespace epick_driver
 {
-
-class DefaultCommandInterface : public CommandInterface
+class Driver
 {
 public:
+  Driver() = default;
+
   /**
-   * Initialize the interface to control the Robotiq EPick gripper.
-   * @param serial_interface The serial connection.
-   * @param slave_address The slave address as specified in the MODBUS RTU protocol.
+   * @brief Connect to the serial port.
    */
-  explicit DefaultCommandInterface(std::unique_ptr<SerialInterface> serial_interface, uint8_t slave_address);
+  virtual bool connect() = 0;
 
-  /** Connect to the gripper serial connection. */
-  bool connect() override;
+  /**
+   * @brief Disconnect from the serial port.
+   */
+  virtual void disconnect() = 0;
 
-  /** Disconnect from the gripper serial connection. */
-  void disconnect() override;
+  virtual void activate() = 0;
+  virtual void deactivate() = 0;
 
-  void set_mode() override;
+  virtual void set_mode() = 0;
 
-  void set_max_device_vacuum() override;
-  void set_min_device_vacuum() override;
+  virtual void set_max_device_vacuum() = 0;
+  virtual void set_min_device_vacuum() = 0;
 
-  void set_grip_timeout() override;
-  void set_release_time() override;
+  virtual void set_grip_timeout() = 0;
+  virtual void set_release_time() = 0;
 
-  void get_status() override;
-
-  /** Activate the gripper with the specified operation mode and parameters. */
-  void activate() override;
-
-  /** Deactivate the gripper. */
-  void deactivate() override;
-
-private:
-  std::unique_ptr<SerialInterface> serial_interface_;
-  uint8_t slave_address_;
-
-  std::vector<uint8_t> createCommand(uint8_t slave_address, uint8_t function_code, uint16_t first_register_address,
-                                     const std::vector<uint16_t>& data);
+  virtual void get_status() = 0;
 };
 }  // namespace epick_driver

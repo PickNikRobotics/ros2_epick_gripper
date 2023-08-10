@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include "epick_driver/command_interface.hpp"
-#include "epick_driver/command_interface_factory.hpp"
+#include "epick_driver/driver.hpp"
+#include "epick_driver/driver_factory.hpp"
 #include "epick_driver/visibility_control.hpp"
 
 #include "hardware_interface/system_interface.hpp"
@@ -50,10 +50,10 @@ public:
 
   /**
    * Constructor with given command interface. This method is used for testing.
-   * @param command_interface The interface to send commands and queries to
+   * @param driver_factory The interface to send commands and queries to
    * the hardware.
    */
-  explicit EpickGripperHardwareInterface(std::unique_ptr<CommandInterfaceFactory> command_interface_factory);
+  explicit EpickGripperHardwareInterface(std::unique_ptr<DriverFactory> driver_factory);
 
   /**
    * Defines aliases and static functions for using the Class with shared_ptrs.
@@ -122,10 +122,10 @@ public:
 
 private:
   // Interface to interact with the hardware using the serial port.
-  std::unique_ptr<CommandInterface> command_interface_;
+  std::unique_ptr<Driver> driver_;
 
-  // Factory to create the command interface during the initialization step.
-  std::unique_ptr<CommandInterfaceFactory> command_interface_factory_;
+  // Factory to create the interface to interact with the hardware using the serial port.
+  std::unique_ptr<DriverFactory> driver_factory_;
 };
 }  // namespace epick_driver
 

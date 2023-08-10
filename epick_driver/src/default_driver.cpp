@@ -26,7 +26,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_command_interface.hpp"
+#include "epick_driver/default_driver.hpp"
 
 #include "epick_driver/crc_utils.hpp"
 #include "epick_driver/data_utils.hpp"
@@ -197,14 +197,14 @@ GripperStatus generateStatus(uint8_t register_value)
   return status;
 }
 
-DefaultCommandInterface::DefaultCommandInterface(std::unique_ptr<SerialInterface> serial_interface, uint8_t slave_address)
+DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
     std::move(serial_interface),
   }, slave_address_{slave_address}
 {
 }
 
-bool DefaultCommandInterface::connect()
+bool DefaultDriver::connect()
 {
   serial_interface_->open();
 
@@ -213,12 +213,12 @@ bool DefaultCommandInterface::connect()
   return serial_interface_->is_open();
 }
 
-void DefaultCommandInterface::disconnect()
+void DefaultDriver::disconnect()
 {
   serial_interface_->close();
 }
 
-void DefaultCommandInterface::activate()
+void DefaultDriver::activate()
 {
   // Set rACT to 1, clear all other registers.
   const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
@@ -235,7 +235,7 @@ void DefaultCommandInterface::activate()
   }
 }
 
-void DefaultCommandInterface::deactivate()
+void DefaultDriver::deactivate()
 {
   // Clear all registers.
   const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
@@ -252,27 +252,27 @@ void DefaultCommandInterface::deactivate()
   }
 }
 
-void DefaultCommandInterface::set_mode()
+void DefaultDriver::set_mode()
 {
 }
 
-void DefaultCommandInterface::set_max_device_vacuum()
+void DefaultDriver::set_max_device_vacuum()
 {
 }
 
-void DefaultCommandInterface::set_min_device_vacuum()
+void DefaultDriver::set_min_device_vacuum()
 {
 }
 
-void DefaultCommandInterface::set_grip_timeout()
+void DefaultDriver::set_grip_timeout()
 {
 }
 
-void DefaultCommandInterface::set_release_time()
+void DefaultDriver::set_release_time()
 {
 }
 
-void DefaultCommandInterface::get_status()
+void DefaultDriver::get_status()
 {
   constexpr uint16_t num_registers_to_read = 0x0003;
   std::vector<uint8_t> request = { slave_address_,
@@ -300,7 +300,7 @@ void DefaultCommandInterface::get_status()
   }
 }
 
-std::vector<uint8_t> DefaultCommandInterface::createCommand(uint8_t slave_address, uint8_t function_code,
+std::vector<uint8_t> DefaultDriver::createCommand(uint8_t slave_address, uint8_t function_code,
                                                             uint16_t first_register_address,
                                                             const std::vector<uint16_t>& data)
 {

@@ -26,8 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_command_interface.hpp"
-#include "epick_driver/default_serial_interface.hpp"
+#include "epick_driver/default_driver.hpp"
+#include "epick_driver/default_serial.hpp"
 
 #include <memory>
 #include <vector>
@@ -44,17 +44,16 @@ int main()
 {
   try
   {
-    auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
-    serial_interface->set_port(kComPort);
-    serial_interface->set_baudrate(kBaudRate);
-    serial_interface->set_timeout(kTimeout);
+    auto serial = std::make_unique<epick_driver::DefaultSerial>();
+    serial->set_port(kComPort);
+    serial->set_baudrate(kBaudRate);
+    serial->set_timeout(kTimeout);
 
-    auto command_interface =
-        std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
+    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), kSlaveAddress);
 
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
-    bool connected = command_interface->connect();
+    bool connected = driver->connect();
     if (!connected)
     {
       std::cout << "The gripper is not connected" << std::endl;
@@ -64,12 +63,12 @@ int main()
     std::cout << "The gripper is connected." << std::endl;
     std::cout << "Activating the gripper..." << std::endl;
 
-    command_interface->activate();
+    driver->activate();
 
     std::cout << "The gripper is activated." << std::endl;
     std::cout << "Reading the gripper status..." << std::endl;
 
-    command_interface->get_status();
+    driver->get_status();
 
     std::cout << "Status retrieved." << std::endl;
   }

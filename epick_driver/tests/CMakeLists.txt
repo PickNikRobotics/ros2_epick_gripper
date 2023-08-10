@@ -14,11 +14,11 @@ endif()
 ###############################################################################
 # test_default_command_interface
 
-ament_add_gmock(test_default_command_interface
-    test_default_command_interface.cpp
-    mock/mock_serial_interface.hpp
+ament_add_gmock(test_default_driver
+    test_default_driver.cpp
+    mock/mock_serial.hpp
 )
-target_include_directories(test_default_command_interface
+target_include_directories(test_default_driver
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_libraries(test_default_command_interface epick_driver)
+target_link_libraries(test_default_driver epick_driver)

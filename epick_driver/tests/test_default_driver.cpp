@@ -29,9 +29,9 @@
 
 #include <gtest/gtest.h>
 
-#include "mock/mock_serial_interface.hpp"
+#include "mock/mock_serial.hpp"
 #include "epick_driver/data_utils.hpp"
-#include "epick_driver/default_command_interface.hpp"
+#include "epick_driver/default_driver.hpp"
 
 namespace epick_driver::test
 {
@@ -42,7 +42,7 @@ using ::testing::SaveArg;
 /**
  * Here we test the driver activation command.
  */
-TEST(TestDefaultCommandInterface, activate)
+TEST(TestDefaultDriver, activate)
 {
   uint8_t slave_address = 0x09;
 
@@ -68,12 +68,11 @@ TEST(TestDefaultCommandInterface, activate)
   // clang-format on
 
   std::vector<uint8_t> actual_command;
-  auto serial_interface = std::make_unique<MockSerialInterface>();
-  EXPECT_CALL(*serial_interface, write(_)).WillOnce(SaveArg<0>(&actual_command));
+  auto serial = std::make_unique<MockSerial>();
+  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
 
-  auto command_interface =
-      std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), slave_address);
-  command_interface->activate();
+  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  driver->activate();
 
   ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
 }
@@ -81,7 +80,7 @@ TEST(TestDefaultCommandInterface, activate)
 /**
  * Here we test the driver deactivation command.
  */
-TEST(TestDefaultCommandInterface, deactivate)
+TEST(TestDefaultDriver, deactivate)
 {
   const uint8_t slave_address = 0x09;
 
@@ -107,12 +106,11 @@ TEST(TestDefaultCommandInterface, deactivate)
   // clang-format on
 
   std::vector<uint8_t> actual_command;
-  auto serial_interface = std::make_unique<MockSerialInterface>();
-  EXPECT_CALL(*serial_interface, write(_)).WillOnce(SaveArg<0>(&actual_command));
+  auto serial = std::make_unique<MockSerial>();
+  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
 
-  auto command_interface =
-      std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), slave_address);
-  command_interface->deactivate();
+  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  driver->deactivate();
 
   ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
 }

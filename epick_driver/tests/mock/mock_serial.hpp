@@ -29,13 +29,13 @@
 
 #pragma once
 
-#include "epick_driver/serial_interface.hpp"
+#include "epick_driver/serial.hpp"
 
 #include <gmock/gmock.h>
 
 namespace epick_driver::test
 {
-class MockSerialInterface : public epick_driver::SerialInterface
+class MockSerial : public epick_driver::Serial
 {
 public:
   MOCK_METHOD(void, open, (), (override));

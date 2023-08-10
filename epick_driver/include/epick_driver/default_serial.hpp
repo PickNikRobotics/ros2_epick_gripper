@@ -28,27 +28,46 @@
 
 #pragma once
 
-#include <epick_driver/command_interface_factory.hpp>
-#include <epick_driver/default_command_interface_factory.hpp>
-#include <hardware_interface/hardware_info.hpp>
-
+#include <epick_driver/serial.hpp>
 #include <memory>
+
+#include "serial/serial.h"
+
+namespace serial
+{
+class Serial;
+}
 
 namespace epick_driver
 {
-/**
- * This class is used to create a default command interface to interact with the hardware.
- */
-class DefaultCommandInterfaceFactory : public CommandInterfaceFactory
+class DefaultSerial : public Serial
 {
 public:
-  DefaultCommandInterfaceFactory() = default;
-
   /**
-   * @brief Create a command interface.
-   * @param info The hardware information.
-   * @return A default interface to interact with the hardware.
+   * Creates a Serial object to send and receive bytes to and from the serial
+   * port.
    */
-  std::unique_ptr<CommandInterface> create(const hardware_interface::HardwareInfo& info);
+  DefaultSerial();
+
+  void open() override;
+
+  [[nodiscard]] bool is_open() const override;
+
+  void close() override;
+
+  [[nodiscard]] std::vector<uint8_t> read(size_t size = 1) override;
+  void write(const std::vector<uint8_t>& data) override;
+
+  void set_port(const std::string& port) override;
+  [[nodiscard]] std::string get_port() const override;
+
+  void set_timeout(uint32_t timeout_ms) override;
+  [[nodiscard]] uint32_t get_timeout() const override;
+
+  void set_baudrate(uint32_t baudrate) override;
+  [[nodiscard]] uint32_t get_baudrate() const override;
+
+private:
+  std::unique_ptr<serial::Serial> serial_ = nullptr;
 };
 }  // namespace epick_driver

@@ -28,7 +28,7 @@
 
 #include "epick_driver/epick_gripper_hardware_interface.hpp"
 
-#include "epick_driver/default_command_interface_factory.hpp"
+#include "epick_driver/default_driver_factory.hpp"
 #include "serial/serial.h"
 
 #include <rclcpp/logging.hpp>
@@ -39,13 +39,13 @@ const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
-  command_interface_factory_ = std::make_unique<DefaultCommandInterfaceFactory>();
+  driver_factory_ = std::make_unique<DefaultDriverFactory>();
 }
 
 // This constructor is use for testing only.
 EpickGripperHardwareInterface::EpickGripperHardwareInterface(
-    std::unique_ptr<CommandInterfaceFactory> command_interface_factory)
-  : command_interface_factory_{ std::move(command_interface_factory) }
+    std::unique_ptr<DriverFactory> driver_factory)
+  : driver_factory_{ std::move(driver_factory) }
 {
 }
 
@@ -62,7 +62,7 @@ EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& i
       return CallbackReturn::ERROR;
     }
 
-    command_interface_ = command_interface_factory_->create(info);
+    driver_ = driver_factory_->create(info);
 
     return CallbackReturn::SUCCESS;
   }
@@ -85,7 +85,7 @@ EpickGripperHardwareInterface::on_configure(const rclcpp_lifecycle::State& previ
     }
 
     // Open the serial port and handshake.
-    bool connected = command_interface_->connect();
+    bool connected = driver_->connect();
     if (!connected)
     {
       RCLCPP_ERROR(kLogger, "Cannot connect to the Robotiq EPick gripper");
@@ -115,8 +115,8 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
   RCLCPP_DEBUG(kLogger, "on_activate");
   try
   {
-    command_interface_->deactivate();
-    command_interface_->activate();
+    driver_->deactivate();
+    driver_->activate();
   }
   catch (const serial::IOException& e)
   {
@@ -133,7 +133,7 @@ EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifec
   RCLCPP_DEBUG(kLogger, "on_deactivate");
   try
   {
-    command_interface_->deactivate();
+    driver_->deactivate();
   }
   catch (const std::exception& e)
   {

@@ -26,35 +26,33 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_serial_interface.hpp"
+#include "epick_driver/default_serial.hpp"
 
 #include <serial/serial.h>
-
-#include <epick_driver/default_serial_interface.hpp>
 
 namespace epick_driver
 {
 
-DefaultSerialInterface::DefaultSerialInterface() : serial_{ std::make_unique<serial::Serial>() }
+DefaultSerial::DefaultSerial() : serial_{ std::make_unique<serial::Serial>() }
 {
 }
 
-void DefaultSerialInterface::open()
+void DefaultSerial::open()
 {
   serial_->open();
 }
 
-bool DefaultSerialInterface::is_open() const
+bool DefaultSerial::is_open() const
 {
   return serial_->isOpen();
 }
 
-void DefaultSerialInterface::close()
+void DefaultSerial::close()
 {
   serial_->close();
 }
 
-std::vector<uint8_t> DefaultSerialInterface::read(size_t size)
+std::vector<uint8_t> DefaultSerial::read(size_t size)
 {
   std::vector<uint8_t> data;
 
@@ -77,7 +75,7 @@ std::vector<uint8_t> DefaultSerialInterface::read(size_t size)
   return data;
 }
 
-void DefaultSerialInterface::write(const std::vector<uint8_t>& data)
+void DefaultSerial::write(const std::vector<uint8_t>& data)
 {
   std::size_t num_bytes_written = serial_->write(data);
   serial_->flush();
@@ -89,34 +87,34 @@ void DefaultSerialInterface::write(const std::vector<uint8_t>& data)
   }
 }
 
-void DefaultSerialInterface::set_port(const std::string& port)
+void DefaultSerial::set_port(const std::string& port)
 {
   serial_->setPort(port);
 }
 
-std::string DefaultSerialInterface::get_port() const
+std::string DefaultSerial::get_port() const
 {
   return serial_->getPort();
 }
 
-void DefaultSerialInterface::set_timeout(uint32_t timeout_ms)
+void DefaultSerial::set_timeout(uint32_t timeout_ms)
 {
   serial::Timeout timeout = serial::Timeout::simpleTimeout(timeout_ms);
   serial_->setTimeout(timeout);
 }
 
-uint32_t DefaultSerialInterface::get_timeout() const
+uint32_t DefaultSerial::get_timeout() const
 {
   uint32_t timeout_ms = serial_->getTimeout().read_timeout_constant;
   return timeout_ms;
 }
 
-void DefaultSerialInterface::set_baudrate(uint32_t baudrate)
+void DefaultSerial::set_baudrate(uint32_t baudrate)
 {
   serial_->setBaudrate(baudrate);
 }
 
-uint32_t DefaultSerialInterface::get_baudrate() const
+uint32_t DefaultSerial::get_baudrate() const
 {
   return serial_->getBaudrate();
 }
