@@ -35,6 +35,8 @@
 
 #include <rclcpp/logging.hpp>
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 // |-----------------------------+-------------------------------+
@@ -167,7 +169,7 @@ void DefaultDriver::activate()
     0x00,  // Number of registers to write MSB.
     0x03,  // Number of registers to write LSB.
     0x06,  // Number of bytes to write.
-    0x01,  // Register 1 MSB.
+    0x01,  // Register 1 MSB - set gACT to 1.
     0x00,  // Register 1 LSB.
     0x00,  // Register 2 MSB.
     0x00,  // Register 2 LSB.
@@ -222,6 +224,22 @@ void DefaultDriver::deactivate()
     RCLCPP_ERROR(kLogger, "Failed to deactivate the gripper: %s", e.what());
     throw;
   }
+}
+
+void DefaultDriver::grip()
+{
+}
+
+void DefaultDriver::release()
+{
+}
+
+void DefaultDriver::set_relative_pressure(const float& relative_pressure_kPa)
+{
+  double absolute_pressure = relative_pressure_kPa + 100.0;
+
+  // Convert the absolute pressure to a value between 0 and 255.
+  uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(absolute_pressure), 0.0, 255.0));
 }
 
 void DefaultDriver::set_mode()

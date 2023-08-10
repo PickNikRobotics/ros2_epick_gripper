@@ -71,18 +71,17 @@ class Driver
 public:
   Driver() = default;
 
-  /**
-   * @brief Connect to the serial port.
-   */
   virtual bool connect() = 0;
 
-  /**
-   * @brief Disconnect from the serial port.
-   */
   virtual void disconnect() = 0;
 
   virtual void activate() = 0;
   virtual void deactivate() = 0;
+
+  virtual void grip() = 0;
+  virtual void release() = 0;
+
+  virtual void set_relative_pressure(const float& relative_pressure_kPa) = 0;
 
   virtual void set_mode() = 0;
 
