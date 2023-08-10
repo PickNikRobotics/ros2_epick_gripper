@@ -69,6 +69,5 @@ public:
 
 private:
   std::unique_ptr<serial::Serial> serial_ = nullptr;
-  uint32_t timeout_ms_ = 0;
 };
 }  // namespace epick_driver

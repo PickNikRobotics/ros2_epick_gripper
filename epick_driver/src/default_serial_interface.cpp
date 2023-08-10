@@ -34,6 +34,7 @@
 
 namespace epick_driver
 {
+
 DefaultSerialInterface::DefaultSerialInterface() : serial_{ std::make_unique<serial::Serial>() }
 {
 }
@@ -56,14 +57,23 @@ void DefaultSerialInterface::close()
 std::vector<uint8_t> DefaultSerialInterface::read(size_t size)
 {
   std::vector<uint8_t> data;
-  size_t num_bytes_read = serial_->read(data, size);
-  if (num_bytes_read != size)
-  {
-    const auto error_msg =
-        "Requested " + std::to_string(size) + " bytes, but only got " + std::to_string(num_bytes_read);
-    THROW(serial::IOException, error_msg.c_str());
-  }
 
+  // Wait until data is available or a timeout occurs.
+  if (serial_->waitReadable())
+  {
+    // Further wait for the transmission time of expected bytes.
+    serial_->waitByteTimes(size);
+    serial_->read(data, size);
+  }
+  else
+  {
+    if (data.size() != size)
+    {
+      const auto error_msg =
+          "Requested " + std::to_string(size) + " bytes, but only got " + std::to_string(data.size());
+      THROW(serial::IOException, error_msg.c_str());
+    }
+  }
   return data;
 }
 
@@ -91,14 +101,14 @@ std::string DefaultSerialInterface::get_port() const
 
 void DefaultSerialInterface::set_timeout(uint32_t timeout_ms)
 {
-  timeout_ms_ = timeout_ms;
   serial::Timeout timeout = serial::Timeout::simpleTimeout(timeout_ms);
   serial_->setTimeout(timeout);
 }
 
 uint32_t DefaultSerialInterface::get_timeout() const
 {
-  return timeout_ms_;
+  uint32_t timeout_ms = serial_->getTimeout().read_timeout_constant;
+  return timeout_ms;
 }
 
 void DefaultSerialInterface::set_baudrate(uint32_t baudrate)

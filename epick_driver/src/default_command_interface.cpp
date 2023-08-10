@@ -35,8 +35,6 @@
 
 #include <rclcpp/logging.hpp>
 
-#include <chrono>
-#include <thread>
 #include <iostream>
 
 // |-----------------------------+-------------------------------+
@@ -228,7 +226,6 @@ void DefaultCommandInterface::activate()
   try
   {
     serial_interface_->write(request);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto response = serial_interface_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
@@ -246,7 +243,6 @@ void DefaultCommandInterface::deactivate()
   try
   {
     serial_interface_->write(request);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto response = serial_interface_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
@@ -293,7 +289,6 @@ void DefaultCommandInterface::get_status()
   {
     serial_interface_->write(request);
     constexpr uint16_t response_size = 0x000B;
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     auto response = serial_interface_->read(response_size);
 
     std::cout << data_utils::to_hex(response) << std::endl;

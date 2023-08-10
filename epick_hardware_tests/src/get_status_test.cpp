@@ -36,6 +36,7 @@
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kSlaveAddress = 0x09;
+constexpr auto kTimeout = 500;  // milliseconds
 
 int main()
 {
@@ -44,6 +45,7 @@ int main()
     auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
     serial_interface->set_port(kComPort);
     serial_interface->set_baudrate(kBaudRate);
+    serial_interface->set_timeout(kTimeout);
 
     auto command_interface =
         std::make_unique<epick_driver::DefaultCommandInterface>(std::move(serial_interface), kSlaveAddress);
