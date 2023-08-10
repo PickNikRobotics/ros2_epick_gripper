@@ -37,7 +37,7 @@
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
-constexpr auto kTimeout = 500;
+constexpr auto kTimeout = 500;  // milliseconds
 
 int main()
 {
