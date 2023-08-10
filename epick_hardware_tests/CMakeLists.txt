@@ -41,10 +41,4 @@ target_include_directories(get_status_test
 target_link_libraries(get_status_test epick_driver::epick_driver)
 ament_target_dependencies(get_status_test epick_driver)
 
-add_executable(read_input_register_test src/read_input_register_test.cpp)
-target_include_directories(read_input_register_test
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(read_input_register_test epick_driver::epick_driver)
-ament_target_dependencies(read_input_register_test epick_driver)
-
 ament_package()
