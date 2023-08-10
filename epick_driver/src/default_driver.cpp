@@ -239,7 +239,31 @@ void DefaultDriver::set_relative_pressure(const float& relative_pressure_kPa)
   double absolute_pressure = relative_pressure_kPa + 100.0;
 
   // Convert the absolute pressure to a value between 0 and 255.
-  uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(absolute_pressure), 0.0, 255.0));
+  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(absolute_pressure), 0.0, 255.0));
+
+  std::vector<uint8_t> request = {
+    slave_address_,
+    static_cast<uint8_t>(kFunctionCode::PresetSingleRegister),
+    0x03,  // Register address MSB
+    0xE9,  // Register address LSB
+    0x00,  // Reserved byte
+    rPR    // The relative pressure.
+  };
+  auto crc = crc_utils::compute_crc(request);
+  request.push_back(data_utils::get_msb(crc));
+  request.push_back(data_utils::get_lsb(crc));
+
+  std::vector<uint8_t> response;
+  try
+  {
+    serial_interface_->write(request);
+    response = serial_interface_->read(kWriteResponseSize);
+  }
+  catch (const serial::IOException& e)
+  {
+    RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
+    throw;
+  }
 }
 
 void DefaultDriver::set_mode()
@@ -280,8 +304,7 @@ GripperStatus DefaultDriver::get_status()
   try
   {
     serial_interface_->write(request);
-    constexpr uint16_t response_size = 0x000B;
-    response = serial_interface_->read(response_size);
+    response = serial_interface_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {

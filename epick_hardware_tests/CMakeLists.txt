@@ -29,16 +29,26 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   serial
 )
 
-add_executable(connection_test src/connection_test.cpp)
-target_include_directories(connection_test
+add_executable(connect src/connect.cpp)
+target_include_directories(connect
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(connection_test epick_driver::epick_driver)
-ament_target_dependencies(connection_test epick_driver)
+target_link_libraries(connect epick_driver::epick_driver)
+ament_target_dependencies(connect epick_driver)
 
-add_executable(get_status_test src/get_status_test.cpp)
-target_include_directories(get_status_test
+add_executable(get_status src/get_status.cpp)
+target_include_directories(get_status
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(get_status_test epick_driver::epick_driver)
-ament_target_dependencies(get_status_test epick_driver)
+target_link_libraries(get_status epick_driver::epick_driver)
+ament_target_dependencies(get_status epick_driver)
+
+add_executable(set_relative_pressure
+    src/set_relative_pressure.cpp
+    src/command_line_utility.hpp
+    src/command_line_utility.cpp
+)
+target_include_directories(set_relative_pressure
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(set_relative_pressure epick_driver::epick_driver)
+ament_target_dependencies(set_relative_pressure epick_driver)
 
 ament_package()
