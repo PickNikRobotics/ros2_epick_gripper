@@ -32,6 +32,39 @@
 
 namespace epick_driver
 {
+
+enum class GripperActivation
+{
+  Inactive,
+  Active,
+};
+
+enum class ObjectDetection
+{
+  Unknown,
+  ObjectDetected,
+  NoObjectDetected
+};
+
+enum class Regulate
+{
+
+};
+
+enum class GripperMode
+{
+  AutomaticMode,
+  AdvancedMode,
+  Reserved
+};
+
+struct GripperStatus
+{
+  GripperActivation activation;
+  GripperMode mode;
+  ObjectDetection object_detection;
+};
+
 class Driver
 {
 public:
@@ -58,6 +91,6 @@ public:
   virtual void set_grip_timeout() = 0;
   virtual void set_release_time() = 0;
 
-  virtual void get_status() = 0;
+  virtual GripperStatus get_status() = 0;
 };
 }  // namespace epick_driver

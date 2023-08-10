@@ -29,6 +29,7 @@
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
 
+#include <map>
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -68,9 +69,30 @@ int main()
     std::cout << "The gripper is activated." << std::endl;
     std::cout << "Reading the gripper status..." << std::endl;
 
-    driver->get_status();
+    epick_driver::GripperStatus status = driver->get_status();
 
     std::cout << "Status retrieved." << std::endl;
+
+    static std::map<epick_driver::GripperActivation, std::string> gripper_activation_names = {
+      { epick_driver::GripperActivation::Inactive, "Inactive" },
+      { epick_driver::GripperActivation::Active, "Active" },
+    };
+
+    static std::map<epick_driver::ObjectDetection, std::string> object_detection_names = {
+      { epick_driver::ObjectDetection::Unknown, "Unknown" },
+      { epick_driver::ObjectDetection::ObjectDetected, "ObjectDetected" },
+      { epick_driver::ObjectDetection::NoObjectDetected, "NoObjectDetected" },
+    };
+
+    static std::map<epick_driver::GripperMode, std::string> gripper_mode_names = {
+      { epick_driver::GripperMode::AutomaticMode, "AutomaticMode" },
+      { epick_driver::GripperMode::AdvancedMode, "AdvancedMode" },
+      { epick_driver::GripperMode::Reserved, "Reserved" }
+    };
+
+    std::cout << "Activation: " << gripper_activation_names.at(status.activation) << std::endl;
+    std::cout << "Mode: " << gripper_mode_names.at(status.mode) << std::endl;
+    std::cout << "Object detection: " << object_detection_names.at(status.object_detection) << std::endl;
   }
   catch (const serial::IOException& e)
   {

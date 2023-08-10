@@ -36,7 +36,6 @@
 
 namespace epick_driver
 {
-
 class DefaultDriver : public Driver
 {
 public:
@@ -61,7 +60,7 @@ public:
   void set_grip_timeout() override;
   void set_release_time() override;
 
-  void get_status() override;
+  GripperStatus get_status() override;
 
   /** Activate the gripper with the specified operation mode and parameters. */
   void activate() override;

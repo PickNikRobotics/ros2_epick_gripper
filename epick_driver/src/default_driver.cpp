@@ -102,100 +102,42 @@ constexpr uint8_t gVAS_mask = 0b00000011;  // Vacuum actuator status
 constexpr uint8_t kFLT_mask = 0b11110000;  //
 constexpr uint8_t gFLT_mask = 0b00001111;  // Gripper fault status
 
-enum class GripperActivation
+// clang-format off
+const std::unordered_map<uint8_t, GripperActivation>& gACT_lookup()
 {
-  Inactive,  // 0b0
-  Active,    // 0b1
-};
-
-enum class ObjectDetection
-{
-  Unknown,
-  ObjectDetected,
-  NoObjectDetected
-};
-
-enum class Regulate
-{
-
-};
-
-enum class GripperMode
-{
-  AutomaticMode,
-  AdvancedMode,
-  Reserved
-};
-
-struct GripperStatus
-{
-  GripperActivation activation;
-  GripperMode mode;
-  ObjectDetection object_detection;
-};
-
-GripperStatus generateStatus(uint8_t register_value)
-{
-  GripperStatus status;
-
-  uint8_t gACT = register_value & gACT_mask;
-  switch (gACT)
-  {
-    case 0b0:
-      status.activation = GripperActivation::Inactive;
-      break;
-    case 0b1:
-      status.activation = GripperActivation::Active;
-      break;
-  }
-
-  uint8_t gMOD = (register_value & gMOD_mask) >> 1;
-  switch (gMOD)
-  {
-    case 0b00:
-      status.mode = GripperMode::AutomaticMode;
-      break;
-    case 0b01:
-      status.mode = GripperMode::AdvancedMode;
-      break;
-    case 0b10:
-      status.mode = GripperMode::Reserved;
-      break;
-    case 0b11:
-      status.mode = GripperMode::Reserved;
-      break;
-  }
-
-  uint8_t gGTO = (register_value & gGTO_mask) >> 3;
-  switch (gGTO)
-  {
-    case 0b0:
-      status.activation = GripperActivation::Inactive;
-      break;
-    case 0b1:
-      status.activation = GripperActivation::Active;
-      break;
-  }
-
-  uint8_t gOBJ = (register_value & gOBJ_mask) >> 4;
-  switch (gOBJ)
-  {
-    case 0b00:
-      status.object_detection = ObjectDetection::Unknown;
-      break;
-    case 0b01:
-      status.object_detection = ObjectDetection::ObjectDetected;
-      break;
-    case 0b10:
-      status.object_detection = ObjectDetection::ObjectDetected;
-      break;
-    case 0b11:
-      status.object_detection = ObjectDetection::NoObjectDetected;
-      break;
-  }
-
-  return status;
+  static const std::unordered_map<uint8_t, GripperActivation> map{
+    { 0b0, GripperActivation::Active },
+    { 0b1, GripperActivation::Inactive },
+  };
+  return map;
 }
+
+const std::unordered_map<uint8_t, Regulate>& gGTO_lookup()
+{
+  static const std::unordered_map<uint8_t, Regulate> map{};
+  return map;
+}
+
+const std::unordered_map<uint8_t, GripperMode>& gMOD_lookup()
+{
+  static const std::unordered_map<uint8_t, GripperMode> map{
+    { 0b00, GripperMode::AutomaticMode },
+    { 0b01, GripperMode::AdvancedMode },
+    { 0b10, GripperMode::Reserved },
+    { 0b11, GripperMode::Reserved } };
+  return map;
+}
+
+const std::unordered_map<uint8_t, ObjectDetection> gOBJ_lookup()
+{
+  static const std::unordered_map<uint8_t, ObjectDetection> map{
+    { 0b00, ObjectDetection::Unknown },
+    { 0b01, ObjectDetection::ObjectDetected },
+    { 0b10, ObjectDetection::ObjectDetected },
+    { 0b11, ObjectDetection::NoObjectDetected } };
+  return map;
+}
+// clang-format on
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
@@ -272,7 +214,7 @@ void DefaultDriver::set_release_time()
 {
 }
 
-void DefaultDriver::get_status()
+GripperStatus DefaultDriver::get_status()
 {
   constexpr uint16_t num_registers_to_read = 0x0003;
   std::vector<uint8_t> request = { slave_address_,
@@ -285,24 +227,30 @@ void DefaultDriver::get_status()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
+  std::vector<uint8_t> response;
   try
   {
     serial_interface_->write(request);
     constexpr uint16_t response_size = 0x000B;
-    auto response = serial_interface_->read(response_size);
-
-    std::cout << data_utils::to_hex(response) << std::endl;
+    response = serial_interface_->read(response_size);
   }
   catch (const serial::IOException& e)
   {
     RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
     throw;
   }
+
+  GripperStatus status;
+  status.activation = gACT_lookup().at(response[0] & gACT_mask);
+  status.mode = gMOD_lookup().at((response[0] & gMOD_mask) >> 1);
+  // TODO: implement this gGTO.
+  status.object_detection = gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
+
+  return status;
 }
 
 std::vector<uint8_t> DefaultDriver::createCommand(uint8_t slave_address, uint8_t function_code,
-                                                            uint16_t first_register_address,
-                                                            const std::vector<uint16_t>& data)
+                                                  uint16_t first_register_address, const std::vector<uint16_t>& data)
 {
   uint16_t num_registers = data.size();
   uint8_t num_bytes = 2 * num_registers;
