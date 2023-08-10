@@ -33,6 +33,8 @@
 #include <vector>
 #include <iostream>
 
+// With this test we connect to the gripper, activate it and read its status.
+
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kSlaveAddress = 0x09;
