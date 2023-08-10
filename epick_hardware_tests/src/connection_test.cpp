@@ -26,11 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_serial_interface.hpp"
+#include "serial/serial.h"
 
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 // This is a very basic test to check if the gripper is correctly wired.
 // We send an activation request and await for an expected response.
@@ -43,10 +45,12 @@ int main()
 {
   try
   {
-    auto serial_interface = std::make_unique<epick_driver::DefaultSerialInterface>();
-    serial_interface->set_port(kComPort);
-    serial_interface->set_baudrate(kBaudRate);
-    serial_interface->set_timeout(kTimeout);
+    auto serial_interface = std::make_unique<serial::Serial>();
+    serial_interface->setPort(kComPort);
+    serial_interface->setBaudrate(kBaudRate);
+
+    serial::Timeout timeout = serial::Timeout::simpleTimeout(kTimeout);
+    serial_interface->setTimeout(timeout);
 
     std::vector<uint8_t> activate_request{ 0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01,
                                            0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
@@ -55,7 +59,7 @@ int main()
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
     serial_interface->open();
-    bool open = serial_interface->is_open();
+    bool open = serial_interface->isOpen();
     if (!open)
     {
       std::cout << "The gripper is not connected" << std::endl;
@@ -66,10 +70,28 @@ int main()
     std::cout << "Sending request..." << std::endl;
 
     serial_interface->write(activate_request);
+    serial_interface->flush();
 
     std::cout << "Reading response..." << std::endl;
 
-    std::vector<uint8_t> response = serial_interface->read(expected_response.size());
+    // Wait until data is available or a timeout occurs.
+    std::vector<uint8_t> response;
+    if (serial_interface->waitReadable())
+    {
+      // Further wait for the transmission time of expected bytes.
+      serial_interface->waitByteTimes(expected_response.size());
+      serial_interface->read(response, expected_response.size());
+    }
+    else
+    {
+      if (response.size() != expected_response.size())
+      {
+        std::cout << "Requested " + std::to_string(expected_response.size()) + " bytes, but only got " +
+                         std::to_string(response.size())
+                  << std::endl;
+        return 1;
+      }
+    }
 
     std::cout << "The gripper is successfully activated." << std::endl;
   }
