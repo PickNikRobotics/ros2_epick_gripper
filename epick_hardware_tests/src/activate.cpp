@@ -26,7 +26,10 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
+
+#include "command_line_utility.hpp"
 
 #include <memory>
 #include <vector>
@@ -38,40 +41,68 @@
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 500;  // milliseconds
+constexpr auto kSlaveAddress = 0x09;
 
-int main()
+int main(int argc, char* argv[])
 {
+  CommandLineUtility cli;
+
+  std::string port = kComPort;
+  cli.registerHandler(
+      "--port", [&port](const char* value) { port = value; }, false);
+
+  int baudrate = kBaudRate;
+  cli.registerHandler(
+      "--baudrate", [&baudrate](const char* value) { baudrate = std::stoi(value); }, false);
+
+  int timeout = kTimeout;
+  cli.registerHandler(
+      "--timeout", [&timeout](const char* value) { timeout = std::stoi(value); }, false);
+
+  int slave_address = kSlaveAddress;
+  cli.registerHandler(
+      "--slave_address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
+
+  cli.registerHandler("-h", []() {
+    std::cout << "Usage: ./connect [OPTIONS]\n"
+              << "Options:\n"
+              << "  --port VALUE            Set the com port (default " << kComPort << ")\n"
+              << "  --baudrate VALUE        Set the baudrate (default " << kBaudRate << "bps)\n"
+              << "  --timeout VALUE         Set the read/write timeout (default " << kTimeout << "ms)\n"
+              << "  --slave_address VALUE   Set the slave address (default " << kSlaveAddress << ")\n"
+              << "  -h                      Show this help message\n";
+    exit(0);
+  });
+
+  if (!cli.parse(argc, argv))
+  {
+    return 1;
+  }
+
   try
   {
     auto serial = std::make_unique<epick_driver::DefaultSerial>();
-    serial->set_port(kComPort);
-    serial->set_baudrate(kBaudRate);
-    serial->set_timeout(kTimeout);
+    serial->set_port(port);
+    serial->set_baudrate(baudrate);
+    serial->set_timeout(timeout);
 
-    std::vector<uint8_t> activate_request{ 0x09, 0x10, 0x03, 0xE8, 0x00, 0x03, 0x06, 0x01,
-                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x72, 0xE1 };
-    std::vector<uint8_t> expected_response{ 0x09, 0x10, 0x03, 0xe8, 0x00, 0x03, 0x01, 0x30 };
+    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
 
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
-    serial->open();
-    bool open = serial->is_open();
-    if (!open)
+    bool connected = driver->connect();
+    if (!connected)
     {
       std::cout << "The gripper is not connected" << std::endl;
       return 1;
     }
 
     std::cout << "The gripper is connected." << std::endl;
-    std::cout << "Sending request..." << std::endl;
+    std::cout << "Activating the gripper..." << std::endl;
 
-    serial->write(activate_request);
+    driver->activate();
 
-    std::cout << "Reading response..." << std::endl;
-
-    std::vector<uint8_t> response = serial->read(expected_response.size());
-
-    std::cout << "The gripper is successfully activated." << std::endl;
+    std::cout << "The gripper is activated." << std::endl;
   }
   catch (const serial::IOException& e)
   {

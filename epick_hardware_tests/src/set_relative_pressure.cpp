@@ -31,7 +31,6 @@
 
 #include "command_line_utility.hpp"
 
-#include <map>
 #include <memory>
 #include <vector>
 #include <iostream>
@@ -40,8 +39,8 @@
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
-constexpr auto kSlaveAddress = 0x09;
 constexpr auto kTimeout = 500;  // milliseconds
+constexpr auto kSlaveAddress = 0x09;
 
 int main(int argc, char* argv[])
 {
@@ -68,7 +67,7 @@ int main(int argc, char* argv[])
       "--pressure", [&pressure](const char* value) { pressure = std::strtod(value, nullptr); }, true);
 
   cli.registerHandler("-h", []() {
-    std::cout << "Usage: ./your_program_name [OPTIONS]\n"
+    std::cout << "Usage: ./set_relative_pressure [OPTIONS]\n"
               << "Options:\n"
               << "  --port VALUE            Set the com port (default " << kComPort << ")\n"
               << "  --baudrate VALUE        Set the baudrate (default " << kBaudRate << "bps)\n"
@@ -81,7 +80,7 @@ int main(int argc, char* argv[])
 
   if (!cli.parse(argc, argv))
   {
-    return 1;  // Error occurred during parsing
+    return 1;
   }
 
   try

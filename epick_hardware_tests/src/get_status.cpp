@@ -29,6 +29,8 @@
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
 
+#include "command_line_utility.hpp"
+
 #include <map>
 #include <memory>
 #include <vector>
@@ -38,19 +40,53 @@
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
-constexpr auto kSlaveAddress = 0x09;
 constexpr auto kTimeout = 500;  // milliseconds
+constexpr auto kSlaveAddress = 0x09;
 
-int main()
+int main(int argc, char* argv[])
 {
+  CommandLineUtility cli;
+
+  std::string port = kComPort;
+  cli.registerHandler(
+      "--port", [&port](const char* value) { port = value; }, false);
+
+  int baudrate = kBaudRate;
+  cli.registerHandler(
+      "--baudrate", [&baudrate](const char* value) { baudrate = std::stoi(value); }, false);
+
+  int timeout = kTimeout;
+  cli.registerHandler(
+      "--timeout", [&timeout](const char* value) { timeout = std::stoi(value); }, false);
+
+  int slave_address = kSlaveAddress;
+  cli.registerHandler(
+      "--slave_address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
+
+  cli.registerHandler("-h", []() {
+    std::cout << "Usage: ./connect [OPTIONS]\n"
+              << "Options:\n"
+              << "  --port VALUE            Set the com port (default " << kComPort << ")\n"
+              << "  --baudrate VALUE        Set the baudrate (default " << kBaudRate << "bps)\n"
+              << "  --timeout VALUE         Set the read/write timeout (default " << kTimeout << "ms)\n"
+              << "  --slave_address VALUE   Set the slave address (default " << kSlaveAddress << ")\n"
+              << "  -h                      Show this help message\n";
+    exit(0);
+  });
+
+  if (!cli.parse(argc, argv))
+  {
+    return 1;
+  }
+
   try
   {
     auto serial = std::make_unique<epick_driver::DefaultSerial>();
-    serial->set_port(kComPort);
-    serial->set_baudrate(kBaudRate);
-    serial->set_timeout(kTimeout);
+    serial->set_port(port);
+    serial->set_baudrate(baudrate);
+    serial->set_timeout(timeout);
 
-    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), kSlaveAddress);
+    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
 
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
