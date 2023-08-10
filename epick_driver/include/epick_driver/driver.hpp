@@ -63,6 +63,7 @@ struct GripperStatus
   GripperActivation activation;
   GripperMode mode;
   ObjectDetection object_detection;
+  double actual_pressure;
 };
 
 class Driver

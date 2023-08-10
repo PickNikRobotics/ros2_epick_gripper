@@ -83,7 +83,7 @@ constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
 // - CRC (2 bytes)
 constexpr int kWriteResponseSize = 8;
 
-const auto kLogger = rclcpp::get_logger("DefaultCommandInterface");
+const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
 enum class kFunctionCode : uint8_t
 {
@@ -149,9 +149,6 @@ DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t s
 bool DefaultDriver::connect()
 {
   serial_interface_->open();
-
-  // TODO: ask for the gripper status. If the gripper answer, then all is up and running.
-
   return serial_interface_->is_open();
 }
 
@@ -162,9 +159,25 @@ void DefaultDriver::disconnect()
 
 void DefaultDriver::activate()
 {
-  // Set rACT to 1, clear all other registers.
-  const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
-                                     kActionRequestRegisterAddress, { 0x0100, 0x0000, 0x0000 });
+  std::vector<uint8_t> request = {
+    slave_address_,
+    static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+    data_utils::get_msb(kActionRequestRegisterAddress),
+    data_utils::get_lsb(kActionRequestRegisterAddress),
+    0x00,  // Number of registers to write MSB.
+    0x03,  // Number of registers to write LSB.
+    0x06,  // Number of bytes to write.
+    0x01,  // Register 1 MSB.
+    0x00,  // Register 1 LSB.
+    0x00,  // Register 2 MSB.
+    0x00,  // Register 2 LSB.
+    0x00,  // Register 3 MSB.
+    0x00,  // Register 3 LSB.
+
+  };
+  auto crc = crc_utils::compute_crc(request);
+  request.push_back(data_utils::get_msb(crc));
+  request.push_back(data_utils::get_lsb(crc));
   try
   {
     serial_interface_->write(request);
@@ -179,9 +192,26 @@ void DefaultDriver::activate()
 
 void DefaultDriver::deactivate()
 {
-  // Clear all registers.
-  const auto request = createCommand(slave_address_, static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
-                                     kActionRequestRegisterAddress, { 0x0000, 0x0000, 0x0000 });
+  std::vector<uint8_t> request = {
+    slave_address_,
+    static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+    data_utils::get_msb(kActionRequestRegisterAddress),
+    data_utils::get_lsb(kActionRequestRegisterAddress),
+    0x00,  // Number of registers to write MSB.
+    0x03,  // Number of registers to write LSB.
+    0x06,  // Number of bytes to write.
+    0x00,  // Register 1 MSB.
+    0x00,  // Register 1 LSB.
+    0x00,  // Register 2 MSB.
+    0x00,  // Register 2 LSB.
+    0x00,  // Register 3 MSB.
+    0x00,  // Register 3 LSB.
+
+  };
+  auto crc = crc_utils::compute_crc(request);
+  request.push_back(data_utils::get_msb(crc));
+  request.push_back(data_utils::get_lsb(crc));
+
   try
   {
     serial_interface_->write(request);
@@ -216,13 +246,14 @@ void DefaultDriver::set_release_time()
 
 GripperStatus DefaultDriver::get_status()
 {
-  constexpr uint16_t num_registers_to_read = 0x0003;
-  std::vector<uint8_t> request = { slave_address_,
-                                   static_cast<uint8_t>(kFunctionCode::ReadInputRegisters),
-                                   data_utils::get_msb(kGripperStatusRegister),
-                                   data_utils::get_lsb(kGripperStatusRegister),
-                                   data_utils::get_msb(num_registers_to_read),
-                                   data_utils::get_lsb(num_registers_to_read) };
+  std::vector<uint8_t> request = {
+    slave_address_,
+    static_cast<uint8_t>(kFunctionCode::ReadInputRegisters),
+    data_utils::get_msb(kGripperStatusRegister),
+    data_utils::get_lsb(kGripperStatusRegister),
+    0x00,  // Number of registers to read MSB
+    0x03   // Number of registers to read LSB
+  };
   auto crc = crc_utils::compute_crc(request);
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
@@ -247,31 +278,5 @@ GripperStatus DefaultDriver::get_status()
   status.object_detection = gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
 
   return status;
-}
-
-std::vector<uint8_t> DefaultDriver::createCommand(uint8_t slave_address, uint8_t function_code,
-                                                  uint16_t first_register_address, const std::vector<uint16_t>& data)
-{
-  uint16_t num_registers = data.size();
-  uint8_t num_bytes = 2 * num_registers;
-
-  std::vector<uint8_t> cmd = { slave_address,
-                               function_code,
-                               data_utils::get_msb(first_register_address),
-                               data_utils::get_lsb(first_register_address),
-                               data_utils::get_msb(num_registers),
-                               data_utils::get_lsb(num_registers),
-                               num_bytes };
-  for (auto byte : data)
-  {
-    cmd.push_back(data_utils::get_msb(byte));
-    cmd.push_back(data_utils::get_lsb(byte));
-  }
-
-  auto crc = crc_utils::compute_crc(cmd);
-  cmd.push_back(data_utils::get_msb(crc));
-  cmd.push_back(data_utils::get_lsb(crc));
-
-  return cmd;
 }
 }  // namespace epick_driver

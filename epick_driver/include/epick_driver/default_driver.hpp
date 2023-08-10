@@ -71,8 +71,5 @@ public:
 private:
   std::unique_ptr<Serial> serial_interface_;
   uint8_t slave_address_;
-
-  std::vector<uint8_t> createCommand(uint8_t slave_address, uint8_t function_code, uint16_t first_register_address,
-                                     const std::vector<uint16_t>& data);
 };
 }  // namespace epick_driver

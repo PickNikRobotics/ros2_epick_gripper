@@ -37,7 +37,7 @@
 
 namespace epick_driver
 {
-const auto kLogger = rclcpp::get_logger("DefaultCommandInterfaceFactory");
+const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info)
