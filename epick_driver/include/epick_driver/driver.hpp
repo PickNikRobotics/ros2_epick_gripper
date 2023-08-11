@@ -28,23 +28,24 @@
 
 #pragma once
 
+#include <chrono>
 #include <string>
 
 namespace epick_driver
 {
 
 // Indicates if the user has requested the gripper to be activated.
-enum class GripperActivationAction
+enum class GripperActivationAction : uint8_t
 {
-  ClearGripperFaultStatus,
-  Activate,
+  ClearGripperFaultStatus = 0b0,
+  Activate = 0b1,
 };
 
 // Indicates the gripper mode.
-enum class GripperMode
+enum class GripperMode : uint8_t
 {
-  AutomaticMode,  // Automatic.
-  AdvancedMode,   // Advanced.
+  AutomaticMode = 0b00000000,  // Automatic.
+  AdvancedMode = 0b00000010,   // Advanced.
   Reserved
 };
 
@@ -71,10 +72,10 @@ enum class GripperActivationStatus
 // Indicates the status of the object detection.
 enum class ObjectDetectionStatus
 {
-  Unknown,                      // Unknown object detection. Regulating towards requested vacuum/pressure.
   ObjectDetectedAtMinPressure,  // Object detected. Minimum vacuum value reached.
   ObjectDetectedAtMaxPressure,  // Object detected. Maximum vacuum value reached.
-  NoObjectDetected              // Object loss, dropped or gripping timeout reached.
+  NoObjectDetected,             // Object loss, dropped or gripping timeout reached.
+  Unknown                       // Unknown object detection. Regulating towards requested vacuum/pressure.
 };
 
 enum class GripperFaultStatus
@@ -119,17 +120,7 @@ class Driver
 public:
   Driver() = default;
 
-  /** Connect to the gripper serial connection. */
-  virtual bool connect() = 0;
-
-  /** Disconnect from the gripper serial connection. */
-  virtual void disconnect() = 0;
-
-  virtual void activate() = 0;
-  virtual void deactivate() = 0;
-
-  virtual void grip() = 0;
-  virtual void release() = 0;
+  virtual void set_mode(const GripperMode gripper_mode) = 0;
 
   /**
    * Set the gripper maximum vacuum pressure to hold an object.
@@ -142,22 +133,29 @@ public:
   virtual void set_max_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
 
   /**
-   * Set the gripper minimum vacuum pressure to hold an object.
+   * Set the gripper minimum acceptable vacuum pressure to hold an object.
    * The vacuum pressure is measured in kPa below the atmospheric pressure
    * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
    * (maximum acceptable value above the atmospheric pressure).
-   * @param vacuum_pressure_kPa The minimum vacuum pressure between -100kPa and
+   * @param vacuum_pressure_kPa The minimum acceptable vacuum pressure between
+   * -100kPa and
    * 155kPa.
    */
   virtual void set_min_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
 
-  virtual void set_mode() = 0;
+  virtual void set_gripper_timeout(std::chrono::milliseconds timeout) = 0;
 
-  virtual void set_max_device_vacuum() = 0;
-  virtual void set_min_device_vacuum() = 0;
+  /** Connect to the gripper serial connection. */
+  virtual bool connect() = 0;
 
-  virtual void set_grip_timeout() = 0;
-  virtual void set_release_time() = 0;
+  /** Disconnect from the gripper serial connection. */
+  virtual void disconnect() = 0;
+
+  virtual void activate() = 0;
+  virtual void deactivate() = 0;
+
+  virtual void grip() = 0;
+  virtual void release() = 0;
 
   virtual GripperStatus get_status() = 0;
 };

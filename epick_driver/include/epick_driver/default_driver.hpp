@@ -31,6 +31,7 @@
 #include "epick_driver/driver.hpp"
 #include "epick_driver/serial.hpp"
 
+#include <chrono>
 #include <functional>
 #include <memory>
 
@@ -49,16 +50,10 @@ public:
   bool connect() override;
   void disconnect() override;
 
+  void set_mode(const GripperMode gripper_mode) override;
   void set_max_vacuum_pressure(const float& vacuum_pressure_kPa) override;
   void set_min_vacuum_pressure(const float& vacuum_pressure_kPa) override;
-
-  void set_mode() override;
-
-  void set_max_device_vacuum() override;
-  void set_min_device_vacuum() override;
-
-  void set_grip_timeout() override;
-  void set_release_time() override;
+  void set_gripper_timeout(std::chrono::milliseconds gripper_timeout) override;
 
   GripperStatus get_status() override;
 
@@ -75,5 +70,10 @@ public:
 private:
   std::unique_ptr<Serial> serial_interface_;
   uint8_t slave_address_;
+
+  GripperMode gripper_mode_ = GripperMode::AutomaticMode;
+  float max_vacuum_pressure_ = -100;
+  float min_vacuum_pressure_ = -10;
+  std::chrono::milliseconds gripper_timeout_;
 };
 }  // namespace epick_driver

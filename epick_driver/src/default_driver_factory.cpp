@@ -78,11 +78,14 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   serial_interface->set_baudrate(baud_rate);
   serial_interface->set_timeout(timeout_ms);
 
-  auto command_interface = std::make_unique<DefaultDriver>(std::move(serial_interface), slave_address);
-  command_interface->set_mode();
-  command_interface->set_release_time();
-  // TODO: set all relevant parameters.
+  auto driver = std::make_unique<DefaultDriver>(std::move(serial_interface), slave_address);
 
-  return command_interface;
+  // TODO: set all relevant parameters.
+  // gripper-mode
+  // max-vacuum-pressure
+  // min-vacuum-pressure
+  // gripper-timeout
+
+  return driver;
 }
 }  // namespace epick_driver

@@ -39,24 +39,4 @@ target_include_directories(activate
 target_link_libraries(activate epick_driver::epick_driver)
 ament_target_dependencies(activate epick_driver)
 
-add_executable(get_status
-    src/get_status.cpp
-    src/command_line_utility.hpp
-    src/command_line_utility.cpp
-)
-target_include_directories(get_status
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(get_status epick_driver::epick_driver)
-ament_target_dependencies(get_status epick_driver)
-
-add_executable(set_max_vacuum_pressure
-    src/set_max_vacuum_pressure.cpp
-    src/command_line_utility.hpp
-    src/command_line_utility.cpp
-)
-target_include_directories(set_max_vacuum_pressure
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(set_max_vacuum_pressure epick_driver::epick_driver)
-ament_target_dependencies(set_max_vacuum_pressure epick_driver)
-
 ament_package()
