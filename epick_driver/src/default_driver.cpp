@@ -137,6 +137,8 @@ void DefaultDriver::activate()
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
 
+  // TODO: set the gripper mode.
+
   std::vector<uint8_t> request = {
     slave_address_,
     static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),

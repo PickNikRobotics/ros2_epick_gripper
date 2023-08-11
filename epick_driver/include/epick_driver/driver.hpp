@@ -35,17 +35,17 @@ namespace epick_driver
 {
 
 // Indicates if the user has requested the gripper to be activated.
-enum class GripperActivationAction : uint8_t
+enum class GripperActivationAction
 {
-  ClearGripperFaultStatus = 0b0,
-  Activate = 0b1,
+  ClearGripperFaultStatus,
+  Activate,
 };
 
 // Indicates the gripper mode.
-enum class GripperMode : uint8_t
+enum class GripperMode
 {
-  AutomaticMode = 0b00000000,  // Automatic.
-  AdvancedMode = 0b00000010,   // Advanced.
+  AutomaticMode,  // Automatic.
+  AdvancedMode,   // Advanced.
   Reserved
 };
 
