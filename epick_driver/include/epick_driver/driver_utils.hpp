@@ -145,6 +145,38 @@ const std::string gripper_regulate_action_to_string(const GripperRegulateAction 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+/// Automatic release action.
+///
+
+constexpr uint8_t gATR_mask = 0b00010000;
+
+/** Associate a configuration of bits to the GripperAutomaticReleaseAction enum. */
+const std::unordered_map<uint8_t, GripperReleaseAction>& gATR_lookup()
+{
+  // clang-format off
+  static const std::unordered_map<uint8_t, GripperReleaseAction> map{
+    { 0b00000000, GripperReleaseAction::NormalRelease },
+    { 0b00010000, GripperReleaseAction::ReleaseWithoutTimeout } };
+  // clang-format on
+  return map;
+}
+
+/**
+ * Convert a GripperReleaseAction enum into a string.
+ * @param gripper_release_action The enum.
+ * @return A string representation of the given enum
+ */
+const std::string gripper_release_action_to_string(const GripperReleaseAction gripper_release_action)
+{
+  // clang-format off
+  static std::map<GripperReleaseAction, std::string> map = {
+    { GripperReleaseAction::NormalRelease, "NormalRelease" },
+    { GripperReleaseAction::ReleaseWithoutTimeout, "ReleaseWithoutTimeout" } };
+  // clang-format on
+  return map.at(gripper_release_action);
+}
+
+///////////////////////////////////////////////////////////////////////////////
 /// Activation status.
 ///
 

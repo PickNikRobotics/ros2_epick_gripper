@@ -51,7 +51,13 @@ enum class GripperMode
 enum class GripperRegulateAction
 {
   StopVacuumGenerator,             // Stop the vacuum generator.
-  FollowRequestedVacuumParameters  // Follow the requested vacuum parameters in real time
+  FollowRequestedVacuumParameters  // Follow the requested vacuum parameters in real time.
+};
+
+enum class GripperReleaseAction
+{
+  NormalRelease,         // Normal operation.
+  ReleaseWithoutTimeout  // Open the valves without any timeout.
 };
 
 // Indicates the status of the gripper activation sequence.
