@@ -88,6 +88,12 @@ int main(int argc, char* argv[])
 
     auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
 
+    std::cout << "Using the following parameters: " << std::endl;
+    std::cout << " - port: " << port << std::endl;
+    std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
+    std::cout << " - read/write timeut: " << timeout << "ms" << std::endl;
+    std::cout << " - slave address: " << slave_address << std::endl;
+
     std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
 
     bool connected = driver->connect();
