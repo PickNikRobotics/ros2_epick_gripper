@@ -217,63 +217,11 @@ void DefaultDriver::set_mode(const GripperMode gripper_mode)
 void DefaultDriver::set_max_vacuum_pressure(const float& vacuum_pressure)
 {
   max_vacuum_pressure_ = vacuum_pressure;
-  //  // Convert the absolute pressure to a value between 0 and 255.
-  //  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(vacuum_pressure + 100), 0.0f, 255.0f));
-
-  //  std::vector<uint8_t> request = {
-  //    slave_address_,
-  //    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
-  //    0x03,  // Register address MSB
-  //    0xE9,  // Register address LSB
-  //    0x00,  // Reserved byte
-  //    rPR    // The absolute pressure.
-  //  };
-  //  auto crc = crc_utils::compute_crc(request);
-  //  request.push_back(data_utils::get_msb(crc));
-  //  request.push_back(data_utils::get_lsb(crc));
-
-  //  std::vector<uint8_t> response;
-  //  try
-  //  {
-  //    serial_interface_->write(request);
-  //    response = serial_interface_->read(kWriteResponseSize);
-  //  }
-  //  catch (const serial::IOException& e)
-  //  {
-  //    RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
-  //    throw;
-  //  }
 }
 
 void DefaultDriver::set_min_vacuum_pressure(const float& vacuum_pressure)
 {
   min_vacuum_pressure_ = vacuum_pressure;
-  //  // Convert the absolute pressure to a value between 0 and 255.
-  //  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(vacuum_pressure + 100), 0.0f, 255.0f));
-
-  //  std::vector<uint8_t> request = {
-  //    slave_address_,
-  //    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
-  //    0x03,  // Register address MSB
-  //    0xEA,  // Register address LSB
-  //    0x00,  // Reserved byte
-  //    rPR    // The absolute pressure.
-  //  };
-  //  auto crc = crc_utils::compute_crc(request);
-  //  request.push_back(data_utils::get_msb(crc));
-  //  request.push_back(data_utils::get_lsb(crc));
-
-  //  std::vector<uint8_t> response;
-  //  try
-  //  {
-  //    serial_interface_->write(request);
-  //    response = serial_interface_->read(kWriteResponseSize);
-  //  }
-  //  catch (const serial::IOException& e)
-  //  {
-  //    RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
-  //    throw;
-  //  }
 }
 
 void DefaultDriver::set_gripper_timeout(std::chrono::milliseconds gripper_timeout)
