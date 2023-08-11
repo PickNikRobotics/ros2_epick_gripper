@@ -33,32 +33,44 @@
 namespace epick_driver
 {
 
-enum class GripperActivation
+// Indicates if the user has requested the gripper to be activated.
+enum class GripperActivationAction
 {
-  Inactive,
-  Active,
+  Disable,
+  Activate,
 };
 
-enum class ObjectDetection
-{
-  Unknown,
-  ObjectDetected,
-  NoObjectDetected
-};
-
-enum class Regulate
-{
-
-};
-
+// Indicates the gripper mode.
 enum class GripperMode
 {
-  AutomaticMode,
-  AdvancedMode,
+  AutomaticMode,  // Automatic.
+  AdvancedMode,   // Advanced.
   Reserved
 };
 
-enum class FaultStatus
+enum class GripperRegulateAction
+{
+  StopVacuumGenerator,             // Stop the vacuum generator.
+  FollowRequestedVacuumParameters  // Follow the requested vacuum parameters in real time
+};
+
+// Indicates the status of the gripper activation sequence.
+enum class GripperActivationStatus
+{
+  GripperNotActivated,  // Gripper is not activated.
+  GripperOperational,   // Gripper is operational.
+};
+
+// Indicates the status of the object detection.
+enum class ObjectDetectionStatus
+{
+  Unknown,                      // Unknown object detection. Regulating towards requested vacuum/pressure.
+  ObjectDetectedAtMinPressure,  // Object detected. Minimum vacuum value reached.
+  ObjectDetectedAtMaxPressure,  // Object detected. Maximum vacuum value reached.
+  NoObjectDetected              // Object loss, dropped or gripping timeout reached.
+};
+
+enum class GripperFaultStatus
 {
   NoFault,
   AcionDelayed,
@@ -84,11 +96,13 @@ enum class ActuatorStatus
 
 struct GripperStatus
 {
-  GripperActivation activation;
-  GripperMode mode;
-  FaultStatus fault_status;
+  GripperActivationAction gripper_activation_action;
+  GripperMode gripper_mode;
+  GripperRegulateAction gripper_regulate_action;
+  GripperActivationStatus gripper_activation_status;
+  GripperFaultStatus gripper_fault_status;
   ActuatorStatus actuator_status;
-  ObjectDetection object_detection;
+  ObjectDetectionStatus object_detection_status;
   float max_pressure_request;
   float actual_pressure;
 };

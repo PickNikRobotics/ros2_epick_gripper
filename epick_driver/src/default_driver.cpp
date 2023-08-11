@@ -96,14 +96,6 @@ enum class kFunctionCode : uint8_t
   MasterReadWriteMultipleRegisters = 0x17,
 };
 
-constexpr uint8_t gACT_mask = 0b00000001;  // Activate echo
-constexpr uint8_t gMOD_mask = 0b00000110;  // Gripper mode echo
-constexpr uint8_t gGTO_mask = 0b00001000;  // Regulate echo
-constexpr uint8_t gSTA_mask = 0b00110000;  // Activation status
-constexpr uint8_t gOBJ_mask = 0b11000000;  // Object status
-constexpr uint8_t gVAS_mask = 0b00000011;  // Vacuum actuator status
-constexpr uint8_t gFLT_mask = 0b00001111;  // Gripper fault status
-
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
     std::move(serial_interface),
@@ -276,12 +268,13 @@ GripperStatus DefaultDriver::get_status()
   }
 
   GripperStatus status;
-  status.activation = driver_utils::gACT_lookup().at(response[0] & gACT_mask);
-  status.mode = driver_utils::gMOD_lookup().at((response[0] & gMOD_mask) >> 1);
-  // TODO: implement this gGTO.
-  status.object_detection = driver_utils::gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
-  status.actuator_status = driver_utils::gVAS_lookup().at((response[0] & gVAS_mask));
-  status.fault_status = driver_utils::gFLT_lookup().at((response[2] & gFLT_mask));
+  status.gripper_activation_action = driver_utils::gACT_lookup().at(response[0] & driver_utils::gACT_mask);
+  status.gripper_mode = driver_utils::gMOD_lookup().at(response[0] & driver_utils::gMOD_mask);
+  status.gripper_regulate_action = driver_utils::gGTO_lookup().at(response[0] & driver_utils::gGTO_mask);
+  status.gripper_activation_status = driver_utils::gSTA_lookup().at(response[0] & driver_utils::gSTA_mask);
+  status.object_detection_status = driver_utils::gOBJ_lookup().at(response[0] & driver_utils::gOBJ_mask);
+  status.actuator_status = driver_utils::gVAS_lookup().at(response[1] & driver_utils::gVAS_mask);
+  status.gripper_fault_status = driver_utils::gFLT_lookup().at(response[2] & driver_utils::gFLT_mask);
 
   // The pressure is measure in kPa.
   // - At 0kPa (vacuum) the gripper grips the object at maximum power;
