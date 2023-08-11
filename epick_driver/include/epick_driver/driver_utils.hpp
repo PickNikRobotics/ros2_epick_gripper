@@ -35,6 +35,11 @@
 #include <iostream>
 #include <map>
 
+/**
+ * This utility is used to convert one byte registers into enums:
+ * first a register is masked, then the result is retrieved from a lookup table.
+ * The utility also converts enums into strings for testing and debugging.
+ */
 namespace epick_driver::driver_utils
 {
 
@@ -49,8 +54,8 @@ const std::unordered_map<uint8_t, GripperActivationAction>& gACT_lookup()
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperActivationAction> map{
-    { 0b0, GripperActivationAction::Disable },
-    { 0b1, GripperActivationAction::Activate },
+    { 0b00000000, GripperActivationAction::Disable },
+    { 0b00000001, GripperActivationAction::Activate },
     };
   // clang-format on
   return map;
@@ -151,7 +156,9 @@ const std::unordered_map<uint8_t, GripperActivationStatus>& gSTA_lookup()
   // clang-format off
   static const std::unordered_map<uint8_t, GripperActivationStatus> map{
     { 0b00000000, GripperActivationStatus::GripperNotActivated },
-    { 0b00010000, GripperActivationStatus::GripperOperational } };
+    { 0b00010000, GripperActivationStatus::Unknown },
+    { 0b00110000, GripperActivationStatus::GripperOperational },
+    { 0b00100000, GripperActivationStatus::Unknown } };
   // clang-format on
   return map;
 }
@@ -166,7 +173,8 @@ const std::string gripper_activation_status_to_string(const GripperActivationSta
   // clang-format off
   static std::map<GripperActivationStatus, std::string> map = {
     { GripperActivationStatus::GripperNotActivated, "GripperNotActivated" },
-    { GripperActivationStatus::GripperOperational, "GripperOperational" } };
+    { GripperActivationStatus::GripperOperational, "GripperOperational" },
+    { GripperActivationStatus::Unknown, "Unknown" } };
   // clang-format on
   return map.at(gripper_activation_status);
 }
@@ -202,8 +210,7 @@ const std::string object_detection_to_string(const ObjectDetectionStatus object_
     { ObjectDetectionStatus::Unknown, "Unknown" },
     { ObjectDetectionStatus::ObjectDetectedAtMinPressure, "ObjectDetectedAtMinPressure" },
     { ObjectDetectionStatus::ObjectDetectedAtMaxPressure, "ObjectDetectedAtMaxPressure" },
-    { ObjectDetectionStatus::NoObjectDetected, "NoObjectDetected" },
-  };
+    { ObjectDetectionStatus::NoObjectDetected, "NoObjectDetected" } };
   // clang-format on
   return map.at(object_detection);
 }
@@ -219,22 +226,22 @@ const std::unordered_map<uint8_t, GripperFaultStatus> gFLT_lookup()
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperFaultStatus> map{
-    { 0b00000000, GripperFaultStatus::NoFault },
-    { 0b00000001, GripperFaultStatus::Unknown },
-    { 0b00000010, GripperFaultStatus::Unknown },
-    { 0b00000011, GripperFaultStatus::PorousMaterialDetected },
-    { 0b00000100, GripperFaultStatus::Unknown },
-    { 0b00000101, GripperFaultStatus::AcionDelayed },
-    { 0b00000110, GripperFaultStatus::GrippingTimeout },
-    { 0b00000111, GripperFaultStatus::ActivationBitNotSet },
-    { 0b00001000, GripperFaultStatus::MaximumTemperatureExceeded },
-    { 0b00001001, GripperFaultStatus::NoCommunicationForAtLeastOneSecond },
-    { 0b00001010, GripperFaultStatus::UderMinimumOperatingVoltage },
-    { 0b00001011, GripperFaultStatus::AutomaticReleaseInProgress },
-    { 0b00001100, GripperFaultStatus::InternalFault },
-    { 0b00001101, GripperFaultStatus::Unknown },
-    { 0b00001110, GripperFaultStatus::Unknown },
-    { 0b00001111, GripperFaultStatus::AutomaticReleaseCompleted }
+    { 0b00000000, GripperFaultStatus::NoFault },                            // 0x0
+    { 0b00000001, GripperFaultStatus::Unknown },                            // 0x1
+    { 0b00000010, GripperFaultStatus::Unknown },                            // 0x2
+    { 0b00000011, GripperFaultStatus::PorousMaterialDetected },             // 0x3
+    { 0b00000100, GripperFaultStatus::Unknown },                            // 0x4
+    { 0b00000101, GripperFaultStatus::AcionDelayed },                       // 0x5
+    { 0b00000110, GripperFaultStatus::GrippingTimeout },                    // 0x6
+    { 0b00000111, GripperFaultStatus::ActivationBitNotSet },                // 0x7
+    { 0b00001000, GripperFaultStatus::MaximumTemperatureExceeded },         // 0x8
+    { 0b00001001, GripperFaultStatus::NoCommunicationForAtLeastOneSecond }, // 0x9
+    { 0b00001010, GripperFaultStatus::UderMinimumOperatingVoltage },        // 0xA
+    { 0b00001011, GripperFaultStatus::AutomaticReleaseInProgress },         // 0xB
+    { 0b00001100, GripperFaultStatus::InternalFault },                      // 0xC
+    { 0b00001101, GripperFaultStatus::Unknown },                            // 0xD
+    { 0b00001110, GripperFaultStatus::Unknown },                            // 0xE
+    { 0b00001111, GripperFaultStatus::AutomaticReleaseCompleted }           // 0xF
   };
   // clang-format on
   return map;

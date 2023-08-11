@@ -59,6 +59,7 @@ enum class GripperActivationStatus
 {
   GripperNotActivated,  // Gripper is not activated.
   GripperOperational,   // Gripper is operational.
+  Unknown
 };
 
 // Indicates the status of the object detection.
