@@ -28,6 +28,7 @@
 
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
+#include "epick_driver/driver_utils.hpp"
 
 #include "command_line_utility.hpp"
 
@@ -42,6 +43,8 @@ constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 500;  // milliseconds
 constexpr auto kSlaveAddress = 0x09;
+
+using namespace epick_driver;
 
 int main(int argc, char* argv[])
 {
@@ -81,12 +84,12 @@ int main(int argc, char* argv[])
 
   try
   {
-    auto serial = std::make_unique<epick_driver::DefaultSerial>();
+    auto serial = std::make_unique<DefaultSerial>();
     serial->set_port(port);
     serial->set_baudrate(baudrate);
     serial->set_timeout(timeout);
 
-    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+    auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;
@@ -115,27 +118,13 @@ int main(int argc, char* argv[])
 
     std::cout << "Status retrieved:" << std::endl;
 
-    static std::map<epick_driver::GripperActivation, std::string> gripper_activation_names = {
-      { epick_driver::GripperActivation::Inactive, "Inactive" },
-      { epick_driver::GripperActivation::Active, "Active" },
-    };
-
-    static std::map<epick_driver::ObjectDetection, std::string> object_detection_names = {
-      { epick_driver::ObjectDetection::Unknown, "Unknown" },
-      { epick_driver::ObjectDetection::ObjectDetected, "ObjectDetected" },
-      { epick_driver::ObjectDetection::NoObjectDetected, "NoObjectDetected" },
-    };
-
-    static std::map<epick_driver::GripperMode, std::string> gripper_mode_names = {
-      { epick_driver::GripperMode::AutomaticMode, "AutomaticMode" },
-      { epick_driver::GripperMode::AdvancedMode, "AdvancedMode" },
-      { epick_driver::GripperMode::Reserved, "Reserved" }
-    };
-
-    std::cout << " - activation: " << gripper_activation_names.at(status.activation) << std::endl;
-    std::cout << " - mode: " << gripper_mode_names.at(status.mode) << std::endl;
-    std::cout << " - object detection: " << object_detection_names.at(status.object_detection) << std::endl;
+    std::cout << " - activation: " << driver_utils::gripper_activation_to_string(status.activation) << std::endl;
+    std::cout << " - mode: " << driver_utils::gripper_mode_to_string(status.mode) << std::endl;
+    std::cout << " - object detection: " << driver_utils::object_detection_to_string(status.object_detection)
+              << std::endl;
     std::cout << " - actual pressure: " << status.pressure << "kPa" << std::endl;
+    std::cout << " - fault status: " << driver_utils::fault_status_to_string(status.fault_status) << std::endl;
+    std::cout << " - actuator status: " << driver_utils::actuator_status_to_string(status.actuator_status) << std::endl;
   }
   catch (const serial::IOException& e)
   {

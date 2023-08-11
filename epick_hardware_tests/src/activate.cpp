@@ -43,6 +43,8 @@ constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 500;  // milliseconds
 constexpr auto kSlaveAddress = 0x09;
 
+using namespace epick_driver;
+
 int main(int argc, char* argv[])
 {
   CommandLineUtility cli;
@@ -81,12 +83,12 @@ int main(int argc, char* argv[])
 
   try
   {
-    auto serial = std::make_unique<epick_driver::DefaultSerial>();
+    auto serial = std::make_unique<DefaultSerial>();
     serial->set_port(port);
     serial->set_baudrate(baudrate);
     serial->set_timeout(timeout);
 
-    auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+    auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;

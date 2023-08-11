@@ -30,6 +30,7 @@
 
 #include "epick_driver/crc_utils.hpp"
 #include "epick_driver/data_utils.hpp"
+#include "epick_driver/driver_utils.hpp"
 
 #include "serial/serial.h"
 
@@ -103,43 +104,6 @@ constexpr uint8_t gOBJ_mask = 0b11000000;  // Object status
 constexpr uint8_t gVAS_mask = 0b00000011;  // Vacuum actuator status
 constexpr uint8_t kFLT_mask = 0b11110000;  //
 constexpr uint8_t gFLT_mask = 0b00001111;  // Gripper fault status
-
-// clang-format off
-const std::unordered_map<uint8_t, GripperActivation>& gACT_lookup()
-{
-  static const std::unordered_map<uint8_t, GripperActivation> map{
-    { 0b0, GripperActivation::Inactive },
-    { 0b1, GripperActivation::Active },
-  };
-  return map;
-}
-
-const std::unordered_map<uint8_t, Regulate>& gGTO_lookup()
-{
-  static const std::unordered_map<uint8_t, Regulate> map{};
-  return map;
-}
-
-const std::unordered_map<uint8_t, GripperMode>& gMOD_lookup()
-{
-  static const std::unordered_map<uint8_t, GripperMode> map{
-    { 0b00, GripperMode::AutomaticMode },
-    { 0b01, GripperMode::AdvancedMode },
-    { 0b10, GripperMode::Reserved },
-    { 0b11, GripperMode::Reserved } };
-  return map;
-}
-
-const std::unordered_map<uint8_t, ObjectDetection> gOBJ_lookup()
-{
-  static const std::unordered_map<uint8_t, ObjectDetection> map{
-    { 0b00, ObjectDetection::Unknown },
-    { 0b01, ObjectDetection::ObjectDetected },
-    { 0b10, ObjectDetection::ObjectDetected },
-    { 0b11, ObjectDetection::NoObjectDetected } };
-  return map;
-}
-// clang-format on
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
@@ -313,16 +277,19 @@ GripperStatus DefaultDriver::get_status()
   }
 
   GripperStatus status;
-  status.activation = gACT_lookup().at(response[0] & gACT_mask);
-  status.mode = gMOD_lookup().at((response[0] & gMOD_mask) >> 1);
+  status.activation = driver_utils::gACT_lookup().at(response[0] & gACT_mask);
+  status.mode = driver_utils::gMOD_lookup().at((response[0] & gMOD_mask) >> 1);
   // TODO: implement this gGTO.
-  status.object_detection = gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
+  status.object_detection = driver_utils::gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
+  status.actuator_status = driver_utils::gVAS_lookup().at((response[0] & gVAS_mask));
+  status.fault_status = driver_utils::gFLT_lookup().at((response[2] & gFLT_mask));
 
-  // Absolute pressure in kPa:
-  // - 0kPa means maximum suction (grip);
-  // - 100kPa means atmospheric pressure (passive hold);
-  // - Everything greater than 100kPa makes the griper work in referse (release).
+  // Absolute pressure of the gripper in kPa:
+  // - 0kPa means the gripper sucks at maximum power (grip);
+  // - 100kPa means the gripper is off and works at atmospheric pressure (passive hold);
+  // - from 100kPa to 155kPa the gripper works in reverse (release).
   status.pressure = static_cast<float>(response[4]);
+
   return status;
 }
 }  // namespace epick_driver

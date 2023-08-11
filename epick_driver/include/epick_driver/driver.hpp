@@ -58,10 +58,36 @@ enum class GripperMode
   Reserved
 };
 
+enum class FaultStatus
+{
+  NoFault,
+  AcionDelayed,
+  PorousMaterialDetected,
+  GrippingTimeout,
+  ActivationBitNotSet,
+  MaximumTemperatureExceeded,
+  NoCommunicationForAtLeastOneSecond,
+  UderMinimumOperatingVoltage,
+  AutomaticReleaseInProgress,
+  InternalFault,
+  AutomaticReleaseCompleted,
+  Unknown
+};
+
+enum class ActuatorStatus
+{
+  Standby,
+  Gripping,
+  PassiveReleasing,
+  ActiveReleasing
+};
+
 struct GripperStatus
 {
   GripperActivation activation;
   GripperMode mode;
+  FaultStatus fault_status;
+  ActuatorStatus actuator_status;
   ObjectDetection object_detection;
   double pressure;
 };
