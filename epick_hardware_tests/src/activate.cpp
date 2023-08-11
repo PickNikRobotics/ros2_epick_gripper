@@ -40,12 +40,16 @@
 // This is a very basic test to check if the gripper is correctly wired.
 // We send an activation request and await for an expected response.
 
+using namespace epick_driver;
+
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 500;  // milliseconds
 constexpr auto kSlaveAddress = 0x09;
-
-using namespace epick_driver;
+constexpr auto kGripperMode = GripperMode::AutomaticMode;
+constexpr auto kMaxVacuumPressure = -100.0f;  // kPa
+constexpr auto kMinVacuumPressure = -10.0f;   // kPa
+constexpr auto kGripperTimeout = std::chrono::milliseconds(2000);
 
 int main(int argc, char* argv[])
 {
@@ -67,28 +71,28 @@ int main(int argc, char* argv[])
   cli.registerHandler(
       "--slave_address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
 
-  GripperMode gripper_mode = GripperMode::AutomaticMode;
+  GripperMode gripper_mode = kGripperMode;
   cli.registerHandler(
       "--gripper-mode",
       [&gripper_mode](const char* value) {
-        if (strcmp(value, "advanced") == 0)
+        if (strcmp(value, "AdvancedMode") == 0)
         {
           gripper_mode = GripperMode::AdvancedMode;
         }
       },
       false);
 
-  double max_vacuum_pressure = -100.0;  // pKa
+  float max_vacuum_pressure = kMaxVacuumPressure;  // pKa
   cli.registerHandler(
       "--max-vacuum-pressure",
-      [&max_vacuum_pressure](const char* value) { max_vacuum_pressure = std::strtod(value, nullptr); }, false);
+      [&max_vacuum_pressure](const char* value) { max_vacuum_pressure = std::strtof(value, nullptr); }, false);
 
-  double min_vacuum_pressure = -10.0;  // pKa
+  float min_vacuum_pressure = kMinVacuumPressure;  // pKa
   cli.registerHandler(
       "--min-vacuum-pressure",
-      [&min_vacuum_pressure](const char* value) { min_vacuum_pressure = std::strtod(value, nullptr); }, false);
+      [&min_vacuum_pressure](const char* value) { min_vacuum_pressure = std::strtof(value, nullptr); }, false);
 
-  std::chrono::milliseconds gripper_timeout = std::chrono::milliseconds(2000);
+  std::chrono::milliseconds gripper_timeout = kGripperTimeout;
   cli.registerHandler(
       "--gripper_timeout",
       [&gripper_timeout](const char* value) { gripper_timeout = std::chrono::milliseconds(std::stoi(value)); }, false);
@@ -100,9 +104,13 @@ int main(int argc, char* argv[])
               << "  --baudrate VALUE             Set the baudrate (default " << kBaudRate << "bps)\n"
               << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "ms)\n"
               << "  --slave_address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
-              << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << max_vacuum_pressure << ")\n"
-              << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << min_vacuum_pressure << ")\n"
-              << "  --gripper_timeout VALUE      Set the gipper timeput in millis (default " << gripper_timeout.count()
+              << "  --gripper-mode VALUE         Set the gripper mode (default "
+              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << "                               Valid values are AutomaticMode or AdvancedMode\n"
+              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kMaxVacuumPressure << ")\n"
+              << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kMinVacuumPressure << ")\n"
+              << "  --gripper_timeout VALUE      Set the gripper timeput in millis (default " << kGripperTimeout.count()
               << ")\n"
               << "  -h                           Show this help message\n";
     exit(0);
