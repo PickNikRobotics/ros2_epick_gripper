@@ -89,7 +89,8 @@ struct GripperStatus
   FaultStatus fault_status;
   ActuatorStatus actuator_status;
   ObjectDetection object_detection;
-  double pressure;
+  float max_pressure_request;
+  float actual_pressure;
 };
 
 class Driver

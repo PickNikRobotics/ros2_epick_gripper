@@ -122,7 +122,8 @@ int main(int argc, char* argv[])
     std::cout << " - mode: " << driver_utils::gripper_mode_to_string(status.mode) << std::endl;
     std::cout << " - object detection: " << driver_utils::object_detection_to_string(status.object_detection)
               << std::endl;
-    std::cout << " - actual pressure: " << status.pressure << "kPa" << std::endl;
+    std::cout << " - max pressure request: " << status.max_pressure_request << "kPa" << std::endl;
+    std::cout << " - actual pressure: " << status.actual_pressure << "kPa" << std::endl;
     std::cout << " - fault status: " << driver_utils::fault_status_to_string(status.fault_status) << std::endl;
     std::cout << " - actuator status: " << driver_utils::actuator_status_to_string(status.actuator_status) << std::endl;
   }
