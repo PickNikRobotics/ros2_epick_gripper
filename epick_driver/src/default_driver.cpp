@@ -287,20 +287,22 @@ GripperStatus DefaultDriver::get_status()
     throw;
   }
 
+  // The content of the requested registers starts from byte 3.
+
   GripperStatus status;
-  status.gripper_activation_action = driver_utils::gACT_lookup().at(response[0] & driver_utils::gACT_mask);
-  status.gripper_mode = driver_utils::gMOD_lookup().at(response[0] & driver_utils::gMOD_mask);
-  status.gripper_regulate_action = driver_utils::gGTO_lookup().at(response[0] & driver_utils::gGTO_mask);
-  status.gripper_activation_status = driver_utils::gSTA_lookup().at(response[0] & driver_utils::gSTA_mask);
-  status.object_detection_status = driver_utils::gOBJ_lookup().at(response[0] & driver_utils::gOBJ_mask);
-  status.actuator_status = driver_utils::gVAS_lookup().at(response[1] & driver_utils::gVAS_mask);
-  status.gripper_fault_status = driver_utils::gFLT_lookup().at(response[2] & driver_utils::gFLT_mask);
+  status.gripper_activation_action = driver_utils::gACT_lookup().at(response[3] & driver_utils::gACT_mask);
+  status.gripper_mode = driver_utils::gMOD_lookup().at(response[3] & driver_utils::gMOD_mask);
+  status.gripper_regulate_action = driver_utils::gGTO_lookup().at(response[3] & driver_utils::gGTO_mask);
+  status.gripper_activation_status = driver_utils::gSTA_lookup().at(response[3] & driver_utils::gSTA_mask);
+  status.object_detection_status = driver_utils::gOBJ_lookup().at(response[3] & driver_utils::gOBJ_mask);
+  status.actuator_status = driver_utils::gVAS_lookup().at(response[4] & driver_utils::gVAS_mask);
+  status.gripper_fault_status = driver_utils::gFLT_lookup().at(response[5] & driver_utils::gFLT_mask);
 
   // The requested pressure level in kPa:
-  status.max_vacuum_pressure = static_cast<float>(response[3]) - 100;
+  status.max_vacuum_pressure = static_cast<float>(response[6]) - 100;
 
   // The actual pressure measured kPa:
-  status.actual_vacuum_pressure = static_cast<float>(response[4]) - 100;
+  status.actual_vacuum_pressure = static_cast<float>(response[7]) - 100;
 
   return status;
 }
