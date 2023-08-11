@@ -131,8 +131,12 @@ int main(int argc, char* argv[])
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
     std::cout << " - read/write timeut: " << timeout << "ms" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
+    std::cout << " - gripper mode: " << driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
+    std::cout << " - max vacuum pressure: " << max_vacuum_pressure << "kPa" << std::endl;
+    std::cout << " - min vacuum pressure: " << min_vacuum_pressure << "kPa" << std::endl;
+    std::cout << " - gripper timeout: " << gripper_timeout.count() << "ms" << std::endl;
 
-    std::cout << "Checking if the gripper is connected to /dev/ttyUSB0..." << std::endl;
+    std::cout << "Checking if the gripper is connected..." << std::endl;
 
     bool connected = driver->connect();
     if (!connected)
