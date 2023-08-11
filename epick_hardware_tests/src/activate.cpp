@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
               << "  --slave_address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
               << "  --gripper-mode VALUE         Set the gripper mode (default "
               << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
-              << "                               Valid values are AutomaticMode or AdvancedMode\n"
+              << "                               Valid values AutomaticMode, AdvancedMode\n"
               << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
               << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kMaxVacuumPressure << ")\n"
               << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kMinVacuumPressure << ")\n"
