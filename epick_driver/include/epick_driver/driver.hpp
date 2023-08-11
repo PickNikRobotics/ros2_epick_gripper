@@ -36,7 +36,7 @@ namespace epick_driver
 // Indicates if the user has requested the gripper to be activated.
 enum class GripperActivationAction
 {
-  Disable,
+  ClearGripperFaultStatus,
   Activate,
 };
 

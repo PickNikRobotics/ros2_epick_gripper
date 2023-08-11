@@ -54,7 +54,7 @@ const std::unordered_map<uint8_t, GripperActivationAction>& gACT_lookup()
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperActivationAction> map{
-    { 0b00000000, GripperActivationAction::Disable },
+    { 0b00000000, GripperActivationAction::ClearGripperFaultStatus },
     { 0b00000001, GripperActivationAction::Activate },
     };
   // clang-format on
@@ -70,7 +70,7 @@ const std::string gripper_activation_action_to_string(const GripperActivationAct
 {
   // clang-format off
   static std::map<GripperActivationAction, std::string> map = {
-    { GripperActivationAction::Disable, "Disable" },
+    { GripperActivationAction::ClearGripperFaultStatus, "ClearGripperFaultStatus" },
     { GripperActivationAction::Activate, "Activate" },
   };
   // clang-format on
