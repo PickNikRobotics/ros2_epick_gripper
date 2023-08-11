@@ -128,8 +128,8 @@ int main(int argc, char* argv[])
     std::cout << " - gripper fault status: " << driver_utils::fault_status_to_string(status.gripper_fault_status)
               << std::endl;
     std::cout << " - actuator status: " << driver_utils::actuator_status_to_string(status.actuator_status) << std::endl;
-    std::cout << " - max pressure request: " << status.max_pressure_request << "kPa" << std::endl;
-    std::cout << " - actual pressure: " << status.actual_pressure << "kPa" << std::endl;
+    std::cout << " - max vacuum pressure: " << status.max_vacuum_pressure << "kPa" << std::endl;
+    std::cout << " - actual vacuum pressure: " << status.actual_vacuum_pressure << "kPa" << std::endl;
   }
   catch (const serial::IOException& e)
   {

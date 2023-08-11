@@ -189,12 +189,10 @@ void DefaultDriver::release()
 {
 }
 
-void DefaultDriver::set_relative_pressure(const float& relative_pressure_kPa)
+void DefaultDriver::set_max_vacuum_pressure(const float& vacuum_pressure_kPa)
 {
-  double absolute_pressure = relative_pressure_kPa + 100.0;
-
   // Convert the absolute pressure to a value between 0 and 255.
-  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(absolute_pressure), 0.0, 255.0));
+  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(vacuum_pressure_kPa + 100), 0.0f, 255.0f));
 
   std::vector<uint8_t> request = {
     slave_address_,
@@ -202,7 +200,37 @@ void DefaultDriver::set_relative_pressure(const float& relative_pressure_kPa)
     0x03,  // Register address MSB
     0xE9,  // Register address LSB
     0x00,  // Reserved byte
-    rPR    // The relative pressure.
+    rPR    // The absolute pressure.
+  };
+  auto crc = crc_utils::compute_crc(request);
+  request.push_back(data_utils::get_msb(crc));
+  request.push_back(data_utils::get_lsb(crc));
+
+  std::vector<uint8_t> response;
+  try
+  {
+    serial_interface_->write(request);
+    response = serial_interface_->read(kWriteResponseSize);
+  }
+  catch (const serial::IOException& e)
+  {
+    RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
+    throw;
+  }
+}
+
+void DefaultDriver::set_min_vacuum_pressure(const float& vacuum_pressure_kPa)
+{
+  // Convert the absolute pressure to a value between 0 and 255.
+  const uint8_t rPR = static_cast<uint8_t>(std::clamp(std::round(vacuum_pressure_kPa + 100), 0.0f, 255.0f));
+
+  std::vector<uint8_t> request = {
+    slave_address_,
+    static_cast<uint8_t>(kFunctionCode::PresetSingleRegister),
+    0x03,  // Register address MSB
+    0xEA,  // Register address LSB
+    0x00,  // Reserved byte
+    rPR    // The absolute pressure.
   };
   auto crc = crc_utils::compute_crc(request);
   request.push_back(data_utils::get_msb(crc));
@@ -276,16 +304,11 @@ GripperStatus DefaultDriver::get_status()
   status.actuator_status = driver_utils::gVAS_lookup().at(response[1] & driver_utils::gVAS_mask);
   status.gripper_fault_status = driver_utils::gFLT_lookup().at(response[2] & driver_utils::gFLT_mask);
 
-  // The pressure is measure in kPa.
-  // - At 0kPa (vacuum) the gripper grips the object at maximum power;
-  // - At 100kPa (atmospheric pressure) the gripper is off and passively holds the object;
-  // - At preasure between 100kPa and 155kPa (greater than atmospheric pressure) the gripper releases the object.
-
   // The requested pressure level in kPa:
-  status.max_pressure_request = static_cast<float>(response[3]);
+  status.max_vacuum_pressure = static_cast<float>(response[3]) - 100;
 
   // The actual pressure measured kPa:
-  status.actual_pressure = static_cast<float>(response[4]);
+  status.actual_vacuum_pressure = static_cast<float>(response[4]) - 100;
 
   return status;
 }

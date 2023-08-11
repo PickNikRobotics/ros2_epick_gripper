@@ -46,26 +46,11 @@ public:
    */
   explicit DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address);
 
-  /** Connect to the gripper serial connection. */
   bool connect() override;
-
-  /** Disconnect from the gripper serial connection. */
   void disconnect() override;
 
-  /**
-   * Set the relative pressure of the gripper in relation to the athmospheric pressure of 100kPa.
-   * If the relative pressure is set to -100kPa, the gripper will try to achieve an absolute pressure of 0kPa,
-   * which means it will work at full power to hold the object in place.
-   * If the relative pressure is set to -22kPa, the gripper will try to achieve the absolute pressure of 78kPa,
-   * which means it will hold the object, but not at full power.
-   * If the relative pressure is set to 0kPa, the gripper returns to the athmospheric pressure of 100kPa,
-   * which will likely cause the object to drop.
-   * If the relative pressure is set to anything bigger than 100kPa, the gripper will work in reverse and release the
-   * object.
-   * @param relative_pressure_kPa The vacuum pressure relative to the athomspheric pressure of 100kPa. Can be anything
-   * greater than -100kPa.
-   */
-  void set_relative_pressure(const float& relative_pressure_kPa) override;
+  void set_max_vacuum_pressure(const float& vacuum_pressure_kPa) override;
+  void set_min_vacuum_pressure(const float& vacuum_pressure_kPa) override;
 
   void set_mode() override;
 

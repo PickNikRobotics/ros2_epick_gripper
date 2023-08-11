@@ -110,8 +110,8 @@ struct GripperStatus
   GripperFaultStatus gripper_fault_status;
   ActuatorStatus actuator_status;
   ObjectDetectionStatus object_detection_status;
-  float max_pressure_request;
-  float actual_pressure;
+  float max_vacuum_pressure;
+  float actual_vacuum_pressure;
 };
 
 class Driver
@@ -119,8 +119,10 @@ class Driver
 public:
   Driver() = default;
 
+  /** Connect to the gripper serial connection. */
   virtual bool connect() = 0;
 
+  /** Disconnect from the gripper serial connection. */
   virtual void disconnect() = 0;
 
   virtual void activate() = 0;
@@ -129,7 +131,25 @@ public:
   virtual void grip() = 0;
   virtual void release() = 0;
 
-  virtual void set_relative_pressure(const float& relative_pressure_kPa) = 0;
+  /**
+   * Set the gripper maximum vacuum pressure to hold an object.
+   * The vacuum pressure is measured in kPa below the atmospheric pressure
+   * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
+   * (maximum acceptable value above the atmospheric pressure).
+   * @param vacuum_pressure_kPa The maximum vacuum pressure between -100kPa and
+   * 155kPa.
+   */
+  virtual void set_max_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
+
+  /**
+   * Set the gripper minimum vacuum pressure to hold an object.
+   * The vacuum pressure is measured in kPa below the atmospheric pressure
+   * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
+   * (maximum acceptable value above the atmospheric pressure).
+   * @param vacuum_pressure_kPa The minimum vacuum pressure between -100kPa and
+   * 155kPa.
+   */
+  virtual void set_min_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
 
   virtual void set_mode() = 0;
 
