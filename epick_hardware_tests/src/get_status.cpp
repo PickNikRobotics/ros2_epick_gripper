@@ -135,6 +135,7 @@ int main(int argc, char* argv[])
     std::cout << " - activation: " << gripper_activation_names.at(status.activation) << std::endl;
     std::cout << " - mode: " << gripper_mode_names.at(status.mode) << std::endl;
     std::cout << " - object detection: " << object_detection_names.at(status.object_detection) << std::endl;
+    std::cout << " - actual pressure: " << status.pressure << "kPa" << std::endl;
   }
   catch (const serial::IOException& e)
   {

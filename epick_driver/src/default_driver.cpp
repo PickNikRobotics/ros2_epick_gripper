@@ -108,8 +108,8 @@ constexpr uint8_t gFLT_mask = 0b00001111;  // Gripper fault status
 const std::unordered_map<uint8_t, GripperActivation>& gACT_lookup()
 {
   static const std::unordered_map<uint8_t, GripperActivation> map{
-    { 0b0, GripperActivation::Active },
-    { 0b1, GripperActivation::Inactive },
+    { 0b0, GripperActivation::Inactive },
+    { 0b1, GripperActivation::Active },
   };
   return map;
 }
@@ -318,6 +318,11 @@ GripperStatus DefaultDriver::get_status()
   // TODO: implement this gGTO.
   status.object_detection = gOBJ_lookup().at((response[0] & gOBJ_mask) >> 4);
 
+  // Absolute pressure in kPa:
+  // - 0kPa means maximum suction (grip);
+  // - 100kPa means atmospheric pressure (passive hold);
+  // - Everything greater than 100kPa makes the griper work in referse (release).
+  status.pressure = static_cast<float>(response[4]);
   return status;
 }
 }  // namespace epick_driver
