@@ -28,12 +28,10 @@
 
 #pragma once
 
-#include <iostream>
-#include <cstring>
-#include <cstdlib>
+#include <functional>
 #include <map>
 #include <set>
-#include <functional>
+#include <string>
 #include <variant>
 
 /**
@@ -43,16 +41,28 @@ class CommandLineUtility
 {
   using LambdaWithValue = std::function<void(const char*)>;
   using LambdaWithoutValue = std::function<void()>;
+  using ParameterHandler = std::variant<LambdaWithValue, LambdaWithoutValue>;
 
 public:
-  void registerHandler(const std::string& parameter, std::variant<LambdaWithValue, LambdaWithoutValue> handler,
-                       bool isMandatory = false);
+  /**
+   * Assign to each command parameter a lambda function to handle it.
+   * @param parameter The parameter to handle.
+   * @param handler The lambda function to handle the parameter value.
+   * @param isMandatory True if the parameter is mandatory, else otherwise.
+   */
+  void registerHandler(const std::string& parameter, ParameterHandler handler, bool isMandatory = false);
 
+  /**
+   * Parse the command line and read all parameters.
+   * @param argc The number of tokens in the command line.
+   * @param argv The list of tokens.
+   * @return True if the parsing is succesful.
+   */
   bool parse(int argc, char* argv[]);
 
 private:
-  // Associate a parameter to a lambda function.
-  std::map<std::string, std::variant<LambdaWithValue, LambdaWithoutValue>> handlers;
+  // Map that associates a lambda function to each parameter to process the expected value.
+  std::map<std::string, ParameterHandler> handlers;
 
   // Store all mandatory parameters.
   std::set<std::string> mandatoryParams;

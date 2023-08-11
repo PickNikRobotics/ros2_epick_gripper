@@ -1,7 +1,8 @@
 #include "command_line_utility.hpp"
 
-void CommandLineUtility::registerHandler(const std::string& parameter,
-                                         std::variant<LambdaWithValue, LambdaWithoutValue> handler, bool isMandatory)
+#include <iostream>
+
+void CommandLineUtility::registerHandler(const std::string& parameter, ParameterHandler handler, bool isMandatory)
 {
   handlers[parameter] = handler;
   if (isMandatory)
