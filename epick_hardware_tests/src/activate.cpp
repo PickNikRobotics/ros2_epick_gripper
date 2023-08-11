@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 
   int slave_address = kSlaveAddress;
   cli.registerHandler(
-      "--slave_address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
+      "--slave-address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
 
   GripperMode gripper_mode = kGripperMode;
   cli.registerHandler(
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
   std::chrono::milliseconds gripper_timeout = kGripperTimeout;
   cli.registerHandler(
-      "--gripper_timeout",
+      "--gripper-timeout",
       [&gripper_timeout](const char* value) { gripper_timeout = std::chrono::milliseconds(std::stoi(value)); }, false);
 
   cli.registerHandler("-h", [&]() {
@@ -103,14 +103,14 @@ int main(int argc, char* argv[])
               << "  --port VALUE                 Set the com port (default " << kComPort << ")\n"
               << "  --baudrate VALUE             Set the baudrate (default " << kBaudRate << "bps)\n"
               << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "ms)\n"
-              << "  --slave_address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
+              << "  --slave-address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
               << "  --gripper-mode VALUE         Set the gripper mode (default "
               << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
               << "                               Valid values AutomaticMode, AdvancedMode\n"
               << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
               << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kMaxVacuumPressure << ")\n"
               << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kMinVacuumPressure << ")\n"
-              << "  --gripper_timeout VALUE      Set the gripper timeput in millis (default " << kGripperTimeout.count()
+              << "  --gripper-timeout VALUE      Set the gripper timeput in millis (default " << kGripperTimeout.count()
               << ")\n"
               << "  -h                           Show this help message\n";
     exit(0);
