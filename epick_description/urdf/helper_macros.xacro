@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Helper for simple joint connections -->
+  <xacro:macro name="joint"
+               params="parent
+                       child
+                       name:=''
+                       type:='fixed'
+                       xyz:='0 0 0'
+                       rpy:='0 0 0'">
+
+      <xacro:if value="${name == ''}">
+        <xacro:property name="name" value="${parent}_to_${child}"/>
+      </xacro:if>
+
+      <joint name="${name}" type="fixed">
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <origin xyz="${xyz}" rpy="${rpy}"/>
+      </joint>
+
+  </xacro:macro>
+
+  <!-- Helper for connecting cylinder links -->
+  <xacro:macro name="cylinder_link"
+               params="name
+                       radius
+                       length
+                       parent
+                       color:='1 1 1 1'
+                       origin_xyz:='0 0 0'
+                       origin_rpy:='0 0 0'">
+
+      <link name="${name}">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>          
+            <cylinder radius="${radius}" length="${length}"/>
+          </geometry>
+          <material>
+            <color rgba="${color}"/>
+          </material>
+        </visual>
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <geometry>          
+            <cylinder radius="${radius}" length="${length}"/>
+          </geometry>
+        </collision>
+      </link>
+
+      <xacro:joint parent="${parent}"
+                   child="${name}"
+                   xyz="${origin_xyz}"
+                   rpy="${origin_rpy}"/>
+
+  </xacro:macro>
+</robot>
