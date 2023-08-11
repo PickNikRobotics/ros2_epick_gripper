@@ -88,14 +88,6 @@ constexpr int kWriteResponseSize = 8;
 
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-enum class kFunctionCode : uint8_t
-{
-  ReadInputRegisters = 0x04,
-  PresetSingleRegister = 0x06,
-  PresetMultipleRegisters = 0x10,
-  MasterReadWriteMultipleRegisters = 0x17,
-};
-
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
     std::move(serial_interface),
@@ -118,7 +110,7 @@ void DefaultDriver::activate()
 {
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
     0x00,  // Number of registers to write MSB.
@@ -151,7 +143,7 @@ void DefaultDriver::deactivate()
 {
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(kFunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
     0x00,  // Number of registers to write MSB.
@@ -196,7 +188,7 @@ void DefaultDriver::set_max_vacuum_pressure(const float& vacuum_pressure_kPa)
 
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(kFunctionCode::PresetSingleRegister),
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
     0x03,  // Register address MSB
     0xE9,  // Register address LSB
     0x00,  // Reserved byte
@@ -226,7 +218,7 @@ void DefaultDriver::set_min_vacuum_pressure(const float& vacuum_pressure_kPa)
 
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(kFunctionCode::PresetSingleRegister),
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
     0x03,  // Register address MSB
     0xEA,  // Register address LSB
     0x00,  // Reserved byte
@@ -273,7 +265,7 @@ GripperStatus DefaultDriver::get_status()
 {
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(kFunctionCode::ReadInputRegisters),
+    static_cast<uint8_t>(driver_utils::FunctionCode::ReadInputRegisters),
     data_utils::get_msb(kGripperStatusRegister),
     data_utils::get_lsb(kGripperStatusRegister),
     0x00,  // Number of registers to read MSB

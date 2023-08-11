@@ -29,9 +29,11 @@
 
 #include <gtest/gtest.h>
 
-#include "mock/mock_serial.hpp"
 #include "epick_driver/data_utils.hpp"
 #include "epick_driver/default_driver.hpp"
+#include "epick_driver/driver_utils.hpp"
+
+#include "mock/mock_serial.hpp"
 
 namespace epick_driver::test
 {
@@ -49,7 +51,7 @@ TEST(TestDefaultDriver, activate)
   // clang-format off
   const std::vector<uint8_t> expected_command{
     slave_address,
-    0x16, // Function code.
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
     // Address of the first requested register - MSB, LSB.
     0x03, 0xE8,
     // Number of registers requested - MSB, LSB.
@@ -63,7 +65,7 @@ TEST(TestDefaultDriver, activate)
     // Value written in the third register - MSB, LSB.
     0x00, 0x00,
     // CRC-16
-    0x7A, 0xE9
+    0x72, 0xE1
   };
   // clang-format on
 
@@ -87,7 +89,7 @@ TEST(TestDefaultDriver, deactivate)
   // clang-format off
   const std::vector<uint8_t> expected_command{
     slave_address,
-    0x16, // Function code.
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
     // Address of the first requested register - MSB, LSB.
     0x03, 0xE8,
     // Number of registers requested - MSB, LSB.
@@ -101,7 +103,7 @@ TEST(TestDefaultDriver, deactivate)
     // Value written in the third register - MSB, LSB.
     0x00, 0x00,
     // CRC-16
-    0x7B, 0x38
+    0x73, 0x30
   };
   // clang-format on
 
@@ -111,6 +113,33 @@ TEST(TestDefaultDriver, deactivate)
 
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
   driver->deactivate();
+
+  ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
+}
+
+TEST(TestDefaultDriver, set_max_vacuum_pressure)
+{
+  uint8_t slave_address = 0x09;
+
+  // clang-format off
+  const std::vector<uint8_t> expected_command{
+    slave_address,
+    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
+    // Address of the first requested register - MSB, LSB.
+    0x03, 0xE9,
+    // Value written in the first register - MSB, LSB.
+    0x00, 0x19, // Absolute pressure 25kPa, vacuum pressure -75kPa.
+    // CRC-16
+    0x98, 0xF8
+  };
+  // clang-format on
+
+  std::vector<uint8_t> actual_command;
+  auto serial = std::make_unique<MockSerial>();
+  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
+
+  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  driver->set_max_vacuum_pressure(-75);
 
   ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
 }

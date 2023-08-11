@@ -43,6 +43,15 @@
 namespace epick_driver::driver_utils
 {
 
+/** These represent read and write actions. */
+enum class FunctionCode : uint8_t
+{
+  ReadInputRegisters = 0x04,
+  PresetSingleRegister = 0x06,
+  PresetMultipleRegisters = 0x10,
+  MasterReadWriteMultipleRegisters = 0x17,
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Gripper activation request.
 ///
