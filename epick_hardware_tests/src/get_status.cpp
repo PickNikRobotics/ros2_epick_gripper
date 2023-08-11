@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
     epick_driver::GripperStatus status = driver->get_status();
 
-    std::cout << "Status retrieved." << std::endl;
+    std::cout << "Status retrieved:" << std::endl;
 
     static std::map<epick_driver::GripperActivation, std::string> gripper_activation_names = {
       { epick_driver::GripperActivation::Inactive, "Inactive" },
@@ -132,9 +132,9 @@ int main(int argc, char* argv[])
       { epick_driver::GripperMode::Reserved, "Reserved" }
     };
 
-    std::cout << "Activation: " << gripper_activation_names.at(status.activation) << std::endl;
-    std::cout << "Mode: " << gripper_mode_names.at(status.mode) << std::endl;
-    std::cout << "Object detection: " << object_detection_names.at(status.object_detection) << std::endl;
+    std::cout << " - activation: " << gripper_activation_names.at(status.activation) << std::endl;
+    std::cout << " - mode: " << gripper_mode_names.at(status.mode) << std::endl;
+    std::cout << " - object detection: " << object_detection_names.at(status.object_detection) << std::endl;
   }
   catch (const serial::IOException& e)
   {
