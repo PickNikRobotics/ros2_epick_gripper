@@ -37,7 +37,7 @@
 #include <vector>
 #include <iostream>
 
-// This is a command to activate the gripper and read its status.
+// This is a command to read the status of the gripper.
 
 using namespace epick_driver;
 
@@ -45,10 +45,6 @@ constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
 constexpr auto kTimeout = 500;  // milliseconds
 constexpr auto kSlaveAddress = 0x09;
-constexpr auto kGripperMode = GripperMode::AutomaticMode;
-constexpr auto kMaxVacuumPressure = -100.0f;  // kPa
-constexpr auto kMinVacuumPressure = -10.0f;   // kPa
-constexpr auto kGripperTimeout = std::chrono::milliseconds(2000);
 
 int main(int argc, char* argv[])
 {
@@ -70,32 +66,6 @@ int main(int argc, char* argv[])
   cli.registerHandler(
       "--slave-address", [&slave_address](const char* value) { slave_address = std::stoi(value); }, false);
 
-  GripperMode gripper_mode = kGripperMode;
-  cli.registerHandler(
-      "--gripper-mode",
-      [&gripper_mode](const char* value) {
-        if (strcmp(value, "AdvancedMode") == 0)
-        {
-          gripper_mode = GripperMode::AdvancedMode;
-        }
-      },
-      false);
-
-  float max_vacuum_pressure = kMaxVacuumPressure;  // pKa
-  cli.registerHandler(
-      "--max-vacuum-pressure",
-      [&max_vacuum_pressure](const char* value) { max_vacuum_pressure = std::strtof(value, nullptr); }, false);
-
-  float min_vacuum_pressure = kMinVacuumPressure;  // pKa
-  cli.registerHandler(
-      "--min-vacuum-pressure",
-      [&min_vacuum_pressure](const char* value) { min_vacuum_pressure = std::strtof(value, nullptr); }, false);
-
-  std::chrono::milliseconds gripper_timeout = kGripperTimeout;
-  cli.registerHandler(
-      "--gripper-timeout",
-      [&gripper_timeout](const char* value) { gripper_timeout = std::chrono::milliseconds(std::stoi(value)); }, false);
-
   cli.registerHandler("-h", [&]() {
     std::cout << "Usage: ./set_relative_pressure [OPTIONS]\n"
               << "Options:\n"
@@ -103,14 +73,6 @@ int main(int argc, char* argv[])
               << "  --baudrate VALUE             Set the baudrate (default " << kBaudRate << "bps)\n"
               << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "ms)\n"
               << "  --slave-address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
-              << "  --gripper-mode VALUE         Set the gripper mode (default "
-              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
-              << "                               Valid values AutomaticMode, AdvancedMode\n"
-              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
-              << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kMaxVacuumPressure << ")\n"
-              << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kMinVacuumPressure << ")\n"
-              << "  --gripper-timeout VALUE      Set the gripper timeput in millis (default " << kGripperTimeout.count()
-              << ")\n"
               << "  -h                           Show this help message\n";
     exit(0);
   });
@@ -128,20 +90,12 @@ int main(int argc, char* argv[])
     serial->set_timeout(timeout);
 
     auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
-    driver->set_mode(gripper_mode);
-    driver->set_max_vacuum_pressure(max_vacuum_pressure);
-    driver->set_min_vacuum_pressure(min_vacuum_pressure);
-    driver->set_gripper_timeout(gripper_timeout);
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
     std::cout << " - read/write timeut: " << timeout << "ms" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
-    std::cout << " - gripper mode: " << driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
-    std::cout << " - max vacuum pressure: " << max_vacuum_pressure << "kPa" << std::endl;
-    std::cout << " - min vacuum pressure: " << min_vacuum_pressure << "kPa" << std::endl;
-    std::cout << " - gripper timeout: " << gripper_timeout.count() << "ms" << std::endl;
 
     std::cout << "Checking if the gripper is connected..." << std::endl;
 
@@ -153,12 +107,6 @@ int main(int argc, char* argv[])
     }
 
     std::cout << "The gripper is connected." << std::endl;
-    std::cout << "Activating the gripper..." << std::endl;
-
-    driver->activate();
-
-    std::cout << "The gripper is activated." << std::endl;
-
     std::cout << "Reading the gripper status..." << std::endl;
 
     epick_driver::GripperStatus status = driver->get_status();
