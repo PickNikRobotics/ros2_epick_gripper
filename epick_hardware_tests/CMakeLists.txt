@@ -49,5 +49,24 @@ target_include_directories(get_status
 target_link_libraries(get_status epick_driver::epick_driver)
 ament_target_dependencies(get_status epick_driver)
 
+add_executable(grip
+    src/grip.cpp
+    src/command_line_utility.hpp
+    src/command_line_utility.cpp
+)
+target_include_directories(grip
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(grip epick_driver::epick_driver)
+ament_target_dependencies(grip epick_driver)
+
+add_executable(release
+    src/release.cpp
+    src/command_line_utility.hpp
+    src/command_line_utility.cpp
+)
+target_include_directories(release
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(release epick_driver::epick_driver)
+ament_target_dependencies(release epick_driver)
 
 ament_package()

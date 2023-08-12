@@ -47,6 +47,7 @@ add_library(
     src/data_utils.cpp
     src/default_driver.cpp
     src/default_driver_factory.cpp
+    src/driver_utils.cpp
     src/default_serial.cpp
 )
 target_include_directories(

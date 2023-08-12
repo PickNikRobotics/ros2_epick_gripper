@@ -88,21 +88,6 @@ constexpr int kWriteResponseSize = 8;
 
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-/**
- * Sets bits in a register based on a bitmask and a set of bits.
- * @param reg Initial register value.
- * @param bitmask Mask that indicates which bits in the register should be modified.
- *        A '1' in a bit position indicates that the corresponding bit in the register
- *        will be modified, and a '0' means it will remain unchanged.
- * @param bits Bits to be set in the register. Only the bits that are '1' in the bitmask
- *        will be set in the register. Other bits will be ignored.
- */
-void set_bits(uint8_t& reg, uint8_t bitmask, uint8_t bits)
-{
-  reg &= ~bitmask;
-  reg |= (bits & bitmask);
-}
-
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
   : serial_interface_{
     std::move(serial_interface),
@@ -134,15 +119,9 @@ void DefaultDriver::activate()
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
 
-  uint8_t action_register = 0b00000001;  // Activate action request.
-  if (gripper_mode_ == GripperMode::AdvancedMode)
-  {
-    set_bits(action_register, driver_utils::gMOD_mask, 0b00000010);
-  }
-  else
-  {
-    set_bits(action_register, driver_utils::gMOD_mask, 0b00000000);
-  }
+  uint8_t action_register = 0b00000000;
+  driver_utils::set_gripper_activation_action(action_register, GripperActivationAction::Activate);
+  driver_utils::set_gripper_mode(action_register, gripper_mode_);
 
   std::vector<uint8_t> request = {
     slave_address_,
@@ -270,13 +249,13 @@ GripperStatus DefaultDriver::get_status()
   // The content of the requested registers starts from byte 3.
 
   GripperStatus status;
-  status.gripper_activation_action = driver_utils::gACT_lookup().at(response[3] & driver_utils::gACT_mask);
-  status.gripper_mode = driver_utils::gMOD_lookup().at(response[3] & driver_utils::gMOD_mask);
-  status.gripper_regulate_action = driver_utils::gGTO_lookup().at(response[3] & driver_utils::gGTO_mask);
-  status.gripper_activation_status = driver_utils::gSTA_lookup().at(response[3] & driver_utils::gSTA_mask);
-  status.object_detection_status = driver_utils::gOBJ_lookup().at(response[3] & driver_utils::gOBJ_mask);
-  status.actuator_status = driver_utils::gVAS_lookup().at(response[4] & driver_utils::gVAS_mask);
-  status.gripper_fault_status = driver_utils::gFLT_lookup().at(response[5] & driver_utils::gFLT_mask);
+  status.gripper_activation_action = driver_utils::get_gripper_activation_action(response[3]);
+  status.gripper_mode = driver_utils::get_gripper_mode(response[3]);
+  status.gripper_regulate_action = driver_utils::get_gripper_regulate_action(response[3]);
+  status.gripper_activation_status = driver_utils::get_gripper_activation_status(response[3]);
+  status.object_detection_status = driver_utils::get_object_detection_status(response[3]);
+  status.actuator_status = driver_utils::get_actuator_status(response[4]);
+  status.gripper_fault_status = driver_utils::get_gripper_fault_status(response[5]);
 
   // The requested pressure level in kPa:
   status.max_vacuum_pressure = static_cast<float>(response[6]) - 100;
