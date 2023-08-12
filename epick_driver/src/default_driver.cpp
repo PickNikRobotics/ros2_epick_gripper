@@ -45,7 +45,7 @@
 // |-------------------------------+-------------------------------+
 // | Address | Function            | Address | Function            |
 // |---------+---------------------+---------+---------------------|
-// | 0x03E8  | Action Request      | 0x07D0  | Gripper Status      |
+// | 0x03E8  | Action Register     | 0x07D0  | Gripper Status      |
 // |         | Reserved            |         | Gripper Status Ext. |
 // +---------+---------------------+---------+---------------------+
 // | 0x03E9  | Reserved            | 0x07D1  | Fault status        |
@@ -137,7 +137,11 @@ void DefaultDriver::activate()
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
 
-  // TODO: set the gripper mode.
+  uint8_t action_register = 0x00000001;
+  if (gripper_mode_ == GripperMode::AdvancedMode)
+  {
+    set_bits(action_register, driver_utils::gMOD_mask, 0x00000010);
+  }
 
   std::vector<uint8_t> request = {
     slave_address_,
@@ -147,12 +151,12 @@ void DefaultDriver::activate()
     0x00,                   // Number of registers to write MSB.
     0x03,                   // Number of registers to write LSB.
     0x06,                   // Number of bytes to write.
-    0x01,                   // Register 1 MSB - set gACT to 1.
-    0x00,                   // Register 1 LSB - Reserved.
-    0x00,                   // Register 2 MSB - Reserved.
-    max_absolute_pressure,  // Register 2 LSB - Max vacuum pressure.
-    timeout_in_hundredths,  // Register 3 MSB - Gripper Timeout.
-    min_absolute_pressure   // Register 3 LSB - Min vacuum pressure
+    action_register,        // Action register.
+    0x00,                   // Reserved.
+    0x00,                   // Reserved.
+    max_absolute_pressure,  // Max absolute pressure.
+    timeout_in_hundredths,  // Gripper Timeout.
+    min_absolute_pressure   // Min absolute pressure
   };
   auto crc = crc_utils::compute_crc(request);
   request.push_back(data_utils::get_msb(crc));
