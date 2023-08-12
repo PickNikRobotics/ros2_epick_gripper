@@ -142,6 +142,12 @@ void DefaultDriver::activate()
   {
     set_bits(action_register, driver_utils::gMOD_mask, 0x00000010);
   }
+  else
+  {
+    set_bits(action_register, driver_utils::gMOD_mask, 0x00000000);
+  }
+
+  std::cout << "*****" << action_register;
 
   std::vector<uint8_t> request = {
     slave_address_,
