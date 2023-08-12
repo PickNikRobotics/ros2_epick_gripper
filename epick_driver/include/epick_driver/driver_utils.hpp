@@ -99,8 +99,8 @@ const std::unordered_map<uint8_t, GripperMode>& gMOD_lookup()
   static const std::unordered_map<uint8_t, GripperMode> map{
     { 0b00000000, GripperMode::AutomaticMode },
     { 0b00000010, GripperMode::AdvancedMode },
-    { 0b00000100, GripperMode::Reserved },
-    { 0b00000110, GripperMode::Reserved } };
+    { 0b00000100, GripperMode::Unknown },
+    { 0b00000110, GripperMode::Unknown } };
   // clang-format on
   return map;
 }
@@ -116,7 +116,7 @@ const std::string gripper_mode_to_string(const GripperMode gripper_mode)
   static std::map<GripperMode, std::string> map = {
     { GripperMode::AutomaticMode, "AutomaticMode" },
     { GripperMode::AdvancedMode, "AdvancedMode" },
-    { GripperMode::Reserved, "Reserved" } };
+    { GripperMode::Unknown, "Unknown" } };
   // clang-format on
   return map.at(gripper_mode);
 }

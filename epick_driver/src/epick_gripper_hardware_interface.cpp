@@ -43,8 +43,7 @@ EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 }
 
 // This constructor is use for testing only.
-EpickGripperHardwareInterface::EpickGripperHardwareInterface(
-    std::unique_ptr<DriverFactory> driver_factory)
+EpickGripperHardwareInterface::EpickGripperHardwareInterface(std::unique_ptr<DriverFactory> driver_factory)
   : driver_factory_{ std::move(driver_factory) }
 {
 }

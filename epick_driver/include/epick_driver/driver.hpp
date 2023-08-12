@@ -46,7 +46,7 @@ enum class GripperMode
 {
   AutomaticMode,  // Automatic.
   AdvancedMode,   // Advanced.
-  Reserved
+  Unknown
 };
 
 enum class GripperRegulateAction

@@ -96,14 +96,11 @@ const auto kLogger = rclcpp::get_logger("DefaultDriver");
  *        will be modified, and a '0' means it will remain unchanged.
  * @param bits Bits to be set in the register. Only the bits that are '1' in the bitmask
  *        will be set in the register. Other bits will be ignored.
- *
- * @return Modified register value after applying the bitmask and bits.
  */
-uint8_t set_bits(uint8_t reg, uint8_t bitmask, uint8_t bits)
+void set_bits(uint8_t& reg, uint8_t bitmask, uint8_t bits)
 {
   reg &= ~bitmask;
   reg |= (bits & bitmask);
-  return reg;
 }
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
@@ -137,17 +134,15 @@ void DefaultDriver::activate()
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
 
-  uint8_t action_register = 0x00000001;
+  uint8_t action_register = 0b00000001;  // Activate action request.
   if (gripper_mode_ == GripperMode::AdvancedMode)
   {
-    set_bits(action_register, driver_utils::gMOD_mask, 0x00000010);
+    set_bits(action_register, driver_utils::gMOD_mask, 0b00000010);
   }
   else
   {
-    set_bits(action_register, driver_utils::gMOD_mask, 0x00000000);
+    set_bits(action_register, driver_utils::gMOD_mask, 0b00000000);
   }
-
-  std::cout << "*****" << action_register;
 
   std::vector<uint8_t> request = {
     slave_address_,
@@ -223,6 +218,11 @@ void DefaultDriver::release()
 
 void DefaultDriver::set_mode(const GripperMode gripper_mode)
 {
+  if (gripper_mode == GripperMode::Unknown)
+  {
+    RCLCPP_ERROR(kLogger, "Invalid gripper mode: %s", driver_utils::gripper_mode_to_string(gripper_mode).c_str());
+    return;
+  }
   gripper_mode_ = gripper_mode;
 }
 
