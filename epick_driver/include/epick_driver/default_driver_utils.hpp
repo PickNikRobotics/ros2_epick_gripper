@@ -35,7 +35,7 @@
  * - set and get information in and out of a byte register using enums;
  * - converts enums into strings for testing and debugging.
  */
-namespace epick_driver::driver_utils
+namespace epick_driver::default_driver_utils
 {
 
 /** These represent read and write actions. */

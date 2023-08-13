@@ -30,7 +30,7 @@
 
 #include "epick_driver/crc_utils.hpp"
 #include "epick_driver/data_utils.hpp"
-#include "epick_driver/driver_utils.hpp"
+#include "epick_driver/default_driver_utils.hpp"
 
 #include "serial/serial.h"
 
@@ -120,12 +120,12 @@ void DefaultDriver::activate()
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
 
   uint8_t action_request_register = 0b00000000;
-  driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
-  driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
+  default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
+  default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
 
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
     0x00,                     // Number of registers to write MSB.
@@ -157,7 +157,7 @@ void DefaultDriver::deactivate()
 {
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
     0x00,  // Number of registers to write MSB.
@@ -191,13 +191,13 @@ void DefaultDriver::grip()
 {
   GripperStatus gripper_status = get_status();
   uint8_t action_request_register = 0b00000000;
-  driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
-  driver_utils::set_gripper_mode(action_request_register, gripper_status.gripper_mode);
-  driver_utils::set_gripper_regulate_action(action_request_register,
+  default_driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
+  default_driver_utils::set_gripper_mode(action_request_register, gripper_status.gripper_mode);
+  default_driver_utils::set_gripper_regulate_action(action_request_register,
                                             GripperRegulateAction::FollowRequestedVacuumParameters);
 
   std::vector<uint8_t> request = { slave_address_,
-                                   static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
+                                   static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetSingleRegister),
                                    data_utils::get_msb(kActionRequestRegisterAddress),
                                    data_utils::get_lsb(kActionRequestRegisterAddress),
                                    action_request_register,
@@ -223,12 +223,12 @@ void DefaultDriver::release()
 {
   GripperStatus gripper_status = get_status();
   uint8_t action_request_register = 0b00000000;
-  driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
-  driver_utils::set_gripper_mode(action_request_register, gripper_status.gripper_mode);
-  driver_utils::set_gripper_regulate_action(action_request_register, GripperRegulateAction::StopVacuumGenerator);
+  default_driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
+  default_driver_utils::set_gripper_mode(action_request_register, gripper_status.gripper_mode);
+  default_driver_utils::set_gripper_regulate_action(action_request_register, GripperRegulateAction::StopVacuumGenerator);
 
   std::vector<uint8_t> request = { slave_address_,
-                                   static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
+                                   static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetSingleRegister),
                                    data_utils::get_msb(kActionRequestRegisterAddress),
                                    data_utils::get_lsb(kActionRequestRegisterAddress),
                                    action_request_register,
@@ -254,7 +254,7 @@ void DefaultDriver::set_mode(const GripperMode gripper_mode)
 {
   if (gripper_mode == GripperMode::Unknown)
   {
-    RCLCPP_ERROR(kLogger, "Invalid gripper mode: %s", driver_utils::gripper_mode_to_string(gripper_mode).c_str());
+    RCLCPP_ERROR(kLogger, "Invalid gripper mode: %s", default_driver_utils::gripper_mode_to_string(gripper_mode).c_str());
     return;
   }
   gripper_mode_ = gripper_mode;
@@ -279,7 +279,7 @@ GripperStatus DefaultDriver::get_status()
 {
   std::vector<uint8_t> request = {
     slave_address_,
-    static_cast<uint8_t>(driver_utils::FunctionCode::ReadInputRegisters),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::ReadInputRegisters),
     data_utils::get_msb(kGripperStatusRegister),
     data_utils::get_lsb(kGripperStatusRegister),
     0x00,  // Number of registers to read MSB
@@ -304,13 +304,13 @@ GripperStatus DefaultDriver::get_status()
   // The content of the requested registers starts from byte 3.
 
   GripperStatus status;
-  status.gripper_activation_action = driver_utils::get_gripper_activation_action(response[3]);
-  status.gripper_mode = driver_utils::get_gripper_mode(response[3]);
-  status.gripper_regulate_action = driver_utils::get_gripper_regulate_action(response[3]);
-  status.gripper_activation_status = driver_utils::get_gripper_activation_status(response[3]);
-  status.object_detection_status = driver_utils::get_object_detection_status(response[3]);
-  status.actuator_status = driver_utils::get_actuator_status(response[4]);
-  status.gripper_fault_status = driver_utils::get_gripper_fault_status(response[5]);
+  status.gripper_activation_action = default_driver_utils::get_gripper_activation_action(response[3]);
+  status.gripper_mode = default_driver_utils::get_gripper_mode(response[3]);
+  status.gripper_regulate_action = default_driver_utils::get_gripper_regulate_action(response[3]);
+  status.gripper_activation_status = default_driver_utils::get_gripper_activation_status(response[3]);
+  status.object_detection_status = default_driver_utils::get_object_detection_status(response[3]);
+  status.actuator_status = default_driver_utils::get_actuator_status(response[4]);
+  status.gripper_fault_status = default_driver_utils::get_gripper_fault_status(response[5]);
 
   // The requested pressure level in kPa:
   status.max_vacuum_pressure = static_cast<float>(response[6]) - 100;

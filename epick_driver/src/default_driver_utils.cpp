@@ -26,14 +26,14 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/driver_utils.hpp"
+#include "epick_driver/default_driver_utils.hpp"
 
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <map>
 
-namespace epick_driver::driver_utils
+namespace epick_driver::default_driver_utils
 {
 
 /**
@@ -79,7 +79,7 @@ GripperActivationAction get_gripper_activation_action(uint8_t& reg)
     { 0b00000000, GripperActivationAction::ClearGripperFaultStatus },
     { 0b00000001, GripperActivationAction::Activate } };
   // clang-format on
-  return map.at(reg & driver_utils::gACT_mask);
+  return map.at(reg & default_driver_utils::gACT_mask);
 }
 
 const std::string gripper_activation_action_to_string(const GripperActivationAction gripper_activation_action)
@@ -123,7 +123,7 @@ GripperMode get_gripper_mode(uint8_t& reg)
     { 0b00000100, GripperMode::Unknown },
     { 0b00000110, GripperMode::Unknown } };
   // clang-format on
-  return map.at(reg & driver_utils::gMOD_mask);
+  return map.at(reg & default_driver_utils::gMOD_mask);
 }
 
 const std::string gripper_mode_to_string(const GripperMode gripper_mode)
@@ -165,7 +165,7 @@ GripperRegulateAction get_gripper_regulate_action(uint8_t& reg)
     { 0b00000000, GripperRegulateAction::StopVacuumGenerator },
     { 0b00001000, GripperRegulateAction::FollowRequestedVacuumParameters } };
   // clang-format on
-  return map.at(reg & driver_utils::gGTO_mask);
+  return map.at(reg & default_driver_utils::gGTO_mask);
 }
 
 const std::string gripper_regulate_action_to_string(const GripperRegulateAction gripper_regulate_action)
@@ -220,7 +220,7 @@ GripperActivationStatus get_gripper_activation_status(uint8_t& reg)
     { 0b00110000, GripperActivationStatus::GripperOperational },
     { 0b00100000, GripperActivationStatus::Unknown } };
   // clang-format on
-  return map.at(reg & driver_utils::gSTA_mask);
+  return map.at(reg & default_driver_utils::gSTA_mask);
 }
 
 const std::string gripper_activation_status_to_string(const GripperActivationStatus gripper_activation_status)
@@ -249,7 +249,7 @@ ObjectDetectionStatus get_object_detection_status(uint8_t& reg)
     { 0b10000000, ObjectDetectionStatus::ObjectDetectedAtMaxPressure },
     { 0b11000000, ObjectDetectionStatus::NoObjectDetected } };
   // clang-format on
-  return map.at(reg & driver_utils::gOBJ_mask);
+  return map.at(reg & default_driver_utils::gOBJ_mask);
 }
 
 const std::string object_detection_to_string(const ObjectDetectionStatus object_detection)
@@ -292,7 +292,7 @@ GripperFaultStatus get_gripper_fault_status(uint8_t& reg)
     { 0b00001111, GripperFaultStatus::AutomaticReleaseCompleted }           // 0xF
   };
   // clang-format on
-  return map.at(reg & driver_utils::gFLT_mask);
+  return map.at(reg & default_driver_utils::gFLT_mask);
 }
 
 const std::string fault_status_to_string(const GripperFaultStatus fault_status)
@@ -331,7 +331,7 @@ ActuatorStatus get_actuator_status(uint8_t& reg)
     { 0b10, ActuatorStatus::PassiveReleasing },
     { 0b11, ActuatorStatus::ActiveReleasing } };
   // clang-format on
-  return map.at(reg & driver_utils::gVAS_mask);
+  return map.at(reg & default_driver_utils::gVAS_mask);
 }
 
 const std::string actuator_status_to_string(const ActuatorStatus actuator_status)
@@ -346,4 +346,4 @@ const std::string actuator_status_to_string(const ActuatorStatus actuator_status
   return map.at(actuator_status);
 }
 
-}  // namespace epick_driver::driver_utils
+}  // namespace epick_driver::default_driver_utils

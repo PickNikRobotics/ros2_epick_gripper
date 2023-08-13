@@ -28,7 +28,7 @@
 
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
-#include "epick_driver/driver_utils.hpp"
+#include "epick_driver/default_driver_utils.hpp"
 
 #include "command_line_utility.hpp"
 
@@ -104,9 +104,9 @@ int main(int argc, char* argv[])
               << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "ms)\n"
               << "  --slave-address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
               << "  --gripper-mode VALUE         Set the gripper mode (default "
-              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << default_driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
               << "                               Valid values AutomaticMode, AdvancedMode\n"
-              << driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << default_driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
               << "  --max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kMaxVacuumPressure << ")\n"
               << "  --min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kMinVacuumPressure << ")\n"
               << "  --gripper-timeout VALUE      Set the gripper timeput in millis (default " << kGripperTimeout.count()
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
     std::cout << " - read/write timeut: " << timeout << "ms" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
-    std::cout << " - gripper mode: " << driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
+    std::cout << " - gripper mode: " << default_driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
     std::cout << " - max vacuum pressure: " << max_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - min vacuum pressure: " << min_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - gripper timeout: " << gripper_timeout.count() << "ms" << std::endl;
@@ -166,15 +166,17 @@ int main(int argc, char* argv[])
     std::cout << "Status retrieved:" << std::endl;
 
     std::cout << " - gripper activation action: "
-              << driver_utils::gripper_activation_action_to_string(status.gripper_activation_action) << std::endl;
-    std::cout << " - gripper regulate action: "
-              << driver_utils::gripper_regulate_action_to_string(status.gripper_regulate_action) << std::endl;
-    std::cout << " - gripper mode: " << driver_utils::gripper_mode_to_string(status.gripper_mode) << std::endl;
-    std::cout << " - object detection status: "
-              << driver_utils::object_detection_to_string(status.object_detection_status) << std::endl;
-    std::cout << " - gripper fault status: " << driver_utils::fault_status_to_string(status.gripper_fault_status)
+              << default_driver_utils::gripper_activation_action_to_string(status.gripper_activation_action)
               << std::endl;
-    std::cout << " - actuator status: " << driver_utils::actuator_status_to_string(status.actuator_status) << std::endl;
+    std::cout << " - gripper regulate action: "
+              << default_driver_utils::gripper_regulate_action_to_string(status.gripper_regulate_action) << std::endl;
+    std::cout << " - gripper mode: " << default_driver_utils::gripper_mode_to_string(status.gripper_mode) << std::endl;
+    std::cout << " - object detection status: "
+              << default_driver_utils::object_detection_to_string(status.object_detection_status) << std::endl;
+    std::cout << " - gripper fault status: "
+              << default_driver_utils::fault_status_to_string(status.gripper_fault_status) << std::endl;
+    std::cout << " - actuator status: " << default_driver_utils::actuator_status_to_string(status.actuator_status)
+              << std::endl;
     std::cout << " - max vacuum pressure: " << status.max_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - actual vacuum pressure: " << status.actual_vacuum_pressure << "kPa" << std::endl;
   }

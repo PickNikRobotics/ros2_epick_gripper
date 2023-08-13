@@ -31,7 +31,7 @@
 
 #include "epick_driver/data_utils.hpp"
 #include "epick_driver/default_driver.hpp"
-#include "epick_driver/driver_utils.hpp"
+#include "epick_driver/default_driver_utils.hpp"
 
 #include "mock/mock_serial.hpp"
 
@@ -51,7 +51,7 @@ TEST(TestDefaultDriver, activate)
   // clang-format off
   const std::vector<uint8_t> expected_command{
     slave_address,
-    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     // Address of the first requested register - MSB, LSB.
     0x03, 0xE8,
     // Number of registers requested - MSB, LSB.
@@ -89,7 +89,7 @@ TEST(TestDefaultDriver, deactivate)
   // clang-format off
   const std::vector<uint8_t> expected_command{
     slave_address,
-    static_cast<uint8_t>(driver_utils::FunctionCode::PresetMultipleRegisters),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     // Address of the first requested register - MSB, LSB.
     0x03, 0xE8,
     // Number of registers requested - MSB, LSB.
@@ -124,7 +124,7 @@ TEST(TestDefaultDriver, set_max_vacuum_pressure)
   // clang-format off
   const std::vector<uint8_t> expected_command{
     slave_address,
-    static_cast<uint8_t>(driver_utils::FunctionCode::PresetSingleRegister),
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetSingleRegister),
     // Address of the first requested register - MSB, LSB.
     0x03, 0xE9,
     // Value written in the first register - MSB, LSB.
