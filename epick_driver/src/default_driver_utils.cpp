@@ -195,6 +195,21 @@ const std::unordered_map<uint8_t, GripperReleaseAction>& gATR_lookup()
   return map;
 }
 
+void set_gripper_automatic_release_action(uint8_t& reg, const GripperReleaseAction gripper_release_action)
+{
+  switch (gripper_release_action)
+  {
+    case GripperReleaseAction::NormalRelease:
+      set_bits(reg, gATR_mask, 0b00000000);
+      break;
+    case GripperReleaseAction::ReleaseWithoutTimeout:
+      set_bits(reg, gATR_mask, 0b00010000);
+      break;
+    default:
+      break;
+  }
+}
+
 const std::string gripper_release_action_to_string(const GripperReleaseAction gripper_release_action)
 {
   // clang-format off

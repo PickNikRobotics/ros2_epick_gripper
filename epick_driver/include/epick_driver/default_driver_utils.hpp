@@ -51,6 +51,11 @@ enum class FunctionCode : uint8_t
 /// Gripper activation request.
 ///
 
+/**
+ * Set the gripper activation action bits into the given register.
+ * @param reg The register to update.
+ * @param gripper_activation_action An enum indicaing the bits to be set.
+ */
 void set_gripper_activation_action(uint8_t& reg, const GripperActivationAction gripper_activation_action);
 
 GripperActivationAction get_gripper_activation_action(uint8_t& reg);
@@ -66,8 +71,18 @@ const std::string gripper_activation_action_to_string(const GripperActivationAct
 /// Gripper mode.
 ///
 
+/**
+ * Set the gripper mode bits into the given register.
+ * @param reg The register to update.
+ * @param gripper_mode An enum indicaing the bits to be set.
+ */
 void set_gripper_mode(uint8_t& reg, const GripperMode gripper_mode);
 
+/**
+ * Get the gripper mode from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The gripper mode.
+ */
 GripperMode get_gripper_mode(uint8_t& reg);
 
 /**
@@ -81,8 +96,18 @@ const std::string gripper_mode_to_string(const GripperMode gripper_mode);
 /// Regulate.
 ///
 
+/**
+ * Set the gripper regulate action bits into the given register.
+ * @param reg The register to update.
+ * @param regulate_action An enum indicaing the bits to be set.
+ */
 void set_gripper_regulate_action(uint8_t& reg, const GripperRegulateAction regulate_action);
 
+/**
+ * Get the gripper regulate action from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The gripper regulate action.
+ */
 GripperRegulateAction get_gripper_regulate_action(uint8_t& reg);
 
 /**
@@ -97,6 +122,13 @@ const std::string gripper_regulate_action_to_string(const GripperRegulateAction 
 ///
 
 /**
+ * Set the gripper automatic release action bits into the given register.
+ * @param reg The register to update.
+ * @param gripper_release_action An enum indicaing the bits to be set.
+ */
+void set_gripper_automatic_release_action(uint8_t& reg, const GripperReleaseAction gripper_release_action);
+
+/**
  * Convert a GripperReleaseAction enum into a string.
  * @param gripper_release_action The enum.
  * @return A string representation of the given enum
@@ -107,6 +139,11 @@ const std::string gripper_release_action_to_string(const GripperReleaseAction gr
 /// Activation status.
 ///
 
+/**
+ * Get the gripper activations status from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The gripper activations status.
+ */
 GripperActivationStatus get_gripper_activation_status(uint8_t& reg);
 
 /**
@@ -120,6 +157,11 @@ const std::string gripper_activation_status_to_string(const GripperActivationSta
 /// Object status
 ///
 
+/**
+ * Get the object detection status from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The object detection status.
+ */
 ObjectDetectionStatus get_object_detection_status(uint8_t& reg);
 
 /**
@@ -133,6 +175,11 @@ const std::string object_detection_to_string(const ObjectDetectionStatus object_
 /// Gripper fault status
 ///
 
+/**
+ * Get the gripper fault status from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The gripper fault status.
+ */
 GripperFaultStatus get_gripper_fault_status(uint8_t& reg);
 
 /**
@@ -146,6 +193,11 @@ const std::string fault_status_to_string(const GripperFaultStatus fault_status);
 /// Actuator status
 ///
 
+/**
+ * Get the gripper actuator status from the given register by reading the corresponding bits.
+ * @param reg The register to read.
+ * @param The gripper actuator status.
+ */
 ActuatorStatus get_actuator_status(uint8_t& reg);
 
 /**
@@ -155,4 +207,4 @@ ActuatorStatus get_actuator_status(uint8_t& reg);
  */
 const std::string actuator_status_to_string(const ActuatorStatus actuator_status);
 
-};  // namespace epick_driver::driver_utils
+};  // namespace epick_driver::default_driver_utils
