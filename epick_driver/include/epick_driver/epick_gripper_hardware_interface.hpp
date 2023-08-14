@@ -32,16 +32,17 @@
 #include "epick_driver/driver_factory.hpp"
 #include "epick_driver/visibility_control.hpp"
 
-#include "hardware_interface/system_interface.hpp"
-
-#include "hardware_interface/handle.hpp"
-#include "hardware_interface/hardware_info.hpp"
-#include "hardware_interface/system_interface.hpp"
-#include "hardware_interface/types/hardware_interface_return_values.hpp"
-#include "rclcpp/macros.hpp"
+#include <hardware_interface/system_interface.hpp>
+#include <hardware_interface/types/hardware_interface_type_values.hpp>
+#include <hardware_interface/handle.hpp>
+#include <hardware_interface/hardware_info.hpp>
+#include <hardware_interface/system_interface.hpp>
+#include <hardware_interface/types/hardware_interface_return_values.hpp>
+#include <rclcpp/macros.hpp>
 
 namespace epick_driver
 {
+
 class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
 {
 public:
@@ -126,6 +127,8 @@ private:
 
   // Factory to create the interface to interact with the hardware using the serial port.
   std::unique_ptr<DriverFactory> driver_factory_;
+
+  bool grip_cmd_;
 };
 }  // namespace epick_driver
 

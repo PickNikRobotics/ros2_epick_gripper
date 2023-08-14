@@ -1,0 +1,100 @@
+// Copyright (c) 2023 PickNik, Inc.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+//    * Redistributions of source code must retain the above copyright
+//      notice, this list of conditions and the following disclaimer.
+//
+//    * Redistributions in binary form must reproduce the above copyright
+//      notice, this list of conditions and the following disclaimer in the
+//      documentation and/or other materials provided with the distribution.
+//
+//    * Neither the name of the {copyright_holder} nor the names of its
+//      contributors may be used to endorse or promote products derived from
+//      this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+// POSSIBILITY OF SUCH DAMAGE.
+
+#include <gtest/gtest.h>
+
+#include "epick_driver/epick_gripper_hardware_interface.hpp"
+
+#include "mock/mock_driver.hpp"
+#include "mock/mock_driver_factory.hpp"
+
+#include <hardware_interface/loaned_command_interface.hpp>
+#include <hardware_interface/loaned_state_interface.hpp>
+#include <hardware_interface/resource_manager.hpp>
+#include <ros2_control_test_assets/components_urdfs.hpp>
+#include <ros2_control_test_assets/descriptions.hpp>
+
+namespace epick_driver::test
+{
+using ::testing::_;
+using ::testing::An;
+using ::testing::Matcher;
+using ::testing::Return;
+using ::testing::SaveArg;
+
+/**
+ * This test generates a minimal xacro robot configuration and loads the
+ * hardware interface plugin.
+ */
+TEST(TestEpickGripperHArdwareInterface, load_urdf)
+{
+  std::string urdf_control_ =
+      R"(
+        <ros2_control name="EpickGripperHArdwareInterface" type="system">
+          <hardware>
+            <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
+            <param name="usb_port">/dev/whatever</param>
+            <param name="baud_rate">9600</param>
+            <param name="timeout">true</param>
+          </hardware>
+        </ros2_control>
+      )";
+
+  auto urdf = ros2_control_test_assets::urdf_head + urdf_control_ + ros2_control_test_assets::urdf_tail;
+  hardware_interface::ResourceManager rm(urdf);
+
+  // Check interfaces
+  EXPECT_EQ(1u, rm.system_components_size());
+}
+
+TEST(TestEpickGripperHArdwareInterface, read_parameters)
+{
+  hardware_interface::HardwareInfo hardware_info;
+  hardware_info.name = "EpickGripperHArdwareInterface";
+  hardware_info.type = "system";
+  hardware_info.hardware_class_type = "stepit_hardware/StepitHardware";
+  hardware_info.hardware_parameters.emplace("usb_port", "/dev/ttyUSB0");
+  hardware_info.hardware_parameters.emplace("baud_rate", "9600");
+  hardware_info.hardware_parameters.emplace("timeout", "200");
+  hardware_info.hardware_parameters.emplace("mode", "advanced");
+  hardware_info.hardware_parameters.emplace("max_vacuum_pressure", "-50");
+  hardware_info.hardware_parameters.emplace("min_vacuum_pressure", "-5");
+  hardware_info.hardware_parameters.emplace("gripper_timeout", "1500");
+
+  auto mock_driver = std::make_unique<MockDriver>();
+  auto mock_driver_factory = std::make_unique<MockDriverFactory>(std::move(mock_driver));
+
+  auto hardware_interface =
+      std::make_unique<epick_driver::EpickGripperHardwareInterface>(std::move(mock_driver_factory));
+
+  // Load the component.
+  hardware_interface::ResourceManager rm;
+  rm.import_component(std::move(hardware_interface), hardware_info);
+}
+
+}  // namespace epick_driver::test

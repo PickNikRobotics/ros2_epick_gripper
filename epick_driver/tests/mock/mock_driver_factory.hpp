@@ -1,4 +1,4 @@
-// Copyright (c) 2023 PickNik, Inc.
+// Copyright (c) 2022 PickNik, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,52 +28,24 @@
 
 #pragma once
 
-#include "epick_driver/driver.hpp"
-#include "epick_driver/serial.hpp"
+#include <epick_driver/driver.hpp>
+#include <epick_driver/driver_factory.hpp>
 
-#include <chrono>
-#include <functional>
-#include <memory>
-
-namespace epick_driver
+namespace epick_driver::test
 {
-class DefaultDriver : public Driver
+class MockDriverFactory : public DriverFactory
 {
 public:
-  /**
-   * Initialize the interface to control the Robotiq EPick gripper.
-   * @param serial_interface The serial connection.
-   * @param slave_address The slave address as specified in the MODBUS RTU protocol.
-   */
-  explicit DefaultDriver(std::unique_ptr<Serial> serial, uint8_t slave_address);
+  explicit MockDriverFactory(std::unique_ptr<Driver> driver)
+    : driver_{ std::move(driver) } {
 
-  bool connect() override;
-  void disconnect() override;
-
-  void set_mode(const GripperMode gripper_mode) override;
-  void set_max_vacuum_pressure(const float vacuum_pressure) override;
-  void set_min_vacuum_pressure(const float vacuum_pressure) override;
-  void set_gripper_timeout(const std::chrono::milliseconds gripper_timeout) override;
-
-  GripperStatus get_status() override;
-
-  /** Activate the gripper with the specified operation mode and parameters. */
-  void activate() override;
-
-  /** Deactivate the gripper. */
-  void deactivate() override;
-
-  void grip() override;
-
-  void release() override;
+    };
+  std::unique_ptr<Driver> create([[maybe_unused]] const hardware_interface::HardwareInfo& info)
+  {
+    return std::move(driver_);
+  };
 
 private:
-  std::unique_ptr<Serial> serial_;
-  uint8_t slave_address_;
-
-  GripperMode gripper_mode_ = GripperMode::AutomaticMode;
-  float max_vacuum_pressure_ = -100;
-  float min_vacuum_pressure_ = -10;
-  std::chrono::milliseconds gripper_timeout_;
+  std::unique_ptr<Driver> driver_;
 };
-}  // namespace epick_driver
+}  // namespace epick_driver::test

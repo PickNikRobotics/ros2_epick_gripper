@@ -130,7 +130,7 @@ public:
    * @param vacuum_pressure_kPa The maximum vacuum pressure between -100kPa and
    * 155kPa.
    */
-  virtual void set_max_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
+  virtual void set_max_vacuum_pressure(const float vacuum_pressure_kPa) = 0;
 
   /**
    * Set the gripper minimum acceptable vacuum pressure to hold an object.
@@ -141,9 +141,9 @@ public:
    * -100kPa and
    * 155kPa.
    */
-  virtual void set_min_vacuum_pressure(const float& vacuum_pressure_kPa) = 0;
+  virtual void set_min_vacuum_pressure(const float vacuum_pressure_kPa) = 0;
 
-  virtual void set_gripper_timeout(std::chrono::milliseconds timeout) = 0;
+  virtual void set_gripper_timeout(const std::chrono::milliseconds timeout) = 0;
 
   /** Connect to the gripper serial connection. */
   virtual bool connect() = 0;

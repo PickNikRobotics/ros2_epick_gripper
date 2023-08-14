@@ -85,34 +85,33 @@ constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
 // - number of registers written (2 bytes)
 // - CRC (2 bytes)
 constexpr int kWriteResponseSize = 8;
+constexpr float kAtmosphericPressure = 100;  // kPa.
 
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial_interface, uint8_t slave_address)
-  : serial_interface_{
-    std::move(serial_interface),
-  }, slave_address_{slave_address}
+DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial, uint8_t slave_address)
+  : serial_{ std::move(serial) }, slave_address_{ slave_address }
 {
 }
 
 bool DefaultDriver::connect()
 {
-  serial_interface_->open();
-  return serial_interface_->is_open();
+  serial_->open();
+  return serial_->is_open();
 }
 
 void DefaultDriver::disconnect()
 {
-  serial_interface_->close();
+  serial_->close();
 }
 
 void DefaultDriver::activate()
 {
   const uint8_t max_absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(max_vacuum_pressure_ + 100), 0.0f, 255.0f));
+      static_cast<uint8_t>(std::clamp(std::round(max_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
 
   const uint8_t min_absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(min_vacuum_pressure_ + 100), 0.0f, 255.0f));
+      static_cast<uint8_t>(std::clamp(std::round(min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
 
   std::chrono::milliseconds clamped_gripper_timeout =
       std::clamp(gripper_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
@@ -143,8 +142,8 @@ void DefaultDriver::activate()
   request.push_back(data_utils::get_lsb(crc));
   try
   {
-    serial_interface_->write(request);
-    auto response = serial_interface_->read(kWriteResponseSize);
+    serial_->write(request);
+    auto response = serial_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -177,8 +176,8 @@ void DefaultDriver::deactivate()
 
   try
   {
-    serial_interface_->write(request);
-    auto response = serial_interface_->read(kWriteResponseSize);
+    serial_->write(request);
+    auto response = serial_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -194,7 +193,7 @@ void DefaultDriver::grip()
   default_driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_status.gripper_mode);
   default_driver_utils::set_gripper_regulate_action(action_request_register,
-                                            GripperRegulateAction::FollowRequestedVacuumParameters);
+                                                    GripperRegulateAction::FollowRequestedVacuumParameters);
 
   std::vector<uint8_t> request = { slave_address_,
                                    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetSingleRegister),
@@ -209,8 +208,8 @@ void DefaultDriver::grip()
   std::vector<uint8_t> response;
   try
   {
-    serial_interface_->write(request);
-    response = serial_interface_->read(kWriteResponseSize);
+    serial_->write(request);
+    response = serial_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -240,8 +239,8 @@ void DefaultDriver::release()
   std::vector<uint8_t> response;
   try
   {
-    serial_interface_->write(request);
-    response = serial_interface_->read(kWriteResponseSize);
+    serial_->write(request);
+    response = serial_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -254,23 +253,24 @@ void DefaultDriver::set_mode(const GripperMode gripper_mode)
 {
   if (gripper_mode == GripperMode::Unknown)
   {
-    RCLCPP_ERROR(kLogger, "Invalid gripper mode: %s", default_driver_utils::gripper_mode_to_string(gripper_mode).c_str());
+    RCLCPP_ERROR(kLogger, "Invalid gripper mode: %s",
+                 default_driver_utils::gripper_mode_to_string(gripper_mode).c_str());
     return;
   }
   gripper_mode_ = gripper_mode;
 }
 
-void DefaultDriver::set_max_vacuum_pressure(const float& vacuum_pressure)
+void DefaultDriver::set_max_vacuum_pressure(const float vacuum_pressure)
 {
   max_vacuum_pressure_ = vacuum_pressure;
 }
 
-void DefaultDriver::set_min_vacuum_pressure(const float& vacuum_pressure)
+void DefaultDriver::set_min_vacuum_pressure(const float vacuum_pressure)
 {
   min_vacuum_pressure_ = vacuum_pressure;
 }
 
-void DefaultDriver::set_gripper_timeout(std::chrono::milliseconds gripper_timeout)
+void DefaultDriver::set_gripper_timeout(const std::chrono::milliseconds gripper_timeout)
 {
   gripper_timeout_ = gripper_timeout;
 }
@@ -292,8 +292,8 @@ GripperStatus DefaultDriver::get_status()
   std::vector<uint8_t> response;
   try
   {
-    serial_interface_->write(request);
-    response = serial_interface_->read(kWriteResponseSize);
+    serial_->write(request);
+    response = serial_->read(kWriteResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -313,10 +313,10 @@ GripperStatus DefaultDriver::get_status()
   status.gripper_fault_status = default_driver_utils::get_gripper_fault_status(response[5]);
 
   // The requested pressure level in kPa:
-  status.max_vacuum_pressure = static_cast<float>(response[6]) - 100;
+  status.max_vacuum_pressure = static_cast<float>(response[6]) - kAtmosphericPressure;
 
   // The actual pressure measured kPa:
-  status.actual_vacuum_pressure = static_cast<float>(response[7]) - 100;
+  status.actual_vacuum_pressure = static_cast<float>(response[7]) - kAtmosphericPressure;
 
   return status;
 }
