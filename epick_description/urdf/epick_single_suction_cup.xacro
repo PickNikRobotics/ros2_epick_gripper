@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Include EPick Body and helper macros -->
+  <xacro:include filename="epick_body.xacro"/>
+
+  <!-- Robotiq EPick + Suction Cup with optional extension
+
+       Creates the following kinematic chain of (prefixed) links:
+         epick_base_link
+         epick_body
+         epick_extension (optional)
+         epick_suction_cup
+         epick_tip
+         epick_tcp
+
+       The dimensions of the suction cup and extension are configurable, the TCP can be
+       adjusted (moved into the suction cup) for tuning the contact stroke.
+
+       parent: the link used as parent for the EPick base
+       origin_*: xyz/rpy offsets of the base link
+       prefix: placed before all link and joint names
+       suction_cup_*:= dimensions of the suction cup shape
+       extension_*:= dimensions of an optional suction cup extension (disabled at 0.0)
+       tcp_stroke_compensation:= TCP offset along the negative Z-axis starting from the tip
+  -->
+  <xacro:macro name="epick_single_suction_cup"
+               params="parent
+                       origin_xyz:='0 0 0'
+                       origin_rpy:='0 0 0'
+                       prefix:=''
+                       suction_cup_radius:=0.012
+                       suction_cup_height:=0.015
+                       extension_radius:=0.0
+                       extension_length:=0.0
+                       tcp_stroke_compensation:=0.0">
+
+    <!-- Body -->
+    <!-- inherits prefix, parent and origin_*, exposes body_link, body_length, body_color -->
+    <xacro:epick_body parent="${parent}"/>
+    <xacro:property name="suction_cup_parent" value="${body_link}"/>
+    <xacro:property name="suction_cup_parent_length" value="${body_length}"/>
+
+    <!-- Extension (optional) -->
+    <xacro:if value="${extension_length * extension_radius > 0.0}">
+        <xacro:property name="suction_cup_parent" value="${prefix}epick_extension"/>
+        <xacro:property name="suction_cup_parent_length" value="${extension_length}"/>
+        <xacro:cylinder_link name="${prefix}epick_extension"
+                             radius="${extension_radius}"
+                             length="${extension_length}"
+                             color="${body_color}"
+                             parent="${body_link}"
+                             origin_xyz="0 0 ${(body_length + extension_length) / 2}"/>
+    </xacro:if>
+
+    <!-- Suction Cup -->
+    <xacro:cylinder_link name="${prefix}epick_suction_cup"
+                         radius="${suction_cup_radius}"
+                         length="${suction_cup_height}"
+                         color="${body_color}"
+                         parent="${suction_cup_parent}"
+                         origin_xyz="0 0 ${(suction_cup_parent_length + suction_cup_height) / 2}"/>
+
+    <!-- TIP Frame -->
+    <!-- represents the outmost point of the collision geometry -->
+    <link name="${prefix}epick_tip"/>
+    <xacro:joint parent="${prefix}epick_suction_cup"
+                 child="${prefix}epick_tip"
+                 xyz="0 0 ${suction_cup_height / 2}"/>
+
+
+    <!-- TCP Frame -->
+    <!-- contact point to use for IK, Z-axis points "forwards", recessed by tcp_stroke_compensation -->
+    <link name="${prefix}epick_tcp"/>
+    <xacro:joint parent="${prefix}epick_tip"
+                 child="${prefix}epick_tcp"
+                 xyz="0 0 ${-tcp_stroke_compensation}"/>
+
+  </xacro:macro>
+</robot>

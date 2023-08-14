@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="world"/>
+
+  <!-- Attach EPick to world -->
+  <xacro:include filename="epick_single_suction_cup.xacro" ns="robotiq"/>
+  <xacro:robotiq.epick_single_suction_cup parent="world"/>
+
+</robot>
