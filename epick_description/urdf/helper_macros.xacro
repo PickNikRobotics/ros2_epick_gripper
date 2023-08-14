@@ -38,7 +38,7 @@
           <geometry>          
             <cylinder radius="${radius}" length="${length}"/>
           </geometry>
-          <material>
+          <material name="">
             <color rgba="${color}"/>
           </material>
         </visual>
