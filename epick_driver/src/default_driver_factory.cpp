@@ -38,30 +38,91 @@
 
 namespace epick_driver
 {
+
+constexpr auto kUsbPortParamName = "usb_port";
+constexpr auto kUsbPortParamDefault = "/dev/ttyUSB0";
+
+constexpr auto kSlaveAddressParamName = "slave_address";
+constexpr auto kSlaveAddressParamDefault = 0x9;
+
+constexpr auto kBaudrateParamName = "baudrate";
+constexpr auto kBaudrateAddressParamDefault = 115200;
+
+constexpr auto kTimeoutParamName = "timeout";
+constexpr auto kTimeoutParamDefault = 500;
+
+constexpr auto kModeParamName = "mode";
+constexpr auto kModeParamDefault = GripperMode::AutomaticMode;
+
+constexpr auto kMaxVacuumPressureParamName = "max_vacuum_pressure";
+constexpr auto kMaxVacuumPressureParamDefault = -100.0;  // kPA
+
+constexpr auto kMinVacuumPressureParamName = "min_vacuum_pressure";
+constexpr auto kMinVacuumPressureParamDefault = 0.0;  // kPA
+
+constexpr auto kGripperTimeoutParamName = "gripper_timeout";
+constexpr auto kGripperTimeoutParamDefault = 500;  // ms
+
 const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info)
 {
-  std::string usb_port = info.hardware_parameters.at("usb_port");
+  std::string usb_port = info.hardware_parameters.count(kUsbPortParamName) ?
+                             info.hardware_parameters.at(kUsbPortParamName) :
+                             kUsbPortParamDefault;
   RCLCPP_INFO(kLogger, "usb_port: %s", usb_port.c_str());
 
-  uint8_t slave_address = static_cast<uint8_t>(std::stoul(info.hardware_parameters.at("slave_address")));
+  uint8_t slave_address = info.hardware_parameters.count(kSlaveAddressParamName) ?
+                              static_cast<uint8_t>(std::stoul(info.hardware_parameters.at(kSlaveAddressParamName))) :
+                              kSlaveAddressParamDefault;
   RCLCPP_INFO(kLogger, "slave_address: %d", slave_address);
 
-  uint32_t baud_rate = static_cast<uint32_t>(std::stoul(info.hardware_parameters.at("baud_rate")));
-  RCLCPP_INFO(kLogger, "baud_rate: %dbps", baud_rate);
+  uint32_t baudrate = info.hardware_parameters.count(kBaudrateParamName) ?
+                          static_cast<uint32_t>(std::stoul(info.hardware_parameters.at(kBaudrateParamName))) :
+                          kBaudrateAddressParamDefault;
+  RCLCPP_INFO(kLogger, "baudrate: %dbps", baudrate);
 
-  double timeout_param = std::stod(info.hardware_parameters.at("timeout"));
-  uint32_t timeout = static_cast<uint32_t>(round(timeout_param));
-  RCLCPP_INFO(kLogger, "timeout: %fms", timeout_param);
+  uint32_t timeout = static_cast<uint32_t>(info.hardware_parameters.count(kTimeoutParamName) ?
+                                               std::stoul(info.hardware_parameters.at(kTimeoutParamName)) :
+                                               kTimeoutParamDefault);
+  RCLCPP_INFO(kLogger, "timeout: %dms", timeout);
 
-  auto serial_interface = std::make_unique<DefaultSerial>();
-  serial_interface->set_port(usb_port);
-  serial_interface->set_baudrate(baud_rate);
-  serial_interface->set_timeout(timeout);
+  GripperMode mode = info.hardware_parameters.count(kModeParamName) ?
+                         info.hardware_parameters.at(kModeParamName) ==
+                                 default_driver_utils::gripper_mode_to_string(GripperMode::AdvancedMode) ?
+                         GripperMode::AdvancedMode :
+                         kModeParamDefault :
+                         kModeParamDefault;
+  RCLCPP_INFO(kLogger, "mode: %s", default_driver_utils::gripper_mode_to_string(mode).c_str());
 
-  return std::make_unique<DefaultDriver>(std::move(serial_interface), slave_address);
-  ;
+  double max_vacuum_pressure = info.hardware_parameters.count(kMaxVacuumPressureParamName) ?
+                                   std::stod(info.hardware_parameters.at(kMaxVacuumPressureParamName)) :
+                                   kMaxVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kMaxVacuumPressureParamName, max_vacuum_pressure);
+
+  double min_vacuum_pressure = info.hardware_parameters.count(kMinVacuumPressureParamName) ?
+                                   std::stod(info.hardware_parameters.at(kMinVacuumPressureParamName)) :
+                                   kMinVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kMinVacuumPressureParamName, min_vacuum_pressure);
+
+  std::chrono::milliseconds gripper_timeout =
+      info.hardware_parameters.count(kGripperTimeoutParamName) ?
+          std::chrono::milliseconds(std::stoi(info.hardware_parameters.at(kGripperTimeoutParamName))) :
+          std::chrono::milliseconds(kGripperTimeoutParamDefault);
+  RCLCPP_INFO(kLogger, "%s: %ldms", kGripperTimeoutParamName, gripper_timeout.count());
+
+  auto serial = std::make_unique<DefaultSerial>();
+  serial->set_port(usb_port);
+  serial->set_baudrate(baudrate);
+  serial->set_timeout(timeout);
+
+  auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
+  driver->set_mode(mode);
+  driver->set_max_vacuum_pressure(max_vacuum_pressure);
+  driver->set_min_vacuum_pressure(min_vacuum_pressure);
+  driver->set_gripper_timeout(gripper_timeout);
+
+  return driver;
 }
 }  // namespace epick_driver

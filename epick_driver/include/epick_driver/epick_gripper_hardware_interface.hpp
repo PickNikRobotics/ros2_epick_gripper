@@ -42,7 +42,6 @@
 
 namespace epick_driver
 {
-
 class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
 {
 public:
@@ -121,6 +120,18 @@ public:
   EPICK_DRIVER_PUBLIC
   hardware_interface::return_type write(const rclcpp::Time& time, const rclcpp::Duration& period) override;
 
+  /**
+   * All command interfaces in ROS2 controls are represented by a double.
+   * We use this constant to represend an off state.
+   */
+  static constexpr double kOffState = std::numeric_limits<double>::quiet_NaN();
+
+  /**
+   * All command interfaces in ROS2 controls are represented by a double.
+   * We use this constant to represent an on state.
+   */
+  static constexpr double kOnState = 1.0;
+
 private:
   // Interface to interact with the hardware using the serial port.
   std::unique_ptr<Driver> driver_;
@@ -128,7 +139,13 @@ private:
   // Factory to create the interface to interact with the hardware using the serial port.
   std::unique_ptr<DriverFactory> driver_factory_;
 
-  bool grip_cmd_;
+  void checkAsyncIO();
+
+  // GPIO interface to switch on and off the gripper suction. 1.0 is on and 0.0 is off.
+  double regulate_ = kOffState;
+
+  // Digital input commands.
+  std::vector<double> digital_input_commands_;
 };
 }  // namespace epick_driver
 

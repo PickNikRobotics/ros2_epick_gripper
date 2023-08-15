@@ -62,6 +62,9 @@ TEST(TestEpickGripperHArdwareInterface, load_urdf)
             <param name="baud_rate">9600</param>
             <param name="timeout">true</param>
           </hardware>
+          <gpio name="gripper_gpio">
+              <command_interface name="regulate"/>
+          </gpio>
         </ros2_control>
       )";
 
@@ -70,31 +73,6 @@ TEST(TestEpickGripperHArdwareInterface, load_urdf)
 
   // Check interfaces
   EXPECT_EQ(1u, rm.system_components_size());
-}
-
-TEST(TestEpickGripperHArdwareInterface, read_parameters)
-{
-  hardware_interface::HardwareInfo hardware_info;
-  hardware_info.name = "EpickGripperHArdwareInterface";
-  hardware_info.type = "system";
-  hardware_info.hardware_class_type = "stepit_hardware/StepitHardware";
-  hardware_info.hardware_parameters.emplace("usb_port", "/dev/ttyUSB0");
-  hardware_info.hardware_parameters.emplace("baud_rate", "9600");
-  hardware_info.hardware_parameters.emplace("timeout", "200");
-  hardware_info.hardware_parameters.emplace("mode", "advanced");
-  hardware_info.hardware_parameters.emplace("max_vacuum_pressure", "-50");
-  hardware_info.hardware_parameters.emplace("min_vacuum_pressure", "-5");
-  hardware_info.hardware_parameters.emplace("gripper_timeout", "1500");
-
-  auto mock_driver = std::make_unique<MockDriver>();
-  auto mock_driver_factory = std::make_unique<MockDriverFactory>(std::move(mock_driver));
-
-  auto hardware_interface =
-      std::make_unique<epick_driver::EpickGripperHardwareInterface>(std::move(mock_driver_factory));
-
-  // Load the component.
-  hardware_interface::ResourceManager rm;
-  rm.import_component(std::move(hardware_interface), hardware_info);
 }
 
 }  // namespace epick_driver::test

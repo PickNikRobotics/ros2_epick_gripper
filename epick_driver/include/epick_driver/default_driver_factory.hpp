@@ -37,7 +37,7 @@
 namespace epick_driver
 {
 /**
- * This class is used to create a default command interface to interact with the hardware.
+ * This class is used to create a default driver to interact with the hardware.
  */
 class DefaultDriverFactory : public DriverFactory
 {
