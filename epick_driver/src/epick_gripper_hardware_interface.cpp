@@ -117,8 +117,14 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
     std::vector<hardware_interface::CommandInterface> command_interfaces;
     for (uint i = 0; i < info_.gpios.size(); i++)
     {
-      digital_input_commands_.emplace_back(hardware_interface::CommandInterface(
-          info_.gpios[i].name, hardware_interface::HW_IF_POSITION, &digital_input_commands_[i]));
+      for (uint j = 0; j < info_.gpios[i].command_interfaces.size(); j++)
+      {
+        auto cmd = info_.gpios[i].command_interfaces[i];
+        RCLCPP_DEBUG(kLogger, "export_command_interface %s", cmd.name.c_str());
+
+        digital_output_commands_.emplace_back(
+            hardware_interface::CommandInterface(info_.gpios[i].name, cmd.name, &digital_output_commands_[i]));
+      }
     }
 
     return command_interfaces;

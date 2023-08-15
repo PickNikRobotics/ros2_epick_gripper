@@ -105,8 +105,8 @@ void DefaultSerial::set_timeout(uint32_t timeout_ms)
 
 uint32_t DefaultSerial::get_timeout() const
 {
-  uint32_t timeout_ms = serial_->getTimeout().read_timeout_constant;
-  return timeout_ms;
+  uint32_t timeout = serial_->getTimeout().read_timeout_constant;
+  return timeout;
 }
 
 void DefaultSerial::set_baudrate(uint32_t baudrate)

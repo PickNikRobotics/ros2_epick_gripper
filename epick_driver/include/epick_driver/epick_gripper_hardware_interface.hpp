@@ -145,7 +145,7 @@ private:
   double regulate_ = kOffState;
 
   // Digital input commands.
-  std::vector<double> digital_input_commands_;
+  std::vector<double> digital_output_commands_;
 };
 }  // namespace epick_driver
 

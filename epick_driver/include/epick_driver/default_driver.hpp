@@ -68,12 +68,11 @@ public:
   void release() override;
 
 private:
-  std::unique_ptr<Serial> serial_;
-  uint8_t slave_address_;
-
+  std::unique_ptr<Serial> serial_ = nullptr;
+  uint8_t slave_address_ = 0x00;
   GripperMode gripper_mode_ = GripperMode::AutomaticMode;
-  float max_vacuum_pressure_ = -100;
-  float min_vacuum_pressure_ = -10;
-  std::chrono::milliseconds gripper_timeout_;
+  float max_vacuum_pressure_ = 0.0;
+  float min_vacuum_pressure_ = 0.0;
+  std::chrono::milliseconds gripper_timeout_ = std::chrono::milliseconds(0);
 };
 }  // namespace epick_driver

@@ -52,20 +52,16 @@ TEST(TestDefaultDriver, activate)
   const std::vector<uint8_t> expected_command{
     slave_address,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
-    // Address of the first requested register - MSB, LSB.
-    0x03, 0xE8,
-    // Number of registers requested - MSB, LSB.
-    0x00, 0x03,
-    // Number of data bytes to follow.
-    0x06,
-    // Value written in the first register - MSB, LSB.
-    0x01, 0x00,
-    // Value written in the second register - MSB, LSB.
-    0x00, 0x00,
-    // Value written in the third register - MSB, LSB.
-    0x00, 0x00,
-    // CRC-16
-    0x72, 0xE1
+    0x03, 0xE8, // Address of the first requested register - MSB, LSB.
+    0x00, 0x03, // Number of registers requested - MSB, LSB.
+    0x06,       // Number of data bytes to follow.
+    0x03,       // Action Register - MSB, LSB.
+    0x00,       // Reserved.
+    0x00,       // Reserved.
+    0x00,       // Max absolute pressure.
+    0x32,       // Grip Timeout.
+    0x5A,       // Min absolute pressure
+    0xE6, 0x58  // CRC-16 - MSB, LSB.
   };
   // clang-format on
 
@@ -74,6 +70,11 @@ TEST(TestDefaultDriver, activate)
   EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
 
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  driver->set_mode(GripperMode::AdvancedMode);
+  driver->set_max_vacuum_pressure(-100.0);  // -100kPa relative to atmospheric pressure.
+  driver->set_min_vacuum_pressure(-10.0);   // -10kPa relative to atmospheric pressure.
+  driver->set_gripper_timeout(std::chrono::milliseconds(500));
+
   driver->activate();
 
   ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
@@ -90,20 +91,16 @@ TEST(TestDefaultDriver, deactivate)
   const std::vector<uint8_t> expected_command{
     slave_address,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
-    // Address of the first requested register - MSB, LSB.
-    0x03, 0xE8,
-    // Number of registers requested - MSB, LSB.
-    0x00, 0x03,
-    // Number of data bytes to follow.
-    0x06,
-    // Value written in the first register - MSB, LSB.
-    0x00, 0x00,
-    // Value written in the second register - MSB, LSB.
-    0x00, 0x00,
-    // Value written in the third register - MSB, LSB.
-    0x00, 0x00,
-    // CRC-16
-    0x73, 0x30
+    0x03, 0xE8, // Address of the first requested register - MSB, LSB.
+    0x00, 0x03, // Number of registers requested - MSB, LSB.
+    0x06,       // Number of data bytes to follow.
+    0x00,       // Action Register.
+    0x00,       // Reserved.
+    0x00,       // Reserved.
+    0x00,       // Max absolute pressure.
+    0x00,       // Grip Timeout.
+    0x00,       // Min absolute pressure
+    0x73, 0x30  // CRC-16 - MSB, LSB.
   };
   // clang-format on
 

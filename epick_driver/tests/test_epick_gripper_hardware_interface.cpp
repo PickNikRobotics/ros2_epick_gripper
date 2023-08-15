@@ -62,7 +62,7 @@ TEST(TestEpickGripperHArdwareInterface, load_urdf)
             <param name="baud_rate">9600</param>
             <param name="timeout">true</param>
           </hardware>
-          <gpio name="gripper_gpio">
+          <gpio name="gripper_cmd">
               <command_interface name="regulate"/>
           </gpio>
         </ros2_control>
