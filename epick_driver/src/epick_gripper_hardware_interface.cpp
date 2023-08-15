@@ -103,10 +103,23 @@ EpickGripperHardwareInterface::on_configure(const rclcpp_lifecycle::State& previ
     RCLCPP_ERROR(kLogger, "Cannot configure the Robotiq EPick gripper: %s", e.what());
     return CallbackReturn::ERROR;
   }
+  return CallbackReturn::SUCCESS;
 }
 
 std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::export_state_interfaces()
 {
+  RCLCPP_DEBUG(kLogger, "export_state_interfaces");
+  try
+  {
+    std::vector<hardware_interface::StateInterface> state_interfaces;
+    return state_interfaces;
+  }
+  catch (const std::exception& ex)
+  {
+    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    return {};
+  }
 }
 
 std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface::export_command_interfaces()
@@ -115,6 +128,8 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   try
   {
     std::vector<hardware_interface::CommandInterface> command_interfaces;
+
+    // Read GPIO.
     for (uint i = 0; i < info_.gpios.size(); i++)
     {
       for (uint j = 0; j < info_.gpios[i].command_interfaces.size(); j++)
@@ -122,11 +137,10 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
         auto cmd = info_.gpios[i].command_interfaces[i];
         RCLCPP_DEBUG(kLogger, "export_command_interface %s", cmd.name.c_str());
 
-        digital_output_commands_.emplace_back(
+        command_interfaces.emplace_back(
             hardware_interface::CommandInterface(info_.gpios[i].name, cmd.name, &digital_output_commands_[i]));
       }
     }
-
     return command_interfaces;
   }
   catch (const std::exception& ex)
@@ -172,13 +186,33 @@ EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifec
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type EpickGripperHardwareInterface::read(const rclcpp::Time& time,
-                                                                    const rclcpp::Duration& period)
+hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unused]] const rclcpp::Time& time,
+                                                                    [[maybe_unused]] const rclcpp::Duration& period)
 {
+  try
+  {
+  }
+  catch (const std::exception& ex)
+  {
+    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    return hardware_interface::return_type::ERROR;
+  }
+  return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type EpickGripperHardwareInterface::write(const rclcpp::Time& time,
-                                                                     const rclcpp::Duration& period)
+hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unused]] const rclcpp::Time& time,
+                                                                     [[maybe_unused]] const rclcpp::Duration& period)
 {
+  try
+  {
+  }
+  catch (const std::exception& ex)
+  {
+    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    return hardware_interface::return_type::ERROR;
+  }
+  return hardware_interface::return_type::OK;
 }
 }  // namespace epick_driver

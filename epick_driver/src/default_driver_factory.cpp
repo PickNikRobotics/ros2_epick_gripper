@@ -68,26 +68,31 @@ const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info)
 {
+  RCLCPP_INFO(kLogger, "Reading usb_port...");
   std::string usb_port = info.hardware_parameters.count(kUsbPortParamName) ?
                              info.hardware_parameters.at(kUsbPortParamName) :
                              kUsbPortParamDefault;
   RCLCPP_INFO(kLogger, "usb_port: %s", usb_port.c_str());
 
+  RCLCPP_INFO(kLogger, "Reading slave_address...");
   uint8_t slave_address = info.hardware_parameters.count(kSlaveAddressParamName) ?
                               static_cast<uint8_t>(std::stoul(info.hardware_parameters.at(kSlaveAddressParamName))) :
                               kSlaveAddressParamDefault;
   RCLCPP_INFO(kLogger, "slave_address: %d", slave_address);
 
+  RCLCPP_INFO(kLogger, "Reading baudrate...");
   uint32_t baudrate = info.hardware_parameters.count(kBaudrateParamName) ?
                           static_cast<uint32_t>(std::stoul(info.hardware_parameters.at(kBaudrateParamName))) :
                           kBaudrateAddressParamDefault;
   RCLCPP_INFO(kLogger, "baudrate: %dbps", baudrate);
 
+  RCLCPP_INFO(kLogger, "Reading timeout...");
   uint32_t timeout = static_cast<uint32_t>(info.hardware_parameters.count(kTimeoutParamName) ?
                                                std::stoul(info.hardware_parameters.at(kTimeoutParamName)) :
                                                kTimeoutParamDefault);
   RCLCPP_INFO(kLogger, "timeout: %dms", timeout);
 
+  RCLCPP_INFO(kLogger, "Reading mode...");
   GripperMode mode = info.hardware_parameters.count(kModeParamName) ?
                          info.hardware_parameters.at(kModeParamName) ==
                                  default_driver_utils::gripper_mode_to_string(GripperMode::AdvancedMode) ?
@@ -96,16 +101,19 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
                          kModeParamDefault;
   RCLCPP_INFO(kLogger, "mode: %s", default_driver_utils::gripper_mode_to_string(mode).c_str());
 
+  RCLCPP_INFO(kLogger, "Reading max vacuum pressure...");
   double max_vacuum_pressure = info.hardware_parameters.count(kMaxVacuumPressureParamName) ?
                                    std::stod(info.hardware_parameters.at(kMaxVacuumPressureParamName)) :
                                    kMaxVacuumPressureParamDefault;
   RCLCPP_INFO(kLogger, "%s: %fkPa", kMaxVacuumPressureParamName, max_vacuum_pressure);
 
+  RCLCPP_INFO(kLogger, "Reading min vacuum pressure...");
   double min_vacuum_pressure = info.hardware_parameters.count(kMinVacuumPressureParamName) ?
                                    std::stod(info.hardware_parameters.at(kMinVacuumPressureParamName)) :
                                    kMinVacuumPressureParamDefault;
   RCLCPP_INFO(kLogger, "%s: %fkPa", kMinVacuumPressureParamName, min_vacuum_pressure);
 
+  RCLCPP_INFO(kLogger, "Reading gripper timeout...");
   std::chrono::milliseconds gripper_timeout =
       info.hardware_parameters.count(kGripperTimeoutParamName) ?
           std::chrono::milliseconds(std::stoi(info.hardware_parameters.at(kGripperTimeoutParamName))) :

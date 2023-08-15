@@ -59,8 +59,8 @@ TEST(TestEpickGripperHArdwareInterface, load_urdf)
           <hardware>
             <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
             <param name="usb_port">/dev/whatever</param>
-            <param name="baud_rate">9600</param>
-            <param name="timeout">true</param>
+            <param name="baudrate">9600</param>
+            <param name="timeout">500</param>
           </hardware>
           <gpio name="gripper_cmd">
               <command_interface name="regulate"/>
