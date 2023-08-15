@@ -39,6 +39,9 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
+constexpr auto kGpio = "gripper_cmd";
+constexpr auto kRegulateCommandInterface = "regulate";
+
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
   driver_factory_ = std::make_unique<DefaultDriverFactory>();
@@ -125,23 +128,28 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
 std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface::export_command_interfaces()
 {
   RCLCPP_DEBUG(kLogger, "export_command_interfaces");
+  std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    std::vector<hardware_interface::CommandInterface> command_interfaces;
-
-    // Read GPIO.
-    for (uint i = 0; i < info_.gpios.size(); i++)
+    auto it = std::find_if(info_.gpios.begin(), info_.gpios.end(), [](const auto& gpio) { return gpio.name == kGpio; });
+    if (it != info_.gpios.end())
     {
-      for (uint j = 0; j < info_.gpios[i].command_interfaces.size(); j++)
+      auto cmd_it = std::find_if(it->command_interfaces.begin(), it->command_interfaces.end(),
+                                 [](const auto& cmd) { return cmd.name == kRegulateCommandInterface; });
+      if (cmd_it != it->command_interfaces.end())
       {
-        auto cmd = info_.gpios[i].command_interfaces[i];
-        RCLCPP_DEBUG(kLogger, "export_command_interface %s", cmd.name.c_str());
-
-        command_interfaces.emplace_back(
-            hardware_interface::CommandInterface(info_.gpios[i].name, cmd.name, &digital_output_commands_[i]));
+        RCLCPP_DEBUG(kLogger, "export_command_interface %s", cmd_it->name.c_str());
+        command_interfaces.emplace_back(hardware_interface::CommandInterface(it->name, cmd_it->name, &regulate_));
+      }
+      else
+      {
+        RCLCPP_ERROR(kLogger, "Command interface %s not found within %s.", kRegulateCommandInterface, kGpio);
       }
     }
-    return command_interfaces;
+    else
+    {
+      RCLCPP_ERROR(kLogger, "GPIO %s not found.", kGpio);
+    }
   }
   catch (const std::exception& ex)
   {
@@ -149,6 +157,7 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
                                       hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return {};
   }
+  return command_interfaces;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn

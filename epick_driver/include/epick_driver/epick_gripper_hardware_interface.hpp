@@ -143,9 +143,6 @@ private:
 
   // GPIO interface to switch on and off the gripper suction. 1.0 is on and 0.0 is off.
   double regulate_ = kOffState;
-
-  // Digital input commands.
-  std::vector<double> digital_output_commands_;
 };
 }  // namespace epick_driver
 
