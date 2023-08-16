@@ -26,13 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_driver.hpp"
+#include <epick_driver/default_driver.hpp>
 
-#include "epick_driver/crc_utils.hpp"
-#include "epick_driver/data_utils.hpp"
-#include "epick_driver/default_driver_utils.hpp"
+#include <epick_driver/crc_utils.hpp>
+#include <epick_driver/data_utils.hpp>
+#include <epick_driver/default_driver_utils.hpp>
 
-#include "serial/serial.h"
+#include <serial/serial.h>
 
 #include <rclcpp/logging.hpp>
 
@@ -40,7 +40,7 @@
 #include <cmath>
 #include <iostream>
 
-// |-------------------------------+-------------------------------+
+// +-------------------------------+-------------------------------+
 // | Gripper Input Registers       | Gripper Output Registers      |
 // |-------------------------------+-------------------------------+
 // | Address | Function            | Address | Function            |

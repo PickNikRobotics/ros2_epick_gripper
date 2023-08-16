@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include "epick_driver/driver.hpp"
+#include <epick_driver/driver.hpp>
 
 /**
  * In this utility class we have methods to:

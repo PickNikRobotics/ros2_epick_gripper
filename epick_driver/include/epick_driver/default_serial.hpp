@@ -31,7 +31,7 @@
 #include <epick_driver/serial.hpp>
 #include <memory>
 
-#include "serial/serial.h"
+#include <serial/serial.h>
 
 namespace serial
 {

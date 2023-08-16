@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include "epick_driver/driver.hpp"
-#include "epick_driver/serial.hpp"
+#include <epick_driver/driver.hpp>
+#include <epick_driver/serial.hpp>
 
 #include <chrono>
 #include <functional>
