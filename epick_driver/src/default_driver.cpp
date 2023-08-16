@@ -72,11 +72,13 @@
 
 namespace epick_driver
 {
-constexpr uint16_t kGripperStatusRegister = 0x07D0;
-constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
+const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-// Robot output/Gripper input registers: 0x03E8 to 0x03EF
-// Robot input/Gripper output registers: 0x07D0 to 0x07D7
+// The register containing the status of the gripper.
+constexpr uint16_t kGripperStatusRegister = 0x07D0;
+
+// The register containing all command requests.
+constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
 
 // The response to a write command consists of:
 // - slave ID (1 byte)
@@ -85,9 +87,8 @@ constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
 // - number of registers written (2 bytes)
 // - CRC (2 bytes)
 constexpr int kWriteResponseSize = 8;
-constexpr float kAtmosphericPressure = 100;  // kPa.
 
-const auto kLogger = rclcpp::get_logger("DefaultDriver");
+constexpr float kAtmosphericPressure = 100;  // kPa.
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial) : serial_{ std::move(serial) }
 {
@@ -161,12 +162,12 @@ void DefaultDriver::deactivate()
     0x00,  // Number of registers to write MSB.
     0x03,  // Number of registers to write LSB.
     0x06,  // Number of bytes to write.
-    0x00,  // Register 1 MSB.
-    0x00,  // Register 1 LSB.
-    0x00,  // Register 2 MSB.
-    0x00,  // Register 2 LSB.
-    0x00,  // Register 3 MSB.
-    0x00,  // Register 3 LSB.
+    0x00,  // Action register.
+    0x00,  // Reserved.
+    0x00,  // Reserved.
+    0x00,  // Max absolute pressure.
+    0x00,  // Gripper Timeout.
+    0x00,  // Min absolute pressure
 
   };
   auto crc = crc_utils::compute_crc(request);
