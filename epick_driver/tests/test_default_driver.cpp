@@ -69,7 +69,8 @@ TEST(TestDefaultDriver, activate)
   auto serial = std::make_unique<MockSerial>();
   EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
 
-  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
+  driver->set_slave_address(slave_address);
   driver->set_mode(GripperMode::AdvancedMode);
   driver->set_max_vacuum_pressure(-100.0);  // -100kPa relative to atmospheric pressure.
   driver->set_min_vacuum_pressure(-10.0);   // -10kPa relative to atmospheric pressure.
@@ -108,7 +109,8 @@ TEST(TestDefaultDriver, deactivate)
   auto serial = std::make_unique<MockSerial>();
   EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
 
-  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial), slave_address);
+  auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
+  driver->set_slave_address(0x9);
   driver->deactivate();
 
   ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));

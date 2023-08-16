@@ -89,8 +89,7 @@ constexpr float kAtmosphericPressure = 100;  // kPa.
 
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial, uint8_t slave_address)
-  : serial_{ std::move(serial) }, slave_address_{ slave_address }
+DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial) : serial_{ std::move(serial) }
 {
 }
 
@@ -247,6 +246,11 @@ void DefaultDriver::release()
     RCLCPP_ERROR(kLogger, "Failed to release: %s", e.what());
     throw;
   }
+}
+
+void DefaultDriver::set_slave_address(const uint8_t slave_address)
+{
+  slave_address_ = slave_address;
 }
 
 void DefaultDriver::set_mode(const GripperMode gripper_mode)

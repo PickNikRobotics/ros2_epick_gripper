@@ -40,6 +40,9 @@
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <rclcpp/macros.hpp>
 
+#include <atomic>
+#include <thread>
+
 namespace epick_driver
 {
 class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
@@ -143,6 +146,9 @@ private:
 
   // GPIO interface to switch on and off the gripper suction. 1.0 is on and 0.0 is off.
   double regulate_ = kOffState;
+
+  std::thread communication_thread_;
+  std::atomic<bool> communication_thread_is_running_;
 };
 }  // namespace epick_driver
 

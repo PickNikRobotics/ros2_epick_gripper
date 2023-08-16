@@ -45,11 +45,12 @@ public:
    * @param serial_interface The serial connection.
    * @param slave_address The slave address as specified in the MODBUS RTU protocol.
    */
-  explicit DefaultDriver(std::unique_ptr<Serial> serial, uint8_t slave_address);
+  explicit DefaultDriver(std::unique_ptr<Serial> serial);
 
   bool connect() override;
   void disconnect() override;
 
+  void set_slave_address(const uint8_t slave_address);
   void set_mode(const GripperMode gripper_mode) override;
   void set_max_vacuum_pressure(const float vacuum_pressure) override;
   void set_min_vacuum_pressure(const float vacuum_pressure) override;

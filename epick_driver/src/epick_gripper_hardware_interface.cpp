@@ -168,12 +168,18 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
   {
     driver_->deactivate();
     driver_->activate();
+
+    communication_thread_is_running_.store(true);
+    communication_thread_ = std::thread([this] {
+      // TODO: implement read/write.
+    });
   }
   catch (const serial::IOException& e)
   {
     RCLCPP_FATAL(kLogger, "Failed to activate the Robotiq EPick gripper: %s", e.what());
     return CallbackReturn::ERROR;
   }
+
   RCLCPP_INFO(kLogger, "Robotiq EPick Gripper successfully activated!");
   return CallbackReturn::SUCCESS;
 }

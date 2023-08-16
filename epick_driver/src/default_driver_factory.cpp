@@ -125,7 +125,8 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   serial->set_baudrate(baudrate);
   serial->set_timeout(timeout);
 
-  auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
+  auto driver = std::make_unique<DefaultDriver>(std::move(serial));
+  driver->set_slave_address(slave_address);
   driver->set_mode(mode);
   driver->set_max_vacuum_pressure(max_vacuum_pressure);
   driver->set_min_vacuum_pressure(min_vacuum_pressure);
