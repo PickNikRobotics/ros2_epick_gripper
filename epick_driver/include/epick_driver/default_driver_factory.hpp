@@ -49,6 +49,6 @@ public:
    * @param info The hardware information.
    * @return A default interface to interact with the hardware.
    */
-  std::unique_ptr<Driver> create(const hardware_interface::HardwareInfo& info);
+  std::unique_ptr<Driver> create(const hardware_interface::HardwareInfo& info) const;
 };
 }  // namespace epick_driver

@@ -66,7 +66,7 @@ constexpr auto kGripperTimeoutParamDefault = 500;  // ms
 const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 
 std::unique_ptr<epick_driver::Driver>
-epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info)
+epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
 {
   RCLCPP_INFO(kLogger, "Reading usb_port...");
   std::string usb_port = info.hardware_parameters.count(kUsbPortParamName) ?
