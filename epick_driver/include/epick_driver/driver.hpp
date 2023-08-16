@@ -120,6 +120,8 @@ class Driver
 public:
   Driver() = default;
 
+  virtual void set_slave_address(const uint8_t slave_address) = 0;
+
   virtual void set_mode(const GripperMode gripper_mode) = 0;
 
   /**

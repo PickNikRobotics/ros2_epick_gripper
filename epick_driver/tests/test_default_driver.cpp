@@ -68,6 +68,7 @@ TEST(TestDefaultDriver, activate)
   std::vector<uint8_t> actual_command;
   auto serial = std::make_unique<MockSerial>();
   EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
+  EXPECT_CALL(*serial, read(_)).Times(1);
 
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
   driver->set_slave_address(slave_address);

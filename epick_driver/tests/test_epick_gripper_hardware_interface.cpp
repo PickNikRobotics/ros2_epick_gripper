@@ -27,11 +27,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "epick_driver/epick_gripper_hardware_interface.hpp"
-
-#include "mock/mock_driver.hpp"
-#include "mock/mock_driver_factory.hpp"
 
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>
@@ -51,7 +49,7 @@ using ::testing::SaveArg;
  * This test generates a minimal xacro robot configuration and loads the
  * hardware interface plugin.
  */
-TEST(TestEpickGripperHArdwareInterface, load_urdf)
+TEST(TestEpickGripperHardwareInterface, load_urdf)
 {
   std::string urdf_control_ =
       R"(

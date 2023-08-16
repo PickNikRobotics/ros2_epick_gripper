@@ -37,10 +37,12 @@ add_library(
     include/epick_driver/default_driver_factory.hpp
     include/epick_driver/default_driver_utils.hpp
     include/epick_driver/default_serial.hpp
+    include/epick_driver/default_serial_factory.hpp
     include/epick_driver/driver.hpp
     include/epick_driver/driver_factory.hpp
     include/epick_driver/epick_gripper_hardware_interface.hpp
     include/epick_driver/serial.hpp
+    include/epick_driver/serial_factory.hpp
     include/epick_driver/visibility_control.hpp
     src/epick_gripper_hardware_interface.cpp
     src/crc_utils.cpp
@@ -49,6 +51,7 @@ add_library(
     src/default_driver_factory.cpp
     src/default_driver_utils.cpp
     src/default_serial.cpp
+    src/default_serial_factory.cpp
 )
 target_include_directories(
     epick_driver

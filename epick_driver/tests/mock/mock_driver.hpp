@@ -39,6 +39,7 @@ namespace epick_driver::test
 class MockDriver : public epick_driver::Driver
 {
 public:
+  MOCK_METHOD(void, set_slave_address, (const uint8_t slave_address), (override));
   MOCK_METHOD(void, set_mode, (const GripperMode mode), (override));
   MOCK_METHOD(void, set_max_vacuum_pressure, (const float vacuum_pressure), (override));
   MOCK_METHOD(void, set_min_vacuum_pressure, (const float vacuum_pressure), (override));

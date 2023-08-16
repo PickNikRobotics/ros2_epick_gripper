@@ -26,11 +26,12 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_driver_factory.hpp"
+#include <epick_driver/default_driver_factory.hpp>
 
-#include "epick_driver/default_driver.hpp"
-#include "epick_driver/default_driver_utils.hpp"
-#include "epick_driver/default_serial.hpp"
+#include <epick_driver/default_driver.hpp>
+#include <epick_driver/default_driver_utils.hpp>
+#include <epick_driver/default_serial.hpp>
+#include <epick_driver/default_serial_factory.hpp>
 
 #include <rclcpp/logging.hpp>
 
@@ -39,17 +40,10 @@
 namespace epick_driver
 {
 
-constexpr auto kUsbPortParamName = "usb_port";
-constexpr auto kUsbPortParamDefault = "/dev/ttyUSB0";
+const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 
 constexpr auto kSlaveAddressParamName = "slave_address";
 constexpr auto kSlaveAddressParamDefault = 0x9;
-
-constexpr auto kBaudrateParamName = "baudrate";
-constexpr auto kBaudrateAddressParamDefault = 115200;
-
-constexpr auto kTimeoutParamName = "timeout";
-constexpr auto kTimeoutParamDefault = 500;
 
 constexpr auto kModeParamName = "mode";
 constexpr auto kModeParamDefault = GripperMode::AutomaticMode;
@@ -63,34 +57,14 @@ constexpr auto kMinVacuumPressureParamDefault = 0.0;  // kPA
 constexpr auto kGripperTimeoutParamName = "gripper_timeout";
 constexpr auto kGripperTimeoutParamDefault = 500;  // ms
 
-const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
-
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
 {
-  RCLCPP_INFO(kLogger, "Reading usb_port...");
-  std::string usb_port = info.hardware_parameters.count(kUsbPortParamName) ?
-                             info.hardware_parameters.at(kUsbPortParamName) :
-                             kUsbPortParamDefault;
-  RCLCPP_INFO(kLogger, "usb_port: %s", usb_port.c_str());
-
   RCLCPP_INFO(kLogger, "Reading slave_address...");
   uint8_t slave_address = info.hardware_parameters.count(kSlaveAddressParamName) ?
                               static_cast<uint8_t>(std::stoul(info.hardware_parameters.at(kSlaveAddressParamName))) :
                               kSlaveAddressParamDefault;
   RCLCPP_INFO(kLogger, "slave_address: %d", slave_address);
-
-  RCLCPP_INFO(kLogger, "Reading baudrate...");
-  uint32_t baudrate = info.hardware_parameters.count(kBaudrateParamName) ?
-                          static_cast<uint32_t>(std::stoul(info.hardware_parameters.at(kBaudrateParamName))) :
-                          kBaudrateAddressParamDefault;
-  RCLCPP_INFO(kLogger, "baudrate: %dbps", baudrate);
-
-  RCLCPP_INFO(kLogger, "Reading timeout...");
-  uint32_t timeout = static_cast<uint32_t>(info.hardware_parameters.count(kTimeoutParamName) ?
-                                               std::stoul(info.hardware_parameters.at(kTimeoutParamName)) :
-                                               kTimeoutParamDefault);
-  RCLCPP_INFO(kLogger, "timeout: %dms", timeout);
 
   RCLCPP_INFO(kLogger, "Reading mode...");
   GripperMode mode = info.hardware_parameters.count(kModeParamName) ?
@@ -120,12 +94,7 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
           std::chrono::milliseconds(kGripperTimeoutParamDefault);
   RCLCPP_INFO(kLogger, "%s: %ldms", kGripperTimeoutParamName, gripper_timeout.count());
 
-  auto serial = std::make_unique<DefaultSerial>();
-  serial->set_port(usb_port);
-  serial->set_baudrate(baudrate);
-  serial->set_timeout(timeout);
-
-  auto driver = std::make_unique<DefaultDriver>(std::move(serial));
+  auto driver = create_driver(info);
   driver->set_slave_address(slave_address);
   driver->set_mode(mode);
   driver->set_max_vacuum_pressure(max_vacuum_pressure);
@@ -133,5 +102,11 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   driver->set_gripper_timeout(gripper_timeout);
 
   return driver;
+}
+
+std::unique_ptr<Driver> DefaultDriverFactory::create_driver(const hardware_interface::HardwareInfo& info) const
+{
+  auto serial = DefaultSerialFactory().create(info);
+  return std::make_unique<DefaultDriver>(std::move(serial));
 }
 }  // namespace epick_driver

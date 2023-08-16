@@ -1,4 +1,4 @@
-// Copyright (c) 2022 PickNik, Inc.
+// Copyright (c) 2023 PickNik, Inc.
 //
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
@@ -28,24 +28,18 @@
 
 #pragma once
 
-#include <epick_driver/driver.hpp>
-#include <epick_driver/driver_factory.hpp>
+#include <epick_driver/serial.hpp>
 
-namespace epick_driver::test
+#include <hardware_interface/hardware_info.hpp>
+
+#include <memory>
+
+namespace epick_driver
 {
-class MockDriverFactory : public DriverFactory
+class SerialFactory
 {
 public:
-  explicit MockDriverFactory(std::unique_ptr<Driver> driver)
-    : driver_{ std::move(driver) } {
-
-    };
-  std::unique_ptr<Driver> create([[maybe_unused]] const hardware_interface::HardwareInfo& info)
-  {
-    return std::move(driver_);
-  };
-
-private:
-  std::unique_ptr<Driver> driver_;
+  virtual std::unique_ptr<Serial> create(const hardware_interface::HardwareInfo& info) const = 0;
 };
-}  // namespace epick_driver::test
+
+}  // namespace epick_driver
