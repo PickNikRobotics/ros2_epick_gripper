@@ -1,7 +1,7 @@
 # See https://docs.ros.org/en/foxy/How-To-Guides/Ament-CMake-Documentation.html
 
 cmake_minimum_required(VERSION 3.8)
-project(epick_driver VERSION 0.0.1 LANGUAGES CXX)
+project(robotiq_controllers VERSION 0.0.1 LANGUAGES CXX)
 
 # This module provides installation directories as per the GNU coding standards.
 include(GNUInstallDirs)
@@ -11,64 +11,37 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 find_package(ament_cmake REQUIRED)
-find_package(hardware_interface REQUIRED)
-find_package(pluginlib REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(rclcpp_lifecycle REQUIRED)
-find_package(serial REQUIRED)
+find_package(controller_interface REQUIRED)
+find_package(std_srvs REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
-  ament_cmake
-  hardware_interface
-  pluginlib
-  rclcpp
-  rclcpp_lifecycle
-  serial
+  controller_interface
+  std_srvs
 )
 
-# Epick driver library.
+# Epick controller library.
 
 add_library(
-    epick_driver
-    SHARED
-    include/epick_driver/crc_utils.hpp
-    include/epick_driver/data_utils.hpp
-    include/epick_driver/default_driver.hpp
-    include/epick_driver/default_driver_factory.hpp
-    include/epick_driver/default_driver_utils.hpp
-    include/epick_driver/default_serial.hpp
-    include/epick_driver/default_serial_factory.hpp
-    include/epick_driver/driver.hpp
-    include/epick_driver/driver_factory.hpp
-    include/epick_driver/epick_gripper_hardware_interface.hpp
-    include/epick_driver/serial.hpp
-    include/epick_driver/serial_factory.hpp
-    include/epick_driver/visibility_control.hpp
-    src/epick_gripper_hardware_interface.cpp
-    src/crc_utils.cpp
-    src/data_utils.cpp
-    src/default_driver.cpp
-    src/default_driver_factory.cpp
-    src/default_driver_utils.cpp
-    src/default_serial.cpp
-    src/default_serial_factory.cpp
+  epick_controller
+  SHARED
+  include/robotiq_controllers/epick_controller.hpp
+  src/epick_controller.cpp
 )
-target_link_libraries(epick_driver atomic)
 target_include_directories(
-    epick_driver
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+  epick_controller
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(
-    epick_driver
-    ${THIS_PACKAGE_INCLUDE_DEPENDS}
+  epick_controller
+  ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
 ###############################################################################
 # PLUGINS
 
-pluginlib_export_plugin_description_file(hardware_interface hardware_interface_plugin.xml)
+pluginlib_export_plugin_description_file(controller_interface controller_plugins.xml)
 
 ###############################################################################
 # EXPORTS
@@ -79,7 +52,7 @@ pluginlib_export_plugin_description_file(hardware_interface hardware_interface_p
 # Without this a client cannot find this library.
 # It can take an arbitrary list of targets named as EXPORT in an install call.
 ament_export_targets(
-    epick_driver_targets # Must match the EXPORT label below in the install section.
+    epick_controller_targets # Must match the EXPORT label below in the install section.
 )
 # Help downstream packages to find transitive dependencies i.e. export all
 # dependencies required by a package to use this library.
@@ -95,7 +68,7 @@ ament_export_include_directories(
 )
 # Tell downstream packages our libraries to link against.
 ament_export_libraries(
-    epick_driver
+    epick_controller
 )
 
 ###############################################################################
@@ -109,23 +82,13 @@ install(
 
 # Install our library.
 install(
-    TARGETS epick_driver
-    EXPORT epick_driver_targets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}      # bin
-    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
+  TARGETS epick_controller
+  EXPORT epick_controller_targets
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}      # bin
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
 )
-
-###############################################################################
-# TESTS
-
-# CTest module automatically creates a BUILD_TESTING option that selects
-# whether to enable testing support (ON by default).
-include(CTest)
-if(BUILD_TESTING)
-  add_subdirectory(tests)
-endif()
 
 ###############################################################################
 # LINTERS
