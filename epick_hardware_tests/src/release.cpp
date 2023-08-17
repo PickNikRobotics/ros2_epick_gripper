@@ -89,7 +89,8 @@ int main(int argc, char* argv[])
     serial->set_baudrate(baudrate);
     serial->set_timeout(timeout);
 
-    auto driver = std::make_unique<DefaultDriver>(std::move(serial), slave_address);
+    auto driver = std::make_unique<DefaultDriver>(std::move(serial));
+    driver->set_slave_address(slave_address);
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;

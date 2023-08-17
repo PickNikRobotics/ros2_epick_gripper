@@ -37,11 +37,11 @@
 
 namespace epick_driver::test
 {
-// We use this class to check if parameters are correctly read.
-class FakeSerialFactory : public DefaultSerialFactory
+// This factory will populate the injected mock with data read form the HardwareInfo.
+class StubSerialFactory : public DefaultSerialFactory
 {
 public:
-  explicit FakeSerialFactory(std::unique_ptr<MockSerial> serial) : serial_{ std::move(serial) }
+  explicit StubSerialFactory(std::unique_ptr<MockSerial> serial) : serial_{ std::move(serial) }
   {
   }
 
@@ -71,7 +71,7 @@ TEST(TestDefaultSerialFactory, create_with_default_parameters)
   EXPECT_CALL(*serial, set_baudrate(115200));
   EXPECT_CALL(*serial, set_timeout(500));
 
-  FakeSerialFactory serial_factory(std::move(serial));
+  StubSerialFactory serial_factory(std::move(serial));
   auto created_serial = serial_factory.create(info);
 }
 
@@ -94,7 +94,7 @@ TEST(TestDefaultSerialFactory, create_with_given_parameters)
   EXPECT_CALL(*serial, set_baudrate(9600));
   EXPECT_CALL(*serial, set_timeout(100));
 
-  FakeSerialFactory serial_factory(std::move(serial));
+  StubSerialFactory serial_factory(std::move(serial));
   auto created_serial = serial_factory.create(info);
 }
 }  // namespace epick_driver::test

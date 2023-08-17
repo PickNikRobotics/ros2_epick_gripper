@@ -39,11 +39,6 @@
 
 namespace epick_driver::test
 {
-using ::testing::_;
-using ::testing::An;
-using ::testing::Matcher;
-using ::testing::Return;
-using ::testing::SaveArg;
 
 /**
  * This test generates a minimal xacro robot configuration and loads the
