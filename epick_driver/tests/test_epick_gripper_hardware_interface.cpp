@@ -29,7 +29,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "epick_driver/epick_gripper_hardware_interface.hpp"
+#include <epick_driver/epick_gripper_hardware_interface.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>

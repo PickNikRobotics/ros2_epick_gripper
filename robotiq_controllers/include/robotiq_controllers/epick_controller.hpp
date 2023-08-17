@@ -28,7 +28,32 @@
 
 #pragma once
 
-namespace epic_controller
-{
+#include <controller_interface/controller_interface.hpp>
+#include <std_srvs/srv/set_bool.hpp>
 
-}
+namespace epick_controller
+{
+class EpickController : public controller_interface::ControllerInterface
+{
+public:
+  controller_interface::InterfaceConfiguration command_interface_configuration() const override;
+
+  controller_interface::InterfaceConfiguration state_interface_configuration() const override;
+
+  controller_interface::return_type update(const rclcpp::Time& time, const rclcpp::Duration& period) override;
+
+  CallbackReturn on_activate(const rclcpp_lifecycle::State& previous_state) override;
+
+  CallbackReturn on_deactivate(const rclcpp_lifecycle::State& previous_state) override;
+
+  CallbackReturn on_init() override;
+
+private:
+  // When we send a true, the gripper will begin to grip, when false the gripper will release.
+  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr regulate_gripper_srv_;
+
+  // The logic of the server to regulate the gripper.
+  bool regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
+                        std_srvs::srv::SetBool::Response::SharedPtr response);
+};
+}  // namespace epick_controller

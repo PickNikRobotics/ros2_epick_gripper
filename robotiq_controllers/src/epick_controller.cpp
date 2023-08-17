@@ -28,7 +28,95 @@
 
 #include <robotiq_controllers/epick_controller.hpp>
 
-namespace epic_controller
+namespace epick_controller
 {
+enum CommandInterfaces : size_t
+{
+  REGULATE_GRIPPER_CMD = 0
+};
 
+controller_interface::InterfaceConfiguration EpickController::command_interface_configuration() const
+{
+  controller_interface::InterfaceConfiguration config;
+  config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+  config.names.emplace_back("gripper_cmd/regulate_cmd");
+  return config;
 }
+
+controller_interface::InterfaceConfiguration EpickController::state_interface_configuration() const
+{
+  controller_interface::InterfaceConfiguration config;
+  config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+  return config;
+}
+
+controller_interface::return_type EpickController::update([[maybe_unused]] const rclcpp::Time& time,
+                                                          [[maybe_unused]] const rclcpp::Duration& period)
+{
+  return controller_interface::return_type::OK;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
+{
+  // Check command interfaces.
+  if (command_interfaces_.size() != 1)
+  {
+    RCLCPP_ERROR(get_node()->get_logger(), "Expected %d command interfaces, but got %zu.", 2,
+                 command_interfaces_.size());
+    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
+  }
+
+  try
+  {
+    // Create a service to regulate the gripper.
+    regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
+        "~/regulate", [this](std_srvs::srv::SetBool::Request::SharedPtr req,
+                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
+  }
+  catch (...)
+  {
+    return LifecycleNodeInterface::CallbackReturn::ERROR;
+  }
+  return LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+EpickController::on_deactivate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
+{
+  try
+  {
+    regulate_gripper_srv_.reset();
+  }
+  catch (...)
+  {
+    return LifecycleNodeInterface::CallbackReturn::ERROR;
+  }
+  return LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickController::on_init()
+{
+  return LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
+                                       std_srvs::srv::SetBool::Response::SharedPtr response)
+{
+  command_interfaces_[REGULATE_GRIPPER_CMD].set_value(request->data ? 1.0 : std::numeric_limits<double>::quiet_NaN());
+  //  resp->success = command_interfaces_[1].get_value();
+
+  //  while (command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value() == ASYNC_WAITING) {
+  //    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  //  }
+  //  resp->success = command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value();
+
+  //  return resp->success;
+  return true;
+}
+
+}  // namespace epick_controller
+
+#include "pluginlib/class_list_macros.hpp"
+
+PLUGINLIB_EXPORT_CLASS(epick_controller::EpickController, controller_interface::ControllerInterface)
