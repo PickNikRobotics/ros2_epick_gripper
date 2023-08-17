@@ -53,6 +53,7 @@ add_library(
     src/default_serial.cpp
     src/default_serial_factory.cpp
 )
+target_link_libraries(epick_driver atomic)
 target_include_directories(
     epick_driver
     PUBLIC

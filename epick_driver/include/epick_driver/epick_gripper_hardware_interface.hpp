@@ -123,18 +123,6 @@ public:
   EPICK_DRIVER_PUBLIC
   hardware_interface::return_type write(const rclcpp::Time& time, const rclcpp::Duration& period) override;
 
-  /**
-   * All command interfaces in ROS2 controls are represented by a double.
-   * We use this constant to represend an off state.
-   */
-  static constexpr double kOffState = std::numeric_limits<double>::quiet_NaN();
-
-  /**
-   * All command interfaces in ROS2 controls are represented by a double.
-   * We use this constant to represent an on state.
-   */
-  static constexpr double kOnState = 1.0;
-
 private:
   // Interface to interact with the hardware using the serial port.
   std::unique_ptr<Driver> driver_;
@@ -142,13 +130,19 @@ private:
   // Factory to create the interface to interact with the hardware using the serial port.
   std::unique_ptr<DriverFactory> driver_factory_;
 
-  void checkAsyncIO();
+  // The variable regulate_cmd_ is updated when the controller writes into the "regulate" hardware interface.
+  // When the controller invokes a write operation, the content of the variable regulate_cmd_ is parsed and moved into
+  // the atomic variable regulate_async_cmd_. Subsequently, a thread will read the content of regulate_async_cmd_
+  // and send a gripper operation on the driver.
+  double regulate_cmd_;
+  std::atomic<bool> regulate_async_cmd_;
 
-  // GPIO interface to switch on and off the gripper suction. 1.0 is on and 0.0 is off.
-  double regulate_ = kOffState;
-
+  // We use a thread to read/write to the driver so that we dont block the hardware_interface read/write.
   std::thread communication_thread_;
   std::atomic<bool> communication_thread_is_running_;
+  void background_task();
+
+  std::atomic<GripperStatus> gripper_status_;
 };
 }  // namespace epick_driver
 

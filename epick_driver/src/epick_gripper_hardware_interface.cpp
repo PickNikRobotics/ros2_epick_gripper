@@ -39,7 +39,7 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
-constexpr auto kGpio = "gripper_cmd";
+constexpr auto kGripperGPIO = "gripper_cmd";
 constexpr auto kRegulateCommandInterface = "regulate";
 
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
@@ -131,24 +131,26 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    auto it = std::find_if(info_.gpios.begin(), info_.gpios.end(), [](const auto& gpio) { return gpio.name == kGpio; });
+    auto it = std::find_if(info_.gpios.begin(), info_.gpios.end(),
+                           [](const auto& gpio) { return gpio.name == kGripperGPIO; });
     if (it != info_.gpios.end())
     {
-      auto cmd_it = std::find_if(it->command_interfaces.begin(), it->command_interfaces.end(),
-                                 [](const auto& cmd) { return cmd.name == kRegulateCommandInterface; });
-      if (cmd_it != it->command_interfaces.end())
+      auto regulate_cmd = std::find_if(it->command_interfaces.begin(), it->command_interfaces.end(),
+                                       [](const auto& cmd) { return cmd.name == kRegulateCommandInterface; });
+      if (regulate_cmd != it->command_interfaces.end())
       {
-        RCLCPP_DEBUG(kLogger, "export_command_interface %s", cmd_it->name.c_str());
-        command_interfaces.emplace_back(hardware_interface::CommandInterface(it->name, cmd_it->name, &regulate_));
+        RCLCPP_DEBUG(kLogger, "export_command_interface %s", regulate_cmd->name.c_str());
+        command_interfaces.emplace_back(
+            hardware_interface::CommandInterface(it->name, regulate_cmd->name, &regulate_cmd_));
       }
       else
       {
-        RCLCPP_ERROR(kLogger, "Command interface %s not found within %s.", kRegulateCommandInterface, kGpio);
+        RCLCPP_ERROR(kLogger, "Command interface %s not found within %s.", kRegulateCommandInterface, kGripperGPIO);
       }
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "GPIO %s not found.", kGpio);
+      RCLCPP_ERROR(kLogger, "GPIO %s not found.", kGripperGPIO);
     }
   }
   catch (const std::exception& ex)
@@ -169,10 +171,9 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
     driver_->deactivate();
     driver_->activate();
 
+    // The following thread will be responsible for comminicating directly with the driver.
     communication_thread_is_running_.store(true);
-    communication_thread_ = std::thread([this] {
-      // TODO: implement read/write.
-    });
+    communication_thread_ = std::thread([this] { this->background_task(); });
   }
   catch (const serial::IOException& e)
   {
@@ -188,6 +189,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
 {
   RCLCPP_DEBUG(kLogger, "on_deactivate");
+  communication_thread_is_running_.store(false);
+  communication_thread_.join();
   try
   {
     driver_->deactivate();
@@ -221,6 +224,8 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
 {
   try
   {
+    bool regulate = !std::isnan(regulate_cmd_);
+    regulate_async_cmd_.store(regulate);
   }
   catch (const std::exception& ex)
   {
@@ -229,5 +234,42 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
     return hardware_interface::return_type::ERROR;
   }
   return hardware_interface::return_type::OK;
+}
+
+void EpickGripperHardwareInterface::background_task()
+{
+  // Read from and write to the gripper at 100 Hz.
+  const auto io_interval = std::chrono::milliseconds(10);
+  auto last_io = std::chrono::high_resolution_clock::now();
+
+  while (communication_thread_is_running_.load())
+  {
+    const auto now = std::chrono::high_resolution_clock::now();
+    if (now - last_io > io_interval)
+    {
+      try
+      {
+        // Depending on the current gripper status decide to send or not a regulate command.
+        auto status = driver_->get_status();
+        bool regulate = regulate_async_cmd_.load();
+        if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator && regulate)
+        {
+          driver_->grip();
+        }
+        if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters && !regulate)
+        {
+          driver_->release();
+        }
+
+        gripper_status_.store(driver_->get_status());
+        last_io = now;
+      }
+      catch (serial::IOException& e)
+      {
+        RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
+        communication_thread_is_running_.store(false);
+      }
+    }
+  }
 }
 }  // namespace epick_driver
