@@ -43,6 +43,8 @@
 #include <ros2_control_test_assets/components_urdfs.hpp>
 #include <ros2_control_test_assets/descriptions.hpp>
 
+#include <chrono>
+
 namespace epick_driver::test
 {
 using ::testing::Contains;
@@ -65,6 +67,26 @@ protected:
 private:
   mutable std::unique_ptr<Driver> driver_;
 };
+
+/**
+ * This method allow a busy wait on a given condition until a timeout is exceeded.
+ * @param condition The condition to be matched.
+ * @param timeout The maximum waiting time.
+ * @return True if the condition is matched, false otherwise.
+ */
+bool wait_for_condition(std::function<bool()> condition, std::chrono::milliseconds timeout)
+{
+  auto start = std::chrono::steady_clock::now();
+  while (std::chrono::steady_clock::now() - start < timeout)
+  {
+    if (condition())
+    {
+      return true;  // Condition met
+    }
+    std::this_thread::yield();  // Yield the current thread to reduce busy-waiting overhead.
+  }
+  return false;  // Timeout reached
+}
 
 /**
  * This test generates a minimal xacro robot configuration and loads the
@@ -100,8 +122,13 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
  */
 TEST(TestEpickGripperHardwareInterface, load_dummy_driver)
 {
+  auto driver = std::make_unique<FakeDriver>();
+
+  // We get our hands on the raw pointer to check expectations later.
+  auto driver_handle = driver.get();
+
   auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>(
-      std::make_unique<TestDriverFactory>(std::make_unique<FakeDriver>()));
+      std::make_unique<TestDriverFactory>(std::move(driver)));
 
   hardware_interface::HardwareInfo info{
     "EpickGripperHardwareInterface",
@@ -127,17 +154,31 @@ TEST(TestEpickGripperHardwareInterface, load_dummy_driver)
 
   EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper_cmd/regulate")));
 
-  // Write velocity values.
+  // Claim the regulate interface.
   hardware_interface::LoanedCommandInterface regulate_cmd = rm.claim_command_interface("gripper_cmd/regulate");
+
+  // Ask the gripper to grip.
   regulate_cmd.set_value(1.0);
+  rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
-  // Invoke a write command.
-  const rclcpp::Time time;
-  const rclcpp::Duration period = rclcpp::Duration::from_seconds(0);
-  rm.write(time, period);
+  auto gripper_gripping = [driver_handle]() {
+    return driver_handle->get_status().gripper_regulate_action ==
+           GripperRegulateAction::FollowRequestedVacuumParameters;
+  };
+  ASSERT_TRUE(wait_for_condition(gripper_gripping, std::chrono::milliseconds(500)))
+      << "Timeout exceeded waiting for the gripper to grip.";
 
-  // We must disconnect the hardware because there is a background thread
-  // running that must be stopped nicely.
+  // Ask the gripper to release.
+  regulate_cmd.set_value(std::numeric_limits<double>::quiet_NaN());
+  rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
+
+  auto gripper_released = [driver_handle]() {
+    return driver_handle->get_status().gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator;
+  };
+  ASSERT_TRUE(wait_for_condition(gripper_released, std::chrono::milliseconds(500)))
+      << "Timeout exceeded waiting for the gripper to release.";
+
+  // Deactivate the hardware.
   rclcpp_lifecycle::State inactive_state{ lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE,
                                           hardware_interface::lifecycle_state_names::INACTIVE };
   rm.set_component_state("EpickGripperHardwareInterface", inactive_state);
