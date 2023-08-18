@@ -7,11 +7,3 @@ controller_manager:
 
     epick_controller:
       type: robotiq_controllers/EpickController
-#epick_controller:
-#  ros__parameters:
-#    joints:
-#      - joint1
-#      - joint2
-#      - joint3
-#      - joint4
-#      - joint5

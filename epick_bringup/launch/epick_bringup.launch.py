@@ -82,18 +82,6 @@ def launch_setup(context, *args, **kwargs):
         },
     )
 
-    # The broadcaster reads all state interfaces and reports them on /joint_states and /dynamic_joint_states.
-    # https://control.ros.org/master/doc/ros2_controllers/joint_state_broadcaster/doc/userdoc.html
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=[
-            "joint_state_broadcaster",
-            "--controller-manager",
-            "/controller_manager",
-        ],
-    )
-
     # This is a controller for the Robotiq Epick gripper.
     epick_controller_spawner = Node(
         package="controller_manager",
@@ -114,7 +102,6 @@ def launch_setup(context, *args, **kwargs):
 
     nodes_to_start = [
         controller_manager,
-        joint_state_broadcaster_spawner,
         epick_controller_spawner,
         robot_state_publisher_node,
     ]
