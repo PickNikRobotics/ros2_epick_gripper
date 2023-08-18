@@ -22,19 +22,19 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 # Epick controller library.
 
 add_library(
-  epick_controller
+  robotiq_controllers
   SHARED
   include/robotiq_controllers/epick_controller.hpp
   src/epick_controller.cpp
 )
 target_include_directories(
-  epick_controller
+  robotiq_controllers
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(
-  epick_controller
+  robotiq_controllers
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
@@ -52,7 +52,7 @@ pluginlib_export_plugin_description_file(controller_interface controller_plugins
 # Without this a client cannot find this library.
 # It can take an arbitrary list of targets named as EXPORT in an install call.
 ament_export_targets(
-    epick_controller_targets # Must match the EXPORT label below in the install section.
+    robotiq_controllers_targets # Must match the EXPORT label below in the install section.
 )
 # Help downstream packages to find transitive dependencies i.e. export all
 # dependencies required by a package to use this library.
@@ -82,8 +82,8 @@ install(
 
 # Install our library.
 install(
-  TARGETS epick_controller
-  EXPORT epick_controller_targets
+  TARGETS robotiq_controllers
+  EXPORT robotiq_controllers_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}      # bin
