@@ -31,7 +31,8 @@
 
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
 #include <epick_driver/default_driver_factory.hpp>
-#include <epick_driver/fake/fake_driver.hpp>
+
+#include <fake/fake_driver.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>

@@ -32,7 +32,6 @@
 #include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/default_serial.hpp>
 #include <epick_driver/default_serial_factory.hpp>
-#include <epick_driver/fake/fake_driver.hpp>
 
 #include <rclcpp/logging.hpp>
 

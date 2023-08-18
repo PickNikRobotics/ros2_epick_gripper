@@ -28,7 +28,7 @@ target_link_libraries(test_default_driver epick_driver)
 
 ament_add_gmock(test_epick_gripper_hardware_interface
     test_epick_gripper_hardware_interface.cpp
-    mock/mock_driver.hpp
+    fake/fake_driver.hpp
 )
 target_include_directories(test_epick_gripper_hardware_interface
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

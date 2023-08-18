@@ -33,18 +33,80 @@ namespace epick_driver
 class FakeDriver : public Driver
 {
 public:
-  void set_slave_address(const uint8_t slave_address) override;
-  void set_mode(const GripperMode gripper_mode) override;
-  void set_max_vacuum_pressure(const float vacuum_pressure) override;
-  void set_min_vacuum_pressure(const float vacuum_pressure) override;
-  void set_gripper_timeout(const std::chrono::milliseconds timeout) override;
-  bool connect() override;
-  void disconnect() override;
-  void activate() override;
-  void deactivate() override;
-  void grip() override;
-  void release() override;
-  GripperStatus get_status() override;
+  void set_slave_address(const uint8_t slave_address) override
+  {
+    slave_address_ = slave_address;
+  }
+
+  void set_mode(const GripperMode gripper_mode) override
+  {
+    gripper_mode_ = gripper_mode;
+  }
+
+  void set_max_vacuum_pressure(const float vacuum_pressure) override
+  {
+    max_vacuum_pressure_ = vacuum_pressure;
+  }
+
+  void set_min_vacuum_pressure(const float vacuum_pressure) override
+  {
+    min_vacuum_pressure_ = vacuum_pressure;
+  }
+
+  void set_gripper_timeout(const std::chrono::milliseconds timeout) override
+  {
+    gripper_timeout_ = timeout;
+  }
+
+  bool connect() override
+  {
+    connected_ = true;
+    return true;
+  }
+
+  void disconnect() override
+  {
+    connected_ = false;
+  }
+
+  void activate() override
+  {
+    activated_ = true;
+  }
+
+  void deactivate() override
+  {
+    activated_ = false;
+  }
+
+  void grip() override
+  {
+    regulate_ = true;
+  }
+
+  void release() override
+  {
+    regulate_ = false;
+  }
+
+  GripperStatus get_status() override
+  {
+    GripperStatus status;
+    status.gripper_activation_action =
+        activated_ ? GripperActivationAction::Activate : GripperActivationAction::ClearGripperFaultStatus;
+    status.gripper_mode = gripper_mode_;
+    status.gripper_regulate_action =
+        regulate_ ? GripperRegulateAction::FollowRequestedVacuumParameters : GripperRegulateAction::StopVacuumGenerator;
+    status.gripper_activation_status =
+        activated_ ? GripperActivationStatus::GripperOperational : GripperActivationStatus::GripperNotActivated;
+    status.gripper_fault_status = GripperFaultStatus::NoFault;
+    status.actuator_status = regulate_ ? ActuatorStatus::Gripping : ActuatorStatus::PassiveReleasing;
+    status.object_detection_status =
+        regulate_ ? ObjectDetectionStatus::ObjectDetectedAtMaxPressure : ObjectDetectionStatus::NoObjectDetected;
+    status.max_vacuum_pressure = max_vacuum_pressure_;
+    status.actual_vacuum_pressure = (max_vacuum_pressure_ + min_vacuum_pressure_) / 2;
+    return status;
+  }
 
 private:
   uint8_t slave_address_ = 0x00;
