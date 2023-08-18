@@ -6,7 +6,7 @@ controller_manager:
     update_rate: 30 # Hz
 
     epick_controller:
-      type: obotiq_controllers/EpickController
+      type: robotiq_controllers/EpickController
 #epick_controller:
 #  ros__parameters:
 #    joints:
