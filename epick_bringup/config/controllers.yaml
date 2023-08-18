@@ -5,49 +5,13 @@ controller_manager:
   ros__parameters:
     update_rate: 30 # Hz
 
-    velocity_controller:
-      type: velocity_controllers/JointGroupVelocityController
-
-    position_controller:
-      type: position_controllers/JointGroupPositionController
-
-    joint_trajectory_controller:
-      type: joint_trajectory_controller/JointTrajectoryController
-
-    joint_state_broadcaster:
-      type: joint_state_broadcaster/JointStateBroadcaster
-
-velocity_controller:
-  ros__parameters:
-    joints:
-      - joint1
-      - joint2
-      - joint3
-      - joint4
-      - joint5
-
-position_controller:
-  ros__parameters:
-    joints:
-      - joint1
-      - joint2
-      - joint3
-      - joint4
-      - joint5
-
-joint_trajectory_controller:
-  ros__parameters:
-    allow_partial_joints_goal: true
-    joints:
-      - joint1
-      - joint2
-      - joint3
-      - joint4
-      - joint5
-
-    command_interfaces:
-      - position
-
-    state_interfaces:
-      - position
-      - velocity
+    epick_controller:
+      type: obotiq_controllers/EpickController
+#epick_controller:
+#  ros__parameters:
+#    joints:
+#      - joint1
+#      - joint2
+#      - joint3
+#      - joint4
+#      - joint5

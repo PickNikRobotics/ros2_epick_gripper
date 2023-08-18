@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot name="test_epick_gripper" xmlns:xacro="http://ros.org/wiki/xacro">
-  <xacro:include filename="$(find epick_description)/urdf/minimal_robot.xacro" />
-  <xacro:include filename="$(find epick_description)/urdf/epik_ros2_control.xacro" />
+  <xacro:include filename="$(find epick_bringup)/urdf/minimal_robot.xacro" />
+  <xacro:include filename="$(find epick_bringup)/urdf/epick_ros2_control.xacro" />
 
   <xacro:minimal_robot />
   <xacro:epick_ros2_control name="epick_ros2_control" />

@@ -98,7 +98,7 @@ def launch_setup(context, *args, **kwargs):
     epick_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["velocity_controller", "-c", "/controller_manager"],
+        arguments=["epick_controller", "-c", "/controller_manager"],
     )
 
     # robot_state_publisher uses the URDF specified by the parameter robot_description and the joint positions
@@ -138,7 +138,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="minimal_robot.urdf.xacro",
+            default_value="urdf.xacro",
             description="URDF/XACRO description file for the robot.",
         ),
         DeclareLaunchArgument(
