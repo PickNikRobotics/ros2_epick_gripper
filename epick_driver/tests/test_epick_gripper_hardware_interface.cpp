@@ -120,7 +120,7 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
  * In this test we startup the hardware interface with a fake driver so we can
  * test read and write operations.
  */
-TEST(TestEpickGripperHardwareInterface, load_dummy_driver)
+TEST(TestEpickGripperHardwareInterface, regulate_interface)
 {
   auto driver = std::make_unique<FakeDriver>();
 
