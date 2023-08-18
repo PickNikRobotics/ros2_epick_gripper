@@ -38,10 +38,10 @@
 namespace epick_driver::test
 {
 // This factory will populate the injected mock with data read form the HardwareInfo.
-class StubDriverFactory : public DefaultDriverFactory
+class TestDriverFactory : public DefaultDriverFactory
 {
 public:
-  explicit StubDriverFactory(std::unique_ptr<MockDriver> driver) : driver_{ std::move(driver) }
+  explicit TestDriverFactory(std::unique_ptr<Driver> driver) : driver_{ std::move(driver) }
   {
   }
 
@@ -52,7 +52,7 @@ protected:
   }
 
 private:
-  mutable std::unique_ptr<MockDriver> driver_;
+  mutable std::unique_ptr<Driver> driver_;
 };
 
 /**
@@ -80,7 +80,7 @@ TEST(TestDefaultDriverFactory, create_with_default_parameters)
   EXPECT_CALL(*driver, release()).Times(0);
   EXPECT_CALL(*driver, get_status()).Times(0);
 
-  StubDriverFactory driver_factory{ std::move(driver) };
+  TestDriverFactory driver_factory{ std::move(driver) };
   auto created_driver = driver_factory.create(info);
 }
 
@@ -115,7 +115,7 @@ TEST(TestDefaultDriverFactory, create_with_given_parameters)
   EXPECT_CALL(*driver, release()).Times(0);
   EXPECT_CALL(*driver, get_status()).Times(0);
 
-  StubDriverFactory driver_factory{ std::move(driver) };
+  TestDriverFactory driver_factory{ std::move(driver) };
   auto created_driver = driver_factory.create(info);
 }
 }  // namespace epick_driver::test

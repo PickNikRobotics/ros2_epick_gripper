@@ -110,16 +110,7 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
 
 std::unique_ptr<Driver> DefaultDriverFactory::create_driver(const hardware_interface::HardwareInfo& info) const
 {
-  // We give the user an option to startup a dummy gripper for testing purposes.
-  if (info.hardware_parameters.count(kUseDummyParamName) &&
-      info.hardware_parameters.at(kUseDummyParamName) != kUseDummyParamDefault)
-  {
-    return std::make_unique<FakeDriver>();
-  }
-  else
-  {
-    auto serial = DefaultSerialFactory().create(info);
-    return std::make_unique<DefaultDriver>(std::move(serial));
-  }
+  auto serial = DefaultSerialFactory().create(info);
+  return std::make_unique<DefaultDriver>(std::move(serial));
 }
 }  // namespace epick_driver

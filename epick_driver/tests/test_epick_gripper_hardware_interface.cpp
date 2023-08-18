@@ -30,6 +30,8 @@
 #include <gmock/gmock.h>
 
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
+#include <epick_driver/default_driver_factory.hpp>
+#include <epick_driver/fake/fake_driver.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>
@@ -44,6 +46,25 @@ namespace epick_driver::test
 {
 using ::testing::Contains;
 using ::testing::Eq;
+
+// This factory will populate the injected driver with data read form the HardwareInfo.
+class TestDriverFactory : public DefaultDriverFactory
+{
+public:
+  explicit TestDriverFactory(std::unique_ptr<Driver> driver) : driver_{ std::move(driver) }
+  {
+  }
+
+protected:
+  std::unique_ptr<Driver> create_driver([[maybe_unused]] const hardware_interface::HardwareInfo& info) const override
+  {
+    return std::move(driver_);
+  }
+
+private:
+  mutable std::unique_ptr<Driver> driver_;
+};
+
 /**
  * This test generates a minimal xacro robot configuration and loads the
  * hardware interface plugin.
@@ -73,20 +94,21 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
 }
 
 /**
- * This test generates a minimal xacro robot configuration and loads the
- * hardware interface plugin.
+ * In this test we startup the hardware interface with a fake driver so we can
+ * test read and write operations.
  */
 TEST(TestEpickGripperHardwareInterface, load_dummy_driver)
 {
-  auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>();
+  auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>(
+      std::make_unique<TestDriverFactory>(std::make_unique<FakeDriver>()));
 
   hardware_interface::HardwareInfo info{
     "EpickGripperHardwareInterface",
     "system",
     "epick_driver/EpickGripperHardwareInterface",
-    { { "use_dummy", "true" } },  // parameters.
-    {},                           // joints.
-    {},                           // Sensors.
+    {},  // parameters.
+    {},  // joints.
+    {},  // Sensors.
     // GPIOs
     { { "gripper_cmd", "GPIO", { { "regulate", "", "", "", "double", 1 } }, {}, { {} } } },
     {},  // Transmission.
