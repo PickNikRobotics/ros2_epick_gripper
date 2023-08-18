@@ -28,7 +28,7 @@
 
 #include <robotiq_controllers/epick_controller.hpp>
 
-namespace epick_controller
+namespace robotiq_controllers
 {
 enum CommandInterfaces : size_t
 {
@@ -115,8 +115,8 @@ bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPt
   return true;
 }
 
-}  // namespace epick_controller
+}  // namespace robotiq_controllers
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(epick_controller::EpickController, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(robotiq_controllers::EpickController, controller_interface::ControllerInterface)
