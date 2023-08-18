@@ -32,6 +32,7 @@
 #include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/default_serial.hpp>
 #include <epick_driver/default_serial_factory.hpp>
+#include <epick_driver/fake/fake_driver.hpp>
 
 #include <rclcpp/logging.hpp>
 
@@ -56,6 +57,9 @@ constexpr auto kMinVacuumPressureParamDefault = 0.0;  // kPA
 
 constexpr auto kGripperTimeoutParamName = "gripper_timeout";
 constexpr auto kGripperTimeoutParamDefault = 500;  // ms
+
+constexpr auto kUseDummyParamName = "use_dummy";
+constexpr auto kUseDummyParamDefault = "false";
 
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
@@ -106,7 +110,16 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
 
 std::unique_ptr<Driver> DefaultDriverFactory::create_driver(const hardware_interface::HardwareInfo& info) const
 {
-  auto serial = DefaultSerialFactory().create(info);
-  return std::make_unique<DefaultDriver>(std::move(serial));
+  // We give the user an option to startup a dummy gripper for testing purposes.
+  if (info.hardware_parameters.count(kUseDummyParamName) &&
+      info.hardware_parameters.at(kUseDummyParamName) != kUseDummyParamDefault)
+  {
+    return std::make_unique<FakeDriver>();
+  }
+  else
+  {
+    auto serial = DefaultSerialFactory().create(info);
+    return std::make_unique<DefaultDriver>(std::move(serial));
+  }
 }
 }  // namespace epick_driver

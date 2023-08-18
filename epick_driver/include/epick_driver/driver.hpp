@@ -129,21 +129,21 @@ public:
    * The vacuum pressure is measured in kPa below the atmospheric pressure
    * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
    * (maximum acceptable value above the atmospheric pressure).
-   * @param vacuum_pressure_kPa The maximum vacuum pressure between -100kPa and
+   * @param vacuum_pressure The maximum vacuum pressure between -100kPa and
    * 155kPa.
    */
-  virtual void set_max_vacuum_pressure(const float vacuum_pressure_kPa) = 0;
+  virtual void set_max_vacuum_pressure(const float vacuum_pressure) = 0;
 
   /**
    * Set the gripper minimum acceptable vacuum pressure to hold an object.
    * The vacuum pressure is measured in kPa below the atmospheric pressure
    * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
    * (maximum acceptable value above the atmospheric pressure).
-   * @param vacuum_pressure_kPa The minimum acceptable vacuum pressure between
+   * @param vacuum_pressure The minimum acceptable vacuum pressure between
    * -100kPa and
    * 155kPa.
    */
-  virtual void set_min_vacuum_pressure(const float vacuum_pressure_kPa) = 0;
+  virtual void set_min_vacuum_pressure(const float vacuum_pressure) = 0;
 
   virtual void set_gripper_timeout(const std::chrono::milliseconds timeout) = 0;
 
