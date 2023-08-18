@@ -70,7 +70,7 @@ TEST(TestDefaultDriverFactory, create_with_default_parameters)
   EXPECT_CALL(*driver, set_slave_address(0x9));
   EXPECT_CALL(*driver, set_mode(GripperMode::AutomaticMode));
   EXPECT_CALL(*driver, set_max_vacuum_pressure(-100));
-  EXPECT_CALL(*driver, set_min_vacuum_pressure(0));
+  EXPECT_CALL(*driver, set_min_vacuum_pressure(-10));
   EXPECT_CALL(*driver, set_gripper_timeout(std::chrono::milliseconds(500)));
   EXPECT_CALL(*driver, connect()).Times(0);
   EXPECT_CALL(*driver, disconnect()).Times(0);

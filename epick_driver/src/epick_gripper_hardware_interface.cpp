@@ -150,7 +150,7 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "GPIO %s not found.", kGripperGPIO);
+      RCLCPP_ERROR(kLogger, "Command interface %s not found.", kGripperGPIO);
     }
   }
   catch (const std::exception& ex)
@@ -224,7 +224,7 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
 {
   try
   {
-    bool regulate = !std::isnan(regulate_cmd_);
+    bool regulate = regulate_cmd_ >= 0.5;
     regulate_async_cmd_.store(regulate);
   }
   catch (const std::exception& ex)
