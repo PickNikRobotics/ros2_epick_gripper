@@ -35,11 +35,13 @@ enum CommandInterfaces : size_t
   REGULATE_GRIPPER_CMD = 0
 };
 
+constexpr auto kRegulateCommandInterface = "gripper_cmd/regulate";
+
 controller_interface::InterfaceConfiguration EpickController::command_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back("gripper_cmd/regulate_cmd");
+  config.names.emplace_back(kRegulateCommandInterface);
   return config;
 }
 
