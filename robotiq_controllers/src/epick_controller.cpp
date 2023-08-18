@@ -101,7 +101,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickC
 }
 
 bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
-                                       std_srvs::srv::SetBool::Response::SharedPtr response)
+                                       [[maybe_unused]] std_srvs::srv::SetBool::Response::SharedPtr response)
 {
   command_interfaces_[REGULATE_GRIPPER_CMD].set_value(request->data ? 1.0 : std::numeric_limits<double>::quiet_NaN());
   //  resp->success = command_interfaces_[1].get_value();
