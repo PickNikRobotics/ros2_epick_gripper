@@ -73,8 +73,8 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
   {
     // Create a service to regulate the gripper.
     regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
-        "~/regulate", [this](std_srvs::srv::SetBool::Request::SharedPtr req,
-                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
+        "/regulate", [this](std_srvs::srv::SetBool::Request::SharedPtr req,
+                            std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
   }
   catch (...)
   {

@@ -134,8 +134,8 @@ private:
   // When the controller invokes a write operation, the content of the variable regulate_cmd_ is parsed and moved into
   // the atomic variable regulate_async_cmd_. Subsequently, a thread will read the content of regulate_async_cmd_
   // and send a gripper operation on the driver.
-  double regulate_cmd_;
-  std::atomic<bool> regulate_async_cmd_;
+  double regulate_cmd_ = std::numeric_limits<double>::quiet_NaN();
+  std::atomic<bool> regulate_async_cmd_ = false;
 
   // We use a thread to read/write to the driver so that we dont block the hardware_interface read/write.
   std::thread communication_thread_;

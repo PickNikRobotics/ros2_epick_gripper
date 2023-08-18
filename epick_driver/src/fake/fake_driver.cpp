@@ -27,63 +27,79 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <epick_driver/fake/fake_driver.hpp>
+#include <epick_driver/default_driver_utils.hpp>
+
+#include <rclcpp/logging.hpp>
 
 namespace epick_driver
 {
+const auto kLogger = rclcpp::get_logger("FakeDriver");
+
 void FakeDriver::set_slave_address(const uint8_t slave_address)
 {
   slave_address_ = slave_address;
+  RCLCPP_INFO(kLogger, "slave_address set to: %d", slave_address);
 }
 
 void FakeDriver::set_mode(const GripperMode gripper_mode)
 {
   gripper_mode_ = gripper_mode;
+  RCLCPP_INFO(kLogger, "mode set to: %s", default_driver_utils::gripper_mode_to_string(gripper_mode).c_str());
 }
 
 void FakeDriver::set_max_vacuum_pressure(const float vacuum_pressure)
 {
   max_vacuum_pressure_ = vacuum_pressure;
+  RCLCPP_INFO(kLogger, "max vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
 void FakeDriver::set_min_vacuum_pressure(const float vacuum_pressure)
 {
   min_vacuum_pressure_ = vacuum_pressure;
+  RCLCPP_INFO(kLogger, "min vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
 void FakeDriver::set_gripper_timeout(const std::chrono::milliseconds timeout)
 {
   gripper_timeout_ = timeout;
+  RCLCPP_INFO(kLogger, "timeout set to: %ldms", timeout.count());
 }
 
 bool FakeDriver::connect()
 {
   connected_ = true;
+  RCLCPP_INFO(kLogger, "Gripper connected.");
   return true;
 }
 
 void FakeDriver::disconnect()
 {
+  RCLCPP_INFO(kLogger, "Gripper disconnected.");
   connected_ = false;
 }
 
 void FakeDriver::activate()
 {
+  RCLCPP_INFO(kLogger, "Gripper activated.");
   activated_ = true;
 }
 
 void FakeDriver::deactivate()
 {
+  RCLCPP_INFO(kLogger, "Gripper deactivated.");
   activated_ = false;
 }
 
 void FakeDriver::grip()
 {
   regulate_ = true;
+  RCLCPP_INFO(kLogger, "Grip enable.");
 }
 
 void FakeDriver::release()
 {
   regulate_ = false;
+  RCLCPP_INFO(kLogger, "Grip released.");
 }
 
 GripperStatus FakeDriver::get_status()
