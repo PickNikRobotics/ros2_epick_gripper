@@ -32,7 +32,7 @@
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
 #include <epick_driver/default_driver_factory.hpp>
 
-#include <fake/fake_driver.hpp>
+#include <epick_driver/fake/fake_driver.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>
@@ -70,9 +70,9 @@ private:
 
 /**
  * This method allow a busy wait on a given condition until a timeout is exceeded.
- * @param condition The condition to be matched.
+ * @param condition The condition to be met.
  * @param timeout The maximum waiting time.
- * @return True if the condition is matched, false otherwise.
+ * @return True if the condition is met, false otherwise.
  */
 bool wait_for_condition(std::function<bool()> condition, std::chrono::milliseconds timeout)
 {

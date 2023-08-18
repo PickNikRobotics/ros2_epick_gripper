@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>epick_driver_bringup</name>
+  <name>epick_bringup</name>
   <version>0.0.1</version>
   <description>
     Bringup package for the Robotiq EPick gripper for testing purposes.

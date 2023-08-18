@@ -41,6 +41,7 @@ add_library(
     include/epick_driver/driver.hpp
     include/epick_driver/driver_factory.hpp
     include/epick_driver/epick_gripper_hardware_interface.hpp
+    include/epick_driver/fake/fake_driver.hpp
     include/epick_driver/serial.hpp
     include/epick_driver/serial_factory.hpp
     include/epick_driver/visibility_control.hpp
@@ -50,6 +51,7 @@ add_library(
     src/default_driver.cpp
     src/default_driver_factory.cpp
     src/default_driver_utils.cpp
+    src/fake/fake_driver.cpp
     src/default_serial.cpp
     src/default_serial_factory.cpp
 )
