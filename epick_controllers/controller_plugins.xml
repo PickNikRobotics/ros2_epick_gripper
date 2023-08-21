@@ -1,4 +1,4 @@
-<library path="robotiq_controllers">
+<library path="epick_controllers">
     <class name="robotiq_controllers/EpickController" type="robotiq_controllers::EpickController" base_class_type="controller_interface::ControllerInterface">
         <description>
             This controller provides an interface to for the Robotiq Epick gripper.

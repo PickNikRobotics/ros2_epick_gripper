@@ -12,7 +12,7 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>epick_driver</depend>
-  <depend>robotiq_controllers</depend>
+  <depend>epick_controllers</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

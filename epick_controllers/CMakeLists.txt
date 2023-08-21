@@ -1,7 +1,7 @@
 # See https://docs.ros.org/en/foxy/How-To-Guides/Ament-CMake-Documentation.html
 
 cmake_minimum_required(VERSION 3.8)
-project(robotiq_controllers VERSION 0.0.1 LANGUAGES CXX)
+project(epick_controllers VERSION 0.0.1 LANGUAGES CXX)
 
 # This module provides installation directories as per the GNU coding standards.
 include(GNUInstallDirs)
@@ -21,20 +21,17 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 # Epick controller library.
 
-add_library(
-  robotiq_controllers
-  SHARED
-  include/robotiq_controllers/epick_controller.hpp
+add_library(epick_controllers SHARED
   src/epick_controller.cpp
 )
 target_include_directories(
-  robotiq_controllers
+  epick_controllers
   PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 ament_target_dependencies(
-  robotiq_controllers
+  epick_controllers
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
@@ -52,7 +49,7 @@ pluginlib_export_plugin_description_file(controller_interface controller_plugins
 # Without this a client cannot find this library.
 # It can take an arbitrary list of targets named as EXPORT in an install call.
 ament_export_targets(
-    robotiq_controllers_targets # Must match the EXPORT label below in the install section.
+  epick_controllers_targets # Must match the EXPORT label below in the install section.
 )
 # Help downstream packages to find transitive dependencies i.e. export all
 # dependencies required by a package to use this library.
@@ -68,7 +65,7 @@ ament_export_include_directories(
 )
 # Tell downstream packages our libraries to link against.
 ament_export_libraries(
-    epick_controller
+  epick_controllers
 )
 
 ###############################################################################
@@ -77,27 +74,17 @@ ament_export_libraries(
 # Install all files of the include folder into the give destination.
 install(
     DIRECTORY include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}          # include
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 # Install our library.
 install(
-  TARGETS robotiq_controllers
-  EXPORT robotiq_controllers_targets
+  TARGETS epick_controllers
+  EXPORT epick_controllers_targets
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}      # lib
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}      # bin
   INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR} # include
 )
-
-###############################################################################
-# LINTERS
-
-add_custom_target(format
-    COMMAND clang-format -i `git ls-files *.hpp *.cpp`
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-add_custom_target(tidy
-    COMMAND clang-tidy -p ${CMAKE_BINARY_DIR} `git ls-files *.cpp`
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 ament_package()

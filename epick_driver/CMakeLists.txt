@@ -28,23 +28,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 # Epick driver library.
 
-add_library(
-    epick_driver
-    SHARED
-    include/epick_driver/crc_utils.hpp
-    include/epick_driver/data_utils.hpp
-    include/epick_driver/default_driver.hpp
-    include/epick_driver/default_driver_factory.hpp
-    include/epick_driver/default_driver_utils.hpp
-    include/epick_driver/default_serial.hpp
-    include/epick_driver/default_serial_factory.hpp
-    include/epick_driver/driver.hpp
-    include/epick_driver/driver_factory.hpp
-    include/epick_driver/epick_gripper_hardware_interface.hpp
-    include/epick_driver/fake/fake_driver.hpp
-    include/epick_driver/serial.hpp
-    include/epick_driver/serial_factory.hpp
-    include/epick_driver/visibility_control.hpp
+add_library(epick_driver SHARED
     src/epick_gripper_hardware_interface.cpp
     src/crc_utils.cpp
     src/data_utils.cpp
