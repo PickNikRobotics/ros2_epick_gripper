@@ -12,8 +12,6 @@
 
   <depend>launch</depend>
   <depend>launch_ros</depend>
-  <depend>ros2_control</depend>
-  <depend>ros2_controllers</depend>
   <depend>epick_driver</depend>
 
   <!-- Check code against style conventions using clang-format. -->
