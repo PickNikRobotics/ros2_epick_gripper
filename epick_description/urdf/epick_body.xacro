@@ -44,9 +44,9 @@
       <visual>
         <!-- Shifted backwards since the mesh origin is at the base end -->
         <origin xyz="0 0 ${-body_length / 2}" rpy="0 0 0"/>
-        <geometry>          
+        <geometry>
           <mesh filename="package://epick_description/meshes/visual/epick_body.stl"
-            scale="0.001 0.001 0.001"/>          
+            scale="0.001 0.001 0.001"/>
         </geometry>
         <material name="epick_gray">
           <color rgba="${body_color}"/>
@@ -54,9 +54,9 @@
       </visual>
       <collision>
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <geometry>          
+        <geometry>
           <cylinder radius="${body_collision_radius}" length="${body_length}"/>
-        </geometry>       
+        </geometry>
       </collision>
     </link>
 

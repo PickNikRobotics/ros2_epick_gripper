@@ -45,8 +45,8 @@ from launch_ros.substitutions import FindPackageShare
 
 import xacro
 
-def launch_setup(context, *args, **kwargs):
 
+def launch_setup(context, *args, **kwargs):
     # Declare all parameters.
     description_package_param = LaunchConfiguration("description_package")
     description_file_param = LaunchConfiguration("description_file")

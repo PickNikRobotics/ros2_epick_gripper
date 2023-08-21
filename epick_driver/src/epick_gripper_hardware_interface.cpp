@@ -65,7 +65,6 @@ EpickGripperHardwareInterface::~EpickGripperHardwareInterface()
   }
 }
 
-
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& info)
 {

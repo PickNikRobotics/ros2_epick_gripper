@@ -42,6 +42,7 @@
 
 #include <atomic>
 #include <thread>
+
 #include "visibility_control.hpp"
 
 namespace epick_driver

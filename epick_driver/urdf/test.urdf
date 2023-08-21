@@ -52,12 +52,12 @@
       <param name="use_dummy">true</param>
 
     </hardware>
-    
+
     <gpio name="gripper_cmd">
       <command_interface name="regulate"/>
     </gpio>
 
   </ros2_control>
-       
+
 </robot>
 "

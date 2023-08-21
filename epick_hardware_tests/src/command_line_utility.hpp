@@ -56,7 +56,7 @@ public:
    * Parse the command line and read all parameters.
    * @param argc The number of tokens in the command line.
    * @param argv The list of tokens.
-   * @return True if the parsing is succesful.
+   * @return True if the parsing is successful.
    */
   bool parse(int argc, char* argv[]);
 

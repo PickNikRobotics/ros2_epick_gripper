@@ -35,7 +35,7 @@
       <link name="${name}">
         <visual>
           <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>          
+          <geometry>
             <cylinder radius="${radius}" length="${length}"/>
           </geometry>
           <material name="">
@@ -44,7 +44,7 @@
         </visual>
         <collision>
           <origin xyz="0 0 0" rpy="0 0 0"/>
-          <geometry>          
+          <geometry>
             <cylinder radius="${radius}" length="${length}"/>
           </geometry>
         </collision>
