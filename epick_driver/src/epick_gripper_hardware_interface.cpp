@@ -29,11 +29,12 @@
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
 
 #include <epick_driver/default_driver_factory.hpp>
+#include <pluginlib/class_list_macros.hpp>
+#include <rclcpp/logging.hpp>
 #include <serial/serial.h>
 
-#include <rclcpp/logging.hpp>
-
 #include <cmath>
+#include <thread>
 
 namespace epick_driver
 {
@@ -41,6 +42,8 @@ const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
 constexpr auto kGripperGPIO = "gripper_cmd";
 constexpr auto kRegulateCommandInterface = "regulate";
+
+constexpr auto kCommandInterval = std::chrono::milliseconds{ 10 };
 
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
@@ -52,6 +55,16 @@ EpickGripperHardwareInterface::EpickGripperHardwareInterface(std::unique_ptr<Dri
   : driver_factory_{ std::move(driver_factory) }
 {
 }
+
+EpickGripperHardwareInterface::~EpickGripperHardwareInterface()
+{
+  communication_thread_is_running_.store(false);
+  if (communication_thread_.joinable())
+  {
+    communication_thread_.join();
+  }
+}
+
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 EpickGripperHardwareInterface::on_init(const hardware_interface::HardwareInfo& info)
@@ -190,7 +203,10 @@ EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifec
 {
   RCLCPP_DEBUG(kLogger, "on_deactivate");
   communication_thread_is_running_.store(false);
-  communication_thread_.join();
+  if (communication_thread_.joinable())
+  {
+    communication_thread_.join();
+  }
   try
   {
     driver_->deactivate();
@@ -239,37 +255,33 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
 void EpickGripperHardwareInterface::background_task()
 {
   // Read from and write to the gripper at 100 Hz.
-  const auto io_interval = std::chrono::milliseconds(10);
-  auto last_io = std::chrono::high_resolution_clock::now();
-
   while (communication_thread_is_running_.load())
   {
-    const auto now = std::chrono::high_resolution_clock::now();
-    if (now - last_io > io_interval)
+    try
     {
-      try
+      // Depending on the current gripper status decide to send or not a regulate command.
+      auto status = driver_->get_status();
+      bool regulate = regulate_async_cmd_.load();
+      if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator && regulate)
       {
-        // Depending on the current gripper status decide to send or not a regulate command.
-        auto status = driver_->get_status();
-        bool regulate = regulate_async_cmd_.load();
-        if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator && regulate)
-        {
-          driver_->grip();
-        }
-        if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters && !regulate)
-        {
-          driver_->release();
-        }
+        driver_->grip();
+      }
+      if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters && !regulate)
+      {
+        driver_->release();
+      }
 
-        gripper_status_.store(driver_->get_status());
-        last_io = now;
-      }
-      catch (serial::IOException& e)
-      {
-        RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
-        communication_thread_is_running_.store(false);
-      }
+      gripper_status_.store(driver_->get_status());
     }
+    catch (serial::IOException& e)
+    {
+      RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
+      communication_thread_is_running_.store(false);
+    }
+
+    std::this_thread::sleep_for(kCommandInterval);
   }
 }
 }  // namespace epick_driver
+
+PLUGINLIB_EXPORT_CLASS(epick_driver::EpickGripperHardwareInterface, hardware_interface::SystemInterface)

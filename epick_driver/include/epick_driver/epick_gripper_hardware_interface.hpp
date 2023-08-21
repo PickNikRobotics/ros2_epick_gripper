@@ -42,6 +42,7 @@
 
 #include <atomic>
 #include <thread>
+#include "visibility_control.hpp"
 
 namespace epick_driver
 {
@@ -50,6 +51,9 @@ class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
 public:
   EPICK_DRIVER_PUBLIC
   EpickGripperHardwareInterface();
+
+  EPICK_DRIVER_PUBLIC
+  ~EpickGripperHardwareInterface();
 
   /**
    * Constructor with given command interface. This method is used for testing.
@@ -146,7 +150,3 @@ private:
   std::atomic<GripperStatus> gripper_status_;
 };
 }  // namespace epick_driver
-
-#include "pluginlib/class_list_macros.hpp"
-
-PLUGINLIB_EXPORT_CLASS(epick_driver::EpickGripperHardwareInterface, hardware_interface::SystemInterface)
