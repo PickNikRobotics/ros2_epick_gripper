@@ -35,7 +35,13 @@ enum CommandInterfaces : size_t
   REGULATE_GRIPPER_CMD = 0
 };
 
-constexpr auto kRegulateCommandInterface = "gripper_cmd/regulate";
+enum StateInterfaces : size_t
+{
+  OBJECT_DETECTION_STATUS = 0
+};
+
+constexpr auto kRegulateCommandInterface = "gripper/regulate";
+constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
 
 controller_interface::InterfaceConfiguration EpickController::command_interface_configuration() const
 {
@@ -49,12 +55,17 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+  config.names.emplace_back(kObjectDetectionStateInterface);
   return config;
 }
 
 controller_interface::return_type EpickController::update([[maybe_unused]] const rclcpp::Time& time,
                                                           [[maybe_unused]] const rclcpp::Duration& period)
 {
+  auto message = std::make_shared<std_msgs::msg::Float64>();
+  message->data = state_interfaces_[OBJECT_DETECTION_STATUS].get_value();
+  object_detection_status_pub_->publish(*message);
+
   return controller_interface::return_type::OK;
 }
 
@@ -75,6 +86,7 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
     regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
         "/regulate", [this](std_srvs::srv::SetBool::Request::SharedPtr req,
                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
+    object_detection_status_pub_ = get_node()->create_publisher<std_msgs::msg::Float64>("object_detection_status", 10);
   }
   catch (...)
   {

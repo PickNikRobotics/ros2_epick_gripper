@@ -171,6 +171,20 @@ ObjectDetectionStatus get_object_detection_status(uint8_t& reg);
  */
 const std::string object_detection_to_string(const ObjectDetectionStatus object_detection);
 
+/**
+ * All Command and State Interface are double. We use this function to convert an enum into
+ * a double representation, so that we can later recover it back.
+ * @return A double representing the enum.
+ */
+double object_detection_to_double(const ObjectDetectionStatus object_detection);
+
+/**
+ * All Command and State Interface are double. We use this function to convert an double into
+ * an enum.
+ * @return A double to be converted into an enum.
+ */
+ObjectDetectionStatus double_to_object_detection(const double object_detection_representation);
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Gripper fault status
 ///

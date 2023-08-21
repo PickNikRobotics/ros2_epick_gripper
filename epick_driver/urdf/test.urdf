@@ -52,9 +52,10 @@
       <param name="use_dummy">true</param>
 
     </hardware>
-
-    <gpio name="gripper_cmd">
+    
+    <gpio name="gripper">
       <command_interface name="regulate"/>
+      <state_interface name="object_detection_status"/>
     </gpio>
 
   </ros2_control>

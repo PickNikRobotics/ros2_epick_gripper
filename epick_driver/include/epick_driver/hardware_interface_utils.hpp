@@ -28,35 +28,29 @@
 
 #pragma once
 
-#include <controller_interface/controller_interface.hpp>
-#include <std_srvs/srv/set_bool.hpp>
-#include <std_msgs/msg/float64.hpp>
+#include <hardware_interface/hardware_info.hpp>
 
-namespace robotiq_controllers
+#include <optional>
+
+namespace epick_driver::hardware_interface_utils
 {
-class EpickController : public controller_interface::ControllerInterface
-{
-public:
-  controller_interface::InterfaceConfiguration command_interface_configuration() const override;
+/**
+ * Look for a GPIO command interface in the hardware info.
+ * @param gpio_name The component name.
+ * @param interface_name The interface name.
+ * @return the interface info of the requested interface, if any.
+ */
+std::optional<hardware_interface::InterfaceInfo>
+get_gpios_command_interface(std::string gpio_name, std::string interface_name,
+                            const hardware_interface::HardwareInfo& info);
 
-  controller_interface::InterfaceConfiguration state_interface_configuration() const override;
-
-  controller_interface::return_type update(const rclcpp::Time& time, const rclcpp::Duration& period) override;
-
-  CallbackReturn on_activate(const rclcpp_lifecycle::State& previous_state) override;
-
-  CallbackReturn on_deactivate(const rclcpp_lifecycle::State& previous_state) override;
-
-  CallbackReturn on_init() override;
-
-private:
-  // When we send a true, the gripper will begin to grip, when false the gripper will release.
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr regulate_gripper_srv_;
-
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr object_detection_status_pub_;
-
-  // The logic of the server to regulate the gripper.
-  bool regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
-                        std_srvs::srv::SetBool::Response::SharedPtr response);
-};
-}  // namespace robotiq_controllers
+/**
+ * Look for a GPIO state interface in the hardware info.
+ * @param gpio_name The component name.
+ * @param interface_name The interface name.
+ * @return the interface info of the requested interface, if any.
+ */
+std::optional<hardware_interface::InterfaceInfo>
+get_gpios_state_interface(std::string gpio_name, std::string interface_name,
+                          const hardware_interface::HardwareInfo& info);
+}  // namespace epick_driver::hardware_interface_utils

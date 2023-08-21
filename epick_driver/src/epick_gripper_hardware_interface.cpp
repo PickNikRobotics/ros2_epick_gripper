@@ -29,19 +29,24 @@
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
 
 #include <epick_driver/default_driver_factory.hpp>
-#include <pluginlib/class_list_macros.hpp>
-#include <rclcpp/logging.hpp>
+#include <epick_driver/default_driver_utils.hpp>
+#include <epick_driver/hardware_interface_utils.hpp>
+
 #include <serial/serial.h>
 
+#include <pluginlib/class_list_macros.hpp>
+#include <rclcpp/logging.hpp>
+
 #include <cmath>
-#include <thread>
+#include <optional>
 
 namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
-constexpr auto kGripperGPIO = "gripper_cmd";
+constexpr auto kGripperGPIO = "gripper";
 constexpr auto kRegulateCommandInterface = "regulate";
+constexpr auto kObjectDetectionStateInterface = "object_detection_status";
 
 constexpr auto kCommandInterval = std::chrono::milliseconds{ 10 };
 
@@ -124,10 +129,19 @@ EpickGripperHardwareInterface::on_configure(const rclcpp_lifecycle::State& previ
 std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::export_state_interfaces()
 {
   RCLCPP_DEBUG(kLogger, "export_state_interfaces");
+  std::vector<hardware_interface::StateInterface> state_interfaces;
   try
   {
-    std::vector<hardware_interface::StateInterface> state_interfaces;
-    return state_interfaces;
+    if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kObjectDetectionStateInterface, info_)
+            .has_value())
+    {
+      state_interfaces.emplace_back(
+          hardware_interface::StateInterface(kGripperGPIO, kObjectDetectionStateInterface, &object_detection_status_));
+    }
+    else
+    {
+      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kObjectDetectionStateInterface);
+    }
   }
   catch (const std::exception& ex)
   {
@@ -135,6 +149,7 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
                                       hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return {};
   }
+  return state_interfaces;
 }
 
 std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface::export_command_interfaces()
@@ -143,26 +158,14 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    auto it = std::find_if(info_.gpios.begin(), info_.gpios.end(),
-                           [](const auto& gpio) { return gpio.name == kGripperGPIO; });
-    if (it != info_.gpios.end())
+    if (hardware_interface_utils::get_gpios_command_interface(kGripperGPIO, kRegulateCommandInterface, info_).has_value())
     {
-      auto regulate_cmd = std::find_if(it->command_interfaces.begin(), it->command_interfaces.end(),
-                                       [](const auto& cmd) { return cmd.name == kRegulateCommandInterface; });
-      if (regulate_cmd != it->command_interfaces.end())
-      {
-        RCLCPP_DEBUG(kLogger, "export_command_interface %s", regulate_cmd->name.c_str());
-        command_interfaces.emplace_back(
-            hardware_interface::CommandInterface(it->name, regulate_cmd->name, &regulate_cmd_));
-      }
-      else
-      {
-        RCLCPP_ERROR(kLogger, "Command interface %s not found within %s.", kRegulateCommandInterface, kGripperGPIO);
-      }
+      command_interfaces.emplace_back(
+          hardware_interface::CommandInterface(kGripperGPIO, kRegulateCommandInterface, &regulate_cmd_));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "Command interface %s not found.", kGripperGPIO);
+      RCLCPP_ERROR(kLogger, "Command interface %s/%s not found.", kGripperGPIO, kRegulateCommandInterface);
     }
   }
   catch (const std::exception& ex)
@@ -224,6 +227,8 @@ hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unus
 {
   try
   {
+    GripperStatus status = safe_gripper_status_.load();
+    object_detection_status_ = default_driver_utils::object_detection_to_double(status.object_detection_status);
   }
   catch (const std::exception& ex)
   {
@@ -240,7 +245,7 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
   try
   {
     bool regulate = regulate_cmd_ >= 0.5;
-    regulate_async_cmd_.store(regulate);
+    safe_regulate_cmd_.store(regulate);
   }
   catch (const std::exception& ex)
   {
@@ -260,7 +265,7 @@ void EpickGripperHardwareInterface::background_task()
     {
       // Depending on the current gripper status decide to send or not a regulate command.
       auto status = driver_->get_status();
-      bool regulate = regulate_async_cmd_.load();
+      bool regulate = safe_regulate_cmd_.load();
       if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator && regulate)
       {
         driver_->grip();
@@ -269,17 +274,16 @@ void EpickGripperHardwareInterface::background_task()
       {
         driver_->release();
       }
-
-      gripper_status_.store(driver_->get_status());
+      safe_gripper_status_.store(driver_->get_status());
     }
     catch (serial::IOException& e)
     {
       RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
       communication_thread_is_running_.store(false);
     }
-
-    std::this_thread::sleep_for(kCommandInterval);
   }
+
+  std::this_thread::sleep_for(kCommandInterval);
 }
 }  // namespace epick_driver
 

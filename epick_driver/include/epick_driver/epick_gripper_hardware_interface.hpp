@@ -135,19 +135,20 @@ private:
   // Factory to create the interface to interact with the hardware using the serial port.
   std::unique_ptr<DriverFactory> driver_factory_;
 
+  // We use a thread to read/write to the driver so that we dont block the hardware_interface read/write.
+  std::thread communication_thread_;
+  std::atomic<bool> communication_thread_is_running_;
+  void background_task();
+
   // The variable regulate_cmd_ is updated when the controller writes into the "regulate" hardware interface.
   // When the controller invokes a write operation, the content of the variable regulate_cmd_ is parsed and moved into
   // the atomic variable regulate_async_cmd_. Subsequently, a thread will read the content of regulate_async_cmd_
   // and send a gripper operation on the driver.
   // Everything below 0.5 will be interpreted as off, everything above as on.
   double regulate_cmd_ = 0.0;
-  std::atomic<bool> regulate_async_cmd_ = false;
+  std::atomic<bool> safe_regulate_cmd_ = false;
 
-  // We use a thread to read/write to the driver so that we dont block the hardware_interface read/write.
-  std::thread communication_thread_;
-  std::atomic<bool> communication_thread_is_running_;
-  void background_task();
-
-  std::atomic<GripperStatus> gripper_status_;
+  std::atomic<GripperStatus> safe_gripper_status_;
+  double object_detection_status_ = 0.0;
 };
 }  // namespace epick_driver
