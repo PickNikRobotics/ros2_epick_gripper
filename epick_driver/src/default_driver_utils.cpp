@@ -331,12 +331,12 @@ GripperFaultStatus get_gripper_fault_status(uint8_t& reg)
     { 0b00000010, GripperFaultStatus::Unknown },                            // 0x2
     { 0b00000011, GripperFaultStatus::PorousMaterialDetected },             // 0x3
     { 0b00000100, GripperFaultStatus::Unknown },                            // 0x4
-    { 0b00000101, GripperFaultStatus::AcionDelayed },                       // 0x5
+    { 0b00000101, GripperFaultStatus::ActionDelayed },                       // 0x5
     { 0b00000110, GripperFaultStatus::GrippingTimeout },                    // 0x6
     { 0b00000111, GripperFaultStatus::ActivationBitNotSet },                // 0x7
     { 0b00001000, GripperFaultStatus::MaximumTemperatureExceeded },         // 0x8
     { 0b00001001, GripperFaultStatus::NoCommunicationForAtLeastOneSecond }, // 0x9
-    { 0b00001010, GripperFaultStatus::UderMinimumOperatingVoltage },        // 0xA
+    { 0b00001010, GripperFaultStatus::UnderMinimumOperatingVoltage },        // 0xA
     { 0b00001011, GripperFaultStatus::AutomaticReleaseInProgress },         // 0xB
     { 0b00001100, GripperFaultStatus::InternalFault },                      // 0xC
     { 0b00001101, GripperFaultStatus::Unknown },                            // 0xD
@@ -352,13 +352,13 @@ const std::string fault_status_to_string(const GripperFaultStatus fault_status)
   // clang-format off
   static std::map<GripperFaultStatus, std::string> map = {
     { GripperFaultStatus::NoFault, "NoFault" },
-    { GripperFaultStatus::AcionDelayed, "AcionDelayed" },
+    { GripperFaultStatus::ActionDelayed, "ActionDelayed" },
     { GripperFaultStatus::PorousMaterialDetected, "PorousMaterialDetected" },
     { GripperFaultStatus::GrippingTimeout, "GrippingTimeout" },
     { GripperFaultStatus::ActivationBitNotSet, "ActivationBitNotSet" },
     { GripperFaultStatus::MaximumTemperatureExceeded, "MaximumTemperatureExceeded" },
     { GripperFaultStatus::NoCommunicationForAtLeastOneSecond, "NoCommunicationForAtLeastOneSecond" },
-    { GripperFaultStatus::UderMinimumOperatingVoltage, "UderMinimumOperatingVoltage" },
+    { GripperFaultStatus::UnderMinimumOperatingVoltage, "UnderMinimumOperatingVoltage" },
     { GripperFaultStatus::AutomaticReleaseInProgress, "AutomaticReleaseInProgress" },
     { GripperFaultStatus::InternalFault, "InternalFault" },
     { GripperFaultStatus::AutomaticReleaseCompleted, "AutomaticReleaseCompleted" },
