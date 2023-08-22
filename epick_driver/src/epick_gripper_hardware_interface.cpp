@@ -297,9 +297,9 @@ void EpickGripperHardwareInterface::background_task()
       RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
       communication_thread_is_running_.store(false);
     }
-  }
 
-  std::this_thread::sleep_for(kCommandInterval);
+    std::this_thread::sleep_for(kCommandInterval);
+  }
 }
 }  // namespace epick_driver
 
