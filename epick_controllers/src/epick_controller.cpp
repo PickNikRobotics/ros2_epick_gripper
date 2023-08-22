@@ -80,7 +80,7 @@ controller_interface::return_type EpickController::update([[maybe_unused]] const
   {
     object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MAX_PRESSURE;
   }
-  if (object_detection_status < 3.5)
+  else if (object_detection_status < 3.5)
   {
     object_detection_status_msg->status = object_detection_status_msg->NO_OBJECT_DETECTED;
   }
