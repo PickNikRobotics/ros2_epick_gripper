@@ -74,6 +74,16 @@ std::string to_hex(const std::vector<uint16_t>& bytes)
   return hex;
 }
 
+std::string uint8_to_binary_string(const uint8_t byte)
+{
+  std::string result = "0x";
+  for (int i = 7; i >= 0; --i)
+  {
+    result += ((byte >> i) & 1) ? '1' : '0';
+  }
+  return result;
+}
+
 uint8_t get_msb(uint16_t value)
 {
   return static_cast<uint8_t>(value >> 8) & 0xFF;

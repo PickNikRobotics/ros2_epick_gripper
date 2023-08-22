@@ -23,7 +23,10 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
 
 # Epick controller library.
 
-add_library(epick_controllers SHARED
+add_library(
+  epick_controllers
+  SHARED
+  include/epick_controllers/epick_controller.hpp
   src/epick_controller.cpp
 )
 target_include_directories(

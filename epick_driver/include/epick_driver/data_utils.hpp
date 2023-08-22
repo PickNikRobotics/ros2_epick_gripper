@@ -53,6 +53,13 @@ std::string to_hex(const std::vector<uint8_t>& bytes);
 std::string to_hex(const std::vector<uint16_t>& bytes);
 
 /**
+ * Convert a byte to a binary representation for testing purposes.
+ * @param byte The byte to decode.
+ * @return The binary representation of the given byte.
+ */
+std::string uint8_to_binary_string(const uint8_t byte);
+
+/**
  * Get the Most Significant Byte (MSB) of the given value.
  * @param value A 16-bits value.
  * @return The Most Significant Byte (MSB) of the given value.

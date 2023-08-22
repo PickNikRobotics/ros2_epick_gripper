@@ -168,7 +168,6 @@ void DefaultDriver::deactivate()
     0x00,  // Max absolute pressure.
     0x00,  // Gripper Timeout.
     0x00,  // Min absolute pressure
-
   };
   auto crc = crc_utils::compute_crc(request);
   request.push_back(data_utils::get_msb(crc));
@@ -188,6 +187,7 @@ void DefaultDriver::deactivate()
 
 void DefaultDriver::grip()
 {
+  RCLCPP_INFO(kLogger, "Gripping...");
   GripperStatus gripper_status = get_status();
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
@@ -220,6 +220,7 @@ void DefaultDriver::grip()
 
 void DefaultDriver::release()
 {
+  RCLCPP_INFO(kLogger, "Releasing...");
   GripperStatus gripper_status = get_status();
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, gripper_status.gripper_activation_action);
