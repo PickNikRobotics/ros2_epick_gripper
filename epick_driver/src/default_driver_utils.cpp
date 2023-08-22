@@ -32,6 +32,7 @@
 #include <cmath>
 #include <iostream>
 #include <map>
+#include <unordered_map>
 
 namespace epick_driver::default_driver_utils
 {
