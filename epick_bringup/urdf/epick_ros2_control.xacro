@@ -19,7 +19,7 @@
         <param name="gripper_timeout">500</param>
 
         <!-- Set use_dummy to true to connect to a dummy driver. -->
-        <param name="use_dummy">true</param>
+        <param name="use_dummy">false</param>
 
       </hardware>
     
