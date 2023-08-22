@@ -44,7 +44,7 @@ namespace epick_driver
 const auto kLogger = rclcpp::get_logger("DefaultDriverFactory");
 
 constexpr auto kSlaveAddressParamName = "slave_address";
-constexpr auto kSlaveAddressParamDefault = 0x9;
+constexpr uint8_t kSlaveAddressParamDefault = 0x9;
 
 constexpr auto kModeParamName = "mode";
 constexpr auto kModeParamDefault = GripperMode::AutomaticMode;
@@ -65,9 +65,11 @@ std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
 {
   RCLCPP_INFO(kLogger, "Reading slave_address...");
-  uint8_t slave_address = info.hardware_parameters.count(kSlaveAddressParamName) ?
-                              static_cast<uint8_t>(std::stoul(info.hardware_parameters.at(kSlaveAddressParamName))) :
-                              kSlaveAddressParamDefault;
+  // Convert base-16 address stored as a string (for example, "0x9") into an integer
+  const uint8_t slave_address =
+      info.hardware_parameters.count(kSlaveAddressParamName) ?
+          static_cast<uint8_t>(std::stoul(info.hardware_parameters.at(kSlaveAddressParamName), nullptr, 16)) :
+          kSlaveAddressParamDefault;
   RCLCPP_INFO(kLogger, "slave_address: %d", slave_address);
 
   RCLCPP_INFO(kLogger, "Reading mode...");
