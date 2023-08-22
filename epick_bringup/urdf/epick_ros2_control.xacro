@@ -12,7 +12,7 @@
         <param name="timeout">500</param>
 
         <!-- Gripper parameters. -->
-        <param name="lave_address">0x9</param>
+        <param name="slave_address">0x9</param>
         <param name="mode">AutomaticMode</param>
         <param name="max_vacuum_pressure">-100</param>
         <param name="min_vacuum_pressure">-10</param>
@@ -22,7 +22,7 @@
         <param name="use_dummy">false</param>
 
       </hardware>
-    
+
       <gpio name="gripper">
         <command_interface name="regulate"/>
         <state_interface name="regulate"/>
