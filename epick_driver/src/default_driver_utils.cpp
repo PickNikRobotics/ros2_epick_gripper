@@ -73,7 +73,7 @@ void set_gripper_activation_action(uint8_t& reg, const GripperActivationAction g
   }
 }
 
-GripperActivationAction get_gripper_activation_action(uint8_t& reg)
+GripperActivationAction get_gripper_activation_action(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperActivationAction> map{
@@ -115,7 +115,7 @@ void set_gripper_mode(uint8_t& reg, const GripperMode gripper_mode)
   }
 }
 
-GripperMode get_gripper_mode(uint8_t& reg)
+GripperMode get_gripper_mode(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperMode> map{
@@ -159,7 +159,7 @@ void set_gripper_regulate_action(uint8_t& reg, const GripperRegulateAction regul
   }
 }
 
-GripperRegulateAction get_gripper_regulate_action(uint8_t& reg)
+GripperRegulateAction get_gripper_regulate_action(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperRegulateAction> map{
@@ -251,7 +251,7 @@ const std::string gripper_release_action_to_string(const GripperReleaseAction gr
 
 constexpr uint8_t gSTA_mask = 0b00110000;
 
-GripperActivationStatus get_gripper_activation_status(uint8_t& reg)
+GripperActivationStatus get_gripper_activation_status(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperActivationStatus> map{
@@ -280,7 +280,7 @@ const std::string gripper_activation_status_to_string(const GripperActivationSta
 
 constexpr uint8_t gOBJ_mask = 0b11000000;
 
-ObjectDetectionStatus get_object_detection_status(uint8_t& reg)
+ObjectDetectionStatus get_object_detection_status(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, ObjectDetectionStatus> map{
@@ -322,7 +322,7 @@ double object_detection_to_double(const ObjectDetectionStatus object_detection)
 
 constexpr uint8_t gFLT_mask = 0b00001111;
 
-GripperFaultStatus get_gripper_fault_status(uint8_t& reg)
+GripperFaultStatus get_gripper_fault_status(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperFaultStatus> map{
@@ -374,7 +374,7 @@ const std::string fault_status_to_string(const GripperFaultStatus fault_status)
 
 constexpr uint8_t gVAS_mask = 0b00000011;
 
-ActuatorStatus get_actuator_status(uint8_t& reg)
+ActuatorStatus get_actuator_status(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, ActuatorStatus> map{

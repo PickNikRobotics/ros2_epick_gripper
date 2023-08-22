@@ -58,7 +58,7 @@ enum class FunctionCode : uint8_t
  */
 void set_gripper_activation_action(uint8_t& reg, const GripperActivationAction gripper_activation_action);
 
-GripperActivationAction get_gripper_activation_action(uint8_t& reg);
+GripperActivationAction get_gripper_activation_action(const uint8_t &reg);
 
 /**
  * Convert a GripperActivationAction enum into a string.
@@ -83,7 +83,7 @@ void set_gripper_mode(uint8_t& reg, const GripperMode gripper_mode);
  * @param reg The register to read.
  * @param The gripper mode.
  */
-GripperMode get_gripper_mode(uint8_t& reg);
+GripperMode get_gripper_mode(const uint8_t &reg);
 
 /**
  * Convert a GripperMode enum into a string.
@@ -108,7 +108,7 @@ void set_gripper_regulate_action(uint8_t& reg, const GripperRegulateAction regul
  * @param reg The register to read.
  * @param The gripper regulate action.
  */
-GripperRegulateAction get_gripper_regulate_action(uint8_t& reg);
+GripperRegulateAction get_gripper_regulate_action(const uint8_t &reg);
 
 /**
  * Convert a GripperRegulateAction enum into a string.
@@ -158,7 +158,7 @@ const std::string gripper_release_action_to_string(const GripperReleaseAction gr
  * @param reg The register to read.
  * @param The gripper activations status.
  */
-GripperActivationStatus get_gripper_activation_status(uint8_t& reg);
+GripperActivationStatus get_gripper_activation_status(const uint8_t &reg);
 
 /**
  * Convert a GripperActivationStatus enum into a string.
@@ -176,7 +176,7 @@ const std::string gripper_activation_status_to_string(const GripperActivationSta
  * @param reg The register to read.
  * @param The object detection status.
  */
-ObjectDetectionStatus get_object_detection_status(uint8_t& reg);
+ObjectDetectionStatus get_object_detection_status(const uint8_t &reg);
 
 /**
  * Convert an ObjectDetection enum into a string.
@@ -201,7 +201,7 @@ double object_detection_to_double(const ObjectDetectionStatus object_detection);
  * @param reg The register to read.
  * @param The gripper fault status.
  */
-GripperFaultStatus get_gripper_fault_status(uint8_t& reg);
+GripperFaultStatus get_gripper_fault_status(const uint8_t &reg);
 
 /**
  * Convert a FaultStatus enum into a string.
@@ -219,7 +219,7 @@ const std::string fault_status_to_string(const GripperFaultStatus fault_status);
  * @param reg The register to read.
  * @param The gripper actuator status.
  */
-ActuatorStatus get_actuator_status(uint8_t& reg);
+ActuatorStatus get_actuator_status(const uint8_t &reg);
 
 /**
  * Convert a ActuatorStatus enum into a string.
