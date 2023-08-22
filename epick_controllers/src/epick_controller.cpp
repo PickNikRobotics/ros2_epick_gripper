@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <robotiq_controllers/epick_controller.hpp>
+#include <epick_controllers/epick_controller.hpp>
 
-namespace robotiq_controllers
+namespace epick_controllers
 {
 enum CommandInterfaces : size_t
 {
@@ -131,8 +131,8 @@ bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPt
   return true;
 }
 
-}  // namespace robotiq_controllers
+}  // namespace epick_controllers
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(robotiq_controllers::EpickController, controller_interface::ControllerInterface)
+PLUGINLIB_EXPORT_CLASS(epick_controllers::EpickController, controller_interface::ControllerInterface)

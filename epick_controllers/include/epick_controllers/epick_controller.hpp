@@ -32,7 +32,7 @@
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_msgs/msg/float64.hpp>
 
-namespace robotiq_controllers
+namespace epick_controllers
 {
 class EpickController : public controller_interface::ControllerInterface
 {
@@ -59,4 +59,4 @@ private:
   bool regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
                         std_srvs::srv::SetBool::Response::SharedPtr response);
 };
-}  // namespace robotiq_controllers
+}  // namespace epick_controllers
