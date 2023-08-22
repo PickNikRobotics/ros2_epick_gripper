@@ -81,13 +81,13 @@ enum class ObjectDetectionStatus
 enum class GripperFaultStatus
 {
   NoFault,
-  AcionDelayed,
+  ActionDelayed,
   PorousMaterialDetected,
   GrippingTimeout,
   ActivationBitNotSet,
   MaximumTemperatureExceeded,
   NoCommunicationForAtLeastOneSecond,
-  UderMinimumOperatingVoltage,
+  UnderMinimumOperatingVoltage,
   AutomaticReleaseInProgress,
   InternalFault,
   AutomaticReleaseCompleted,
