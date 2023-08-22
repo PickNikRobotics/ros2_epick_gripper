@@ -6,4 +6,4 @@ controller_manager:
     update_rate: 30 # Hz
 
     epick_controller:
-      type: robotiq_controllers/EpickController
+      type: epick_controllers/EpickController
