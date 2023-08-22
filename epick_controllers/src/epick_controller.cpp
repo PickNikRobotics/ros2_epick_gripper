@@ -43,6 +43,9 @@ enum StateInterfaces : size_t
 constexpr auto kRegulateCommandInterface = "gripper/regulate";
 constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
 
+constexpr auto kRegulateService = "/regulate";
+constexpr auto kObjectDetectionStatusTopic = "/object_detection_status";
+
 controller_interface::InterfaceConfiguration EpickController::command_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration config;
@@ -62,9 +65,31 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
 controller_interface::return_type EpickController::update([[maybe_unused]] const rclcpp::Time& time,
                                                           [[maybe_unused]] const rclcpp::Duration& period)
 {
-  auto message = std::make_shared<std_msgs::msg::Float64>();
-  message->data = state_interfaces_[OBJECT_DETECTION_STATUS].get_value();
-  object_detection_status_pub_->publish(*message);
+  double object_detection_status = state_interfaces_[OBJECT_DETECTION_STATUS].get_value();
+  auto object_detection_status_msg = std::make_shared<epick_msgs::msg::ObjectDetectionStatus>();
+
+  if (object_detection_status < 0.5)
+  {
+    object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
+  }
+  else if (object_detection_status < 1.5)
+  {
+    object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MIN_PRESSURE;
+  }
+  else if (object_detection_status < 2.5)
+  {
+    object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MAX_PRESSURE;
+  }
+  if (object_detection_status < 3.5)
+  {
+    object_detection_status_msg->status = object_detection_status_msg->NO_OBJECT_DETECTED;
+  }
+  else
+  {
+    object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
+  }
+
+  object_detection_status_pub_->publish(*object_detection_status_msg);
 
   return controller_interface::return_type::OK;
 }
@@ -84,9 +109,12 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
   {
     // Create a service to regulate the gripper.
     regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
-        "/regulate", [this](std_srvs::srv::SetBool::Request::SharedPtr req,
-                            std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
-    object_detection_status_pub_ = get_node()->create_publisher<std_msgs::msg::Float64>("object_detection_status", 10);
+        kRegulateService,
+        [this](std_srvs::srv::SetBool::Request::SharedPtr req, std_srvs::srv::SetBool::Response::SharedPtr resp) {
+          this->regulate_gripper(req, resp);
+        });
+    object_detection_status_pub_ =
+        get_node()->create_publisher<epick_msgs::msg::ObjectDetectionStatus>(kObjectDetectionStatusTopic, 10);
   }
   catch (...)
   {

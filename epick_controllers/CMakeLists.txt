@@ -12,10 +12,12 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(controller_interface REQUIRED)
+find_package(epick_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   controller_interface
+  epick_msgs
   std_srvs
 )
 

@@ -31,6 +31,7 @@
 #include <controller_interface/controller_interface.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <epick_msgs/msg/object_detection_status.hpp>
 
 namespace epick_controllers
 {
@@ -53,7 +54,7 @@ private:
   // When we send a true, the gripper will begin to grip, when false the gripper will release.
   rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr regulate_gripper_srv_;
 
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr object_detection_status_pub_;
+  rclcpp::Publisher<epick_msgs::msg::ObjectDetectionStatus>::SharedPtr object_detection_status_pub_;
 
   // The logic of the server to regulate the gripper.
   bool regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,

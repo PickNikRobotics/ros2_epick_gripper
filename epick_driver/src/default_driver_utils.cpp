@@ -291,30 +291,6 @@ double object_detection_to_double(const ObjectDetectionStatus object_detection)
   return map.at(object_detection);
 }
 
-ObjectDetectionStatus double_to_object_detection(const double object_detection_representation)
-{
-  if (object_detection_representation < 0.5)
-  {
-    return ObjectDetectionStatus::Unknown;
-  }
-  else if (object_detection_representation < 1.5)
-  {
-    return ObjectDetectionStatus::ObjectDetectedAtMinPressure;
-  }
-  else if (object_detection_representation < 2.5)
-  {
-    return ObjectDetectionStatus::ObjectDetectedAtMaxPressure;
-  }
-  if (object_detection_representation < 3.5)
-  {
-    return ObjectDetectionStatus::NoObjectDetected;
-  }
-  else
-  {
-    return ObjectDetectionStatus::Unknown;
-  }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 /// Gripper fault status
 ///
