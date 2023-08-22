@@ -105,6 +105,7 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
            </hardware>
            <gpio name="gripper">
                <command_interface name="regulate"/>
+               <state_interface name="regulate"/>
                <state_interface name="object_detection_status"/>
            </gpio>
          </ros2_control>
@@ -142,7 +143,7 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
     { { "gripper",
         "GPIO",
         { { "regulate", "", "", "", "double", 1 } },
-        { { "object_detection_status", "", "", "", "double", 1 } },
+        { { "regulate", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
         { {} } } },
     {},  // Transmission.
     ""   // original xml.

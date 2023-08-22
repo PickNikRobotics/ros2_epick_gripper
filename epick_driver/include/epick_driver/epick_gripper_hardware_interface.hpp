@@ -140,15 +140,12 @@ private:
   std::atomic<bool> communication_thread_is_running_;
   void background_task();
 
-  // The variable regulate_cmd_ is updated when the controller writes into the "regulate" hardware interface.
-  // When the controller invokes a write operation, the content of the variable regulate_cmd_ is parsed and moved into
-  // the atomic variable regulate_async_cmd_. Subsequently, a thread will read the content of regulate_async_cmd_
-  // and send a gripper operation on the driver.
-  // Everything below 0.5 will be interpreted as off, everything above as on.
-  double regulate_cmd_ = 0.0;
-  std::atomic<bool> safe_regulate_cmd_ = false;
+  double regulate_cmd_;
+  std::atomic<GripperRegulateAction> safe_regulate_cmd_;
+
+  double regulate_state_;
 
   std::atomic<GripperStatus> safe_gripper_status_;
-  double object_detection_status_ = 0.0;
+  double object_detection_status_;
 };
 }  // namespace epick_driver

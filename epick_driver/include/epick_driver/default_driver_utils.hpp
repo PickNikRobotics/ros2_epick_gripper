@@ -117,6 +117,20 @@ GripperRegulateAction get_gripper_regulate_action(uint8_t& reg);
  */
 const std::string gripper_regulate_action_to_string(const GripperRegulateAction gripper_regulate_action);
 
+/**
+ * All Command and State Interfaces are double. We use this function to convert a double into
+ * an enum.
+ * @return A double to be converted into an enum.
+ */
+GripperRegulateAction double_to_regulate_action(double regulate);
+
+/**
+ * All Command and State Interfaces are double. We use this function to convert an enum into
+ * a adouble.
+ * @return The enum representing the given double.
+ */
+double regulate_action_to_double(GripperRegulateAction regulate);
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Automatic release action.
 ///
@@ -177,13 +191,6 @@ const std::string object_detection_to_string(const ObjectDetectionStatus object_
  * @return A double representing the enum.
  */
 double object_detection_to_double(const ObjectDetectionStatus object_detection);
-
-/**
- * All Command and State Interface are double. We use this function to convert an double into
- * an enum.
- * @return A double to be converted into an enum.
- */
-ObjectDetectionStatus double_to_object_detection(const double object_detection_representation);
 
 ///////////////////////////////////////////////////////////////////////////////
 /// Gripper fault status

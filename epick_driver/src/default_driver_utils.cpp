@@ -178,6 +178,30 @@ const std::string gripper_regulate_action_to_string(const GripperRegulateAction 
   return map.at(gripper_regulate_action);
 }
 
+GripperRegulateAction double_to_regulate_action(double regulate)
+{
+  if (regulate >= 0.5)
+  {
+    return GripperRegulateAction::FollowRequestedVacuumParameters;
+  }
+  else
+  {
+    return GripperRegulateAction::StopVacuumGenerator;
+  }
+}
+
+double regulate_action_to_double(GripperRegulateAction regulate)
+{
+  if (regulate == GripperRegulateAction::FollowRequestedVacuumParameters)
+  {
+    return 1.0;
+  }
+  else
+  {
+    return 0.0;
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// Automatic release action.
 ///
