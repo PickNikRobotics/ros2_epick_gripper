@@ -30,15 +30,23 @@
 
 namespace epick_controllers
 {
+namespace command
+{
 enum CommandInterfaces : size_t
 {
-  REGULATE_GRIPPER_CMD = 0
+  GRIPPER_REGULATE_ACTION = 0
 };
+}
 
+namespace state
+{
 enum StateInterfaces : size_t
 {
-  OBJECT_DETECTION_STATUS = 0
+  GRIPPER_REGULATE_ACTION = 0,
+  OBJECT_DETECTION_STATUS = 1
+
 };
+}
 
 constexpr auto kRegulateCommandInterface = "gripper/regulate";
 constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
@@ -58,6 +66,7 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
+  config.names.emplace_back(kRegulateCommandInterface);
   config.names.emplace_back(kObjectDetectionStateInterface);
   return config;
 }
@@ -65,7 +74,7 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
 controller_interface::return_type EpickController::update([[maybe_unused]] const rclcpp::Time& time,
                                                           [[maybe_unused]] const rclcpp::Duration& period)
 {
-  double object_detection_status = state_interfaces_[OBJECT_DETECTION_STATUS].get_value();
+  double object_detection_status = state_interfaces_[state::OBJECT_DETECTION_STATUS].get_value();
   auto object_detection_status_msg = std::make_shared<epick_msgs::msg::ObjectDetectionStatus>();
 
   if (object_detection_status < 0.5)
@@ -145,17 +154,10 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickC
 bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
                                        [[maybe_unused]] std_srvs::srv::SetBool::Response::SharedPtr response)
 {
-  command_interfaces_[REGULATE_GRIPPER_CMD].set_value(request->data ? 1.0 : 0.0);
+  command_interfaces_[command::GRIPPER_REGULATE_ACTION].set_value(request->data ? 1.0 : 0.0);
 
   // TODO: read the response.
-  //  resp->success = command_interfaces_[1].get_value();
 
-  //  while (command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value() == ASYNC_WAITING) {
-  //    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  //  }
-  //  resp->success = command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value();
-
-  //  return resp->success;
   return true;
 }
 

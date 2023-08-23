@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/driver.hpp>
 #include <epick_driver/driver_factory.hpp>
 #include <epick_driver/visibility_control.hpp>
@@ -47,6 +48,33 @@
 
 namespace epick_driver
 {
+
+// We use this structure to hold our state interface values.
+struct State
+{
+  double gripper_regulate_action;
+  double object_detection_status;
+};
+
+// We use this structure to hold a thread-safe copy of our state interface values.
+struct SafeState
+{
+  std::atomic<double> gripper_regulate_action;
+  std::atomic<double> object_detection_status;
+};
+
+// We use this structure to hold our command interface values.
+struct Command
+{
+  double gripper_regulate_action;
+};
+
+// We use this structure to hold a thread-safe copy of our command interface values.
+struct SafeCommand
+{
+  std::atomic<double> gripper_regulate_action;
+};
+
 class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
 {
 public:
@@ -140,12 +168,20 @@ private:
   std::atomic<bool> communication_thread_is_running_;
   void background_task();
 
-  double regulate_cmd_;
-  std::atomic<GripperRegulateAction> safe_regulate_cmd_;
+  // This stores the double values of our GPIO command interfaces.
+  Command gripper_cmds_{ default_driver_utils::regulate_action_to_double(GripperRegulateAction::StopVacuumGenerator) };
 
-  double regulate_state_;
+  // This stores the double values of our GPIO state interfaces.
+  State gripper_status_{ default_driver_utils::regulate_action_to_double(GripperRegulateAction::StopVacuumGenerator),
+                         default_driver_utils::object_detection_to_double(ObjectDetectionStatus::Unknown) };
 
-  std::atomic<GripperStatus> safe_gripper_status_;
-  double object_detection_status_;
+  // This stores thread-safe copies the double values of our GPIO command interfaces.
+  SafeCommand safe_gripper_cmd_{ default_driver_utils::regulate_action_to_double(
+      GripperRegulateAction::StopVacuumGenerator) };
+
+  // This stores thread-safe copies the double values of our GPIO state interfaces.
+  SafeState safe_gripper_status_{ default_driver_utils::regulate_action_to_double(
+                                      GripperRegulateAction::StopVacuumGenerator),
+                                  default_driver_utils::object_detection_to_double(ObjectDetectionStatus::Unknown) };
 };
 }  // namespace epick_driver

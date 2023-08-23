@@ -9,14 +9,14 @@
        <!-- Serial connection parameters. -->
         <param name="usb_port">/dev/ttyUSB0</param>
         <param name="baud_rate">9600</param>
-        <param name="timeout">500</param>
+        <param name="timeout">2000</param>
 
         <!-- Gripper parameters. -->
         <param name="slave_address">0x9</param>
         <param name="mode">AutomaticMode</param>
         <param name="max_vacuum_pressure">-100</param>
         <param name="min_vacuum_pressure">-10</param>
-        <param name="gripper_timeout">500</param>
+        <param name="gripper_timeout">25000</param>
 
         <!-- Set use_dummy to true to connect to a dummy driver. -->
         <param name="use_dummy">false</param>
