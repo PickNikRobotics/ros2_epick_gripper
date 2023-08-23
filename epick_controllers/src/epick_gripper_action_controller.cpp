@@ -97,6 +97,8 @@ controller_interface::return_type EpickGripperActionController::update([[maybe_u
 
   check_for_success(current_state, current_command);
 
+  regulate_command_interface_->get().set_value(current_command);
+
   return controller_interface::return_type::OK;
 }
 
