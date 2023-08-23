@@ -292,9 +292,10 @@ void EpickGripperHardwareInterface::background_task()
     catch (serial::IOException& e)
     {
       RCLCPP_ERROR(kLogger, "Error: %s", e.what());
-      communication_thread_is_running_.store(false);
     }
   }
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 }  // namespace epick_driver
 
