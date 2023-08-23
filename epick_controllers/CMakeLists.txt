@@ -6,6 +6,8 @@ project(epick_controllers VERSION 0.0.1 LANGUAGES CXX)
 # This module provides installation directories as per the GNU coding standards.
 include(GNUInstallDirs)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -13,11 +15,17 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(controller_interface REQUIRED)
 find_package(epick_msgs REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclcpp_action REQUIRED)
+find_package(realtime_tools REQUIRED)
 find_package(std_srvs REQUIRED)
 
 set(THIS_PACKAGE_INCLUDE_DEPENDS
   controller_interface
   epick_msgs
+  rclcpp
+  rclcpp_action
+  realtime_tools
   std_srvs
 )
 
@@ -27,7 +35,9 @@ add_library(
   epick_controllers
   SHARED
   include/epick_controllers/epick_controller.hpp
+  include/epick_controllers/epick_gripper_action_controller.hpp
   src/epick_controller.cpp
+  src/epick_gripper_action_controller.cpp
 )
 target_include_directories(
   epick_controllers

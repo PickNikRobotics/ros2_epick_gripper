@@ -4,4 +4,9 @@
             This controller provides an interface to for the Robotiq Epick gripper.
         </description>
     </class>
+    <class name="epick_controllers/EpickGripperActionController" type="epick_controllers::EpickGripperActionController" base_class_type="controller_interface::ControllerInterface">
+        <description>
+
+        </description>
+    </class>
 </library>
