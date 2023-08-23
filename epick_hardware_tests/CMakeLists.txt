@@ -36,6 +36,16 @@ target_include_directories(activate
 target_link_libraries(activate epick_driver::epick_driver)
 ament_target_dependencies(activate epick_driver)
 
+add_executable(deactivate
+    src/deactivate.cpp
+    src/command_line_utility.hpp
+    src/command_line_utility.cpp
+)
+target_include_directories(deactivate
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(deactivate epick_driver::epick_driver)
+ament_target_dependencies(deactivate epick_driver)
+
 add_executable(get_status
     src/get_status.cpp
     src/command_line_utility.hpp
