@@ -7,3 +7,5 @@ controller_manager:
 
     epick_gripper_action_controller:
       type: epick_controllers/EpickGripperActionController
+    epick_status_publisher_controller:
+      type: epick_controllers/EpickStatusPublisherController

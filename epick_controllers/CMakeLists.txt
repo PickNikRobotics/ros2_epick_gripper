@@ -36,8 +36,10 @@ add_library(
   SHARED
   include/epick_controllers/epick_controller.hpp
   include/epick_controllers/epick_gripper_action_controller.hpp
+  include/epick_controllers/epick_status_publisher_controller.hpp
   src/epick_controller.cpp
   src/epick_gripper_action_controller.cpp
+  src/epick_status_publisher_controller.cpp
 )
 target_include_directories(
   epick_controllers

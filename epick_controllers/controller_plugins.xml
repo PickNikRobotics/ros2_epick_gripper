@@ -9,4 +9,9 @@
 
         </description>
     </class>
+    <class name="epick_controllers/EpickStatusPublisherController" type="epick_controllers::EpickStatusPublisherController" base_class_type="controller_interface::ControllerInterface">
+        <description>
+
+        </description>
+    </class>
 </library>
