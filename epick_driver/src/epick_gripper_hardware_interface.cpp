@@ -195,7 +195,7 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
     driver_->deactivate();
     driver_->activate();
 
-    // The following thread will be responsible for comminicating directly with the driver.
+    // The following thread will be responsible for communicating directly with the driver.
     communication_thread_is_running_.store(true);
     communication_thread_ = std::thread([this] { this->background_task(); });
   }
