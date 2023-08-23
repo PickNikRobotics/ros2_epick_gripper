@@ -74,21 +74,19 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
+constexpr float kAtmosphericPressure = 100;  // kPa.
+
 // The register containing the status of the gripper.
 constexpr uint16_t kGripperStatusRegister = 0x07D0;
 
 // The register containing all command requests.
 constexpr uint16_t kActionRequestRegisterAddress = 0x03E8;
 
-// The response to a write command consists of:
-// - slave ID (1 byte)
-// - function code (1 byte)
-// - address of the first register that was written (2 bytes)
-// - number of registers written (2 bytes)
-// - CRC (2 bytes)
-constexpr int kWriteResponseSize = 8;
-
-constexpr float kAtmosphericPressure = 100;  // kPa.
+constexpr size_t kActivateResponseSize = 8;
+constexpr size_t kDectivateResponseSize = 8;
+constexpr size_t kGripResponseSize = 8;
+constexpr size_t kReleaseResponseSize = 8;
+constexpr size_t kGetStatusResponseSize = 11;
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial) : serial_{ std::move(serial) }
 {
@@ -143,7 +141,7 @@ void DefaultDriver::activate()
   try
   {
     serial_->write(request);
-    auto response = serial_->read(kWriteResponseSize);
+    auto response = serial_->read(kActivateResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -176,7 +174,7 @@ void DefaultDriver::deactivate()
   try
   {
     serial_->write(request);
-    auto response = serial_->read(kWriteResponseSize);
+    auto response = serial_->read(kDectivateResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -209,7 +207,7 @@ void DefaultDriver::grip()
   try
   {
     serial_->write(request);
-    response = serial_->read(kWriteResponseSize);
+    response = serial_->read(kGripResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -241,7 +239,7 @@ void DefaultDriver::release()
   try
   {
     serial_->write(request);
-    response = serial_->read(kWriteResponseSize);
+    response = serial_->read(kReleaseResponseSize);
   }
   catch (const serial::IOException& e)
   {
@@ -295,11 +293,11 @@ GripperStatus DefaultDriver::get_status()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  std::vector<uint8_t> response;
+  std::vector<uint8_t> response(kGetStatusResponseSize);
   try
   {
     serial_->write(request);
-    response = serial_->read(kWriteResponseSize);
+    response = serial_->read(kGetStatusResponseSize);
   }
   catch (const serial::IOException& e)
   {

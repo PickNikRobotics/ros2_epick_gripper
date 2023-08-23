@@ -54,23 +54,24 @@ void DefaultSerial::close()
 
 std::vector<uint8_t> DefaultSerial::read(size_t size)
 {
-  std::vector<uint8_t> data;
+  std::vector<uint8_t> data(size);
 
   // Wait until data is available or a timeout occurs.
   if (serial_->waitReadable())
   {
     // Further wait for the transmission time of expected bytes.
     serial_->waitByteTimes(size);
-    serial_->read(data, size);
+    size_t bytes_read = serial_->read(data.data(), size);
+
+    if (bytes_read != size)
+    {
+      const auto error_msg = "Requested " + std::to_string(size) + " bytes, but got " + std::to_string(bytes_read);
+      THROW(serial::IOException, error_msg.c_str());
+    }
   }
   else
   {
-    if (data.size() != size)
-    {
-      const auto error_msg =
-          "Requested " + std::to_string(size) + " bytes, but only got " + std::to_string(data.size());
-      THROW(serial::IOException, error_msg.c_str());
-    }
+    THROW(serial::IOException, "Reading timeout.");
   }
   return data;
 }
@@ -81,8 +82,8 @@ void DefaultSerial::write(const std::vector<uint8_t>& data)
   serial_->flush();
   if (num_bytes_written != data.size())
   {
-    const auto error_msg = "Attempted to write " + std::to_string(data.size()) + " bytes, but only wrote " +
-                           std::to_string(num_bytes_written);
+    const auto error_msg =
+        "Attempted to write " + std::to_string(data.size()) + " bytes, but wrote " + std::to_string(num_bytes_written);
     THROW(serial::IOException, error_msg.c_str());
   }
 }
