@@ -43,16 +43,13 @@ namespace state
 enum StateInterfaces : size_t
 {
   GRIP_CMD = 0,
-  OBJECT_DETECTION_STATUS = 1
 };
 }
 
 constexpr auto kGripCommandInterface = "gripper/grip_cmd";
 constexpr auto kGripStateInterface = "gripper/grip_cmd";
-constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
 
 constexpr auto kGripService = "/grip_cmd";
-constexpr auto kObjectDetectionStatusTopic = "/object_detection_status";
 
 // If we use a service to set a double variable in a command interface, we want to wait until the same variable appears
 // to have the same value in the corresponding state interface. We do not want to wait more than the give timeout.
@@ -76,39 +73,12 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
   config.names.emplace_back(kGripStateInterface);
-  config.names.emplace_back(kObjectDetectionStateInterface);
   return config;
 }
 
 controller_interface::return_type EpickController::update([[maybe_unused]] const rclcpp::Time& time,
                                                           [[maybe_unused]] const rclcpp::Duration& period)
 {
-  double object_detection_status = state_interfaces_[state::OBJECT_DETECTION_STATUS].get_value();
-  auto object_detection_status_msg = std::make_shared<epick_msgs::msg::ObjectDetectionStatus>();
-
-  if (object_detection_status < 0.5)
-  {
-    object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
-  }
-  else if (object_detection_status < 1.5)
-  {
-    object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MIN_PRESSURE;
-  }
-  else if (object_detection_status < 2.5)
-  {
-    object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MAX_PRESSURE;
-  }
-  else if (object_detection_status < 3.5)
-  {
-    object_detection_status_msg->status = object_detection_status_msg->NO_OBJECT_DETECTED;
-  }
-  else
-  {
-    object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
-  }
-
-  object_detection_status_pub_->publish(*object_detection_status_msg);
-
   return controller_interface::return_type::OK;
 }
 
@@ -129,8 +99,6 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
     grip_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
         kGripService, [this](std_srvs::srv::SetBool::Request::SharedPtr req,
                              std_srvs::srv::SetBool::Response::SharedPtr resp) { this->grip_cmd(req, resp); });
-    object_detection_status_pub_ =
-        get_node()->create_publisher<epick_msgs::msg::ObjectDetectionStatus>(kObjectDetectionStatusTopic, 10);
   }
   catch (...)
   {
@@ -177,7 +145,7 @@ bool EpickController::grip_cmd(std_srvs::srv::SetBool::Request::SharedPtr reques
   if (request->data == grip_cmd)
   {
     response->success = true;
-    response->message = "The command succeeded.";
+    response->message = "Regulate command succeeded.";
   }
   else
   {
