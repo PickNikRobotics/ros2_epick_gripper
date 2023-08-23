@@ -93,7 +93,7 @@ def launch_setup(context, *args, **kwargs):
     epick_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["epick_controller", "-c", "/controller_manager"],
+        arguments=["epick_gripper_action_controller", "-c", "/controller_manager"],
     )
 
     # robot_state_publisher uses the URDF specified by the parameter robot_description

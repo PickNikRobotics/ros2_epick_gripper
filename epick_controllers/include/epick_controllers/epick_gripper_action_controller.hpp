@@ -44,6 +44,8 @@ class EpickGripperActionController : public controller_interface::ControllerInte
 public:
   using GripperCommandAction = control_msgs::action::GripperCommand;
   using GoalHandle = rclcpp_action::ServerGoalHandle<GripperCommandAction>;
+  using RealtimeGoalHandle = realtime_tools::RealtimeServerGoalHandle<control_msgs::action::GripperCommand>;
+  using RealtimeGoalHandleBuffer = realtime_tools::RealtimeBuffer<std::shared_ptr<RealtimeGoalHandle>>;
 
   struct Commands
   {
@@ -72,11 +74,19 @@ private:
 
   void preempt_active_goal();
 
+  void set_hold_position();
+
+  void check_for_success(const double current_regulate_state, const double current_regulate_command);
+
   std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface>> regulate_command_interface_;
 
   std::optional<std::reference_wrapper<hardware_interface::LoanedStateInterface>> is_regulating_state_interface_;
 
   std::shared_ptr<rclcpp_action::Server<GripperCommandAction>> action_server_;
+
+  std::shared_ptr<rclcpp::TimerBase> goal_handle_timer_;
+
+  RealtimeGoalHandleBuffer rt_active_goal_;
 
   GripperCommandAction::Result::SharedPtr pre_alloc_result_;
 

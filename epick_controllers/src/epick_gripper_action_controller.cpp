@@ -27,8 +27,11 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <algorithm>
+#include <chrono>
 #include <epick_controllers/epick_gripper_action_controller.hpp>
+#include <limits>
 #include <optional>
+#include <rclcpp/logging.hpp>
 #include "hardware_interface/loaned_command_interface.hpp"
 #include "hardware_interface/loaned_state_interface.hpp"
 
@@ -78,38 +81,21 @@ controller_interface::InterfaceConfiguration EpickGripperActionController::state
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back(kIsRegulatingStateInterface, kObjectDetectionStateInterface);
+  config.names.emplace_back(kIsRegulatingStateInterface);
   return config;
 }
 
 controller_interface::return_type EpickGripperActionController::update([[maybe_unused]] const rclcpp::Time& time,
                                                                        [[maybe_unused]] const rclcpp::Duration& period)
 {
-  // double object_detection_status = state_interfaces_[OBJECT_DETECTION_STATUS].get_value();
-  // auto object_detection_status_msg = std::make_shared<epick_msgs::msg::ObjectDetectionStatus>();
+  commands_rt_ = *(commands_buffer_.readFromRT());
 
-  // if (object_detection_status < 0.5)
-  // {
-  //   object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
-  // }
-  // else if (object_detection_status < 1.5)
-  // {
-  //   object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MIN_PRESSURE;
-  // }
-  // else if (object_detection_status < 2.5)
-  // {
-  //   object_detection_status_msg->status = object_detection_status_msg->OBJECT_DETECTED_AT_MAX_PRESSURE;
-  // }
-  // else if (object_detection_status < 3.5)
-  // {
-  //   object_detection_status_msg->status = object_detection_status_msg->NO_OBJECT_DETECTED;
-  // }
-  // else
-  // {
-  //   object_detection_status_msg->status = object_detection_status_msg->UNKNOWN;
-  // }
+  const double current_command = commands_rt_.regulate;
+  const double current_state = is_regulating_state_interface_->get().get_value();
 
-  // object_detection_status_pub_->publish(*object_detection_status_msg);
+  RCLCPP_INFO(get_node()->get_logger(), "command: %f; state: %f", current_command, current_state);
+
+  check_for_success(current_state, current_command);
 
   return controller_interface::return_type::OK;
 }
@@ -160,14 +146,11 @@ EpickGripperActionController::on_activate([[maybe_unused]] const rclcpp_lifecycl
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 EpickGripperActionController::on_deactivate([[maybe_unused]] const rclcpp_lifecycle::State& previous_state)
 {
-  // try
-  // {
-  //   regulate_gripper_srv_.reset();
-  // }
-  // catch (...)
-  // {
-  //   return LifecycleNodeInterface::CallbackReturn::ERROR;
-  // }
+  regulate_command_interface_ = std::nullopt;
+  is_regulating_state_interface_ = std::nullopt;
+
+  release_interfaces();
+
   return LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -175,23 +158,6 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickG
 {
   return LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
-
-// bool EpickGripperActionController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
-//                                        [[maybe_unused]] std_srvs::srv::SetBool::Response::SharedPtr response)
-// {
-//   // command_interfaces_[REGULATE_GRIPPER_CMD].set_value(request->data ? 1.0 : 0.0);
-
-//   // TODO: read the response.
-//   //  resp->success = command_interfaces_[1].get_value();
-
-//   //  while (command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value() == ASYNC_WAITING) {
-//   //    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-//   //  }
-//   //  resp->success = command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value();
-
-//   //  return resp->success;
-//   return true;
-// }
 
 rclcpp_action::GoalResponse
 EpickGripperActionController::goal_callback(const rclcpp_action::GoalUUID& uuid,
@@ -203,14 +169,90 @@ EpickGripperActionController::goal_callback(const rclcpp_action::GoalUUID& uuid,
 rclcpp_action::CancelResponse
 EpickGripperActionController::cancel_callback(const std::shared_ptr<GoalHandle> goal_handle)
 {
+  RCLCPP_INFO(get_node()->get_logger(), "Got request to cancel goal");
+
+  // Check that cancel request refers to currently active goal (if any)
+  const auto active_goal = *rt_active_goal_.readFromNonRT();
+  if (active_goal && active_goal->gh_ == goal_handle)
+  {
+    // Enter hold current position mode
+    set_hold_position();
+
+    RCLCPP_INFO(get_node()->get_logger(), "Canceling active action goal because cancel callback received.");
+
+    // Mark the current goal as canceled
+    auto action_res = std::make_shared<GripperCommandAction::Result>();
+    active_goal->setCanceled(action_res);
+    // Reset current goal
+    rt_active_goal_.writeFromNonRT(std::shared_ptr<RealtimeGoalHandle>());
+  }
+  return rclcpp_action::CancelResponse::ACCEPT;
 }
 
 void EpickGripperActionController::accepted_callback(std::shared_ptr<GoalHandle> goal_handle)
 {
+  auto rt_goal = std::make_shared<RealtimeGoalHandle>(goal_handle);
+
+  const auto& goal = goal_handle->get_goal();
+  commands_.regulate = goal->command.position;
+  commands_buffer_.writeFromNonRT(commands_);
+
+  pre_alloc_result_->reached_goal = false;
+  pre_alloc_result_->stalled = false;
+
+  rt_goal->execute();
+  rt_active_goal_.writeFromNonRT(rt_goal);
+
+  // Set smartpointer to expire for create_wall_timer to delete previous entry from timer list
+  goal_handle_timer_.reset();
+
+  // Setup goal status checking timer
+  goal_handle_timer_ = get_node()->create_wall_timer(std::chrono::duration<double>{ 1.0 },
+                                                     std::bind(&RealtimeGoalHandle::runNonRealtime, rt_goal));
 }
 
 void EpickGripperActionController::preempt_active_goal()
 {
+  // Cancels the currently active goal
+  const auto active_goal = *rt_active_goal_.readFromNonRT();
+  if (active_goal)
+  {
+    // Marks the current goal as canceled
+    active_goal->setCanceled(std::make_shared<GripperCommandAction::Result>());
+    rt_active_goal_.writeFromNonRT(std::shared_ptr<RealtimeGoalHandle>());
+  }
+}
+
+void EpickGripperActionController::set_hold_position()
+{
+  commands_.regulate = regulate_command_interface_->get().get_value();
+  commands_buffer_.writeFromNonRT(commands_);
+}
+
+void EpickGripperActionController::check_for_success(const double current_regulate_state,
+                                                     const double current_regulate_command)
+{
+  const auto active_goal = *rt_active_goal_.readFromNonRT();
+  if (!active_goal)
+  {
+    // RCLCPP_INFO(get_node()->get_logger(), "has no active action goal");
+    return;
+  }
+
+  // RCLCPP_INFO(get_node()->get_logger(), "command: %f; state: %f", current_regulate_command, current_regulate_state);
+
+  if (std::abs(current_regulate_command - current_regulate_state) < std::numeric_limits<double>::epsilon())
+  {
+    RCLCPP_INFO(get_node()->get_logger(), "success!");
+
+    // success
+    pre_alloc_result_->position = current_regulate_state;
+    pre_alloc_result_->reached_goal = true;
+    pre_alloc_result_->stalled = false;
+
+    active_goal->setSucceeded(pre_alloc_result_);
+    rt_active_goal_.writeFromNonRT(std::shared_ptr<RealtimeGoalHandle>());
+  }
 }
 
 }  // namespace epick_controllers
