@@ -268,8 +268,14 @@ void EpickGripperHardwareInterface::background_task()
   {
     try
     {
-      // Depending on the current gripper status decide to send or not a regulate command.
+      // Retrieve current status and update state interfaces
       auto status = driver_->get_status();
+      safe_gripper_status_.object_detection_status.store(
+          default_driver_utils::object_detection_to_double(status.object_detection_status));
+      safe_gripper_status_.gripper_regulate_action.store(
+          default_driver_utils::regulate_action_to_double(status.gripper_regulate_action));
+
+      // Depending on the current gripper status decide to send or not a regulate command.
       auto regulate_action =
           default_driver_utils::double_to_regulate_action(safe_gripper_cmd_.gripper_regulate_action.load());
       if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator &&
@@ -282,12 +288,6 @@ void EpickGripperHardwareInterface::background_task()
       {
         driver_->release();
       }
-
-      status = driver_->get_status();
-      safe_gripper_status_.object_detection_status.store(
-          default_driver_utils::object_detection_to_double(status.object_detection_status));
-      safe_gripper_status_.gripper_regulate_action.store(
-          default_driver_utils::regulate_action_to_double(status.gripper_regulate_action));
     }
     catch (serial::IOException& e)
     {
