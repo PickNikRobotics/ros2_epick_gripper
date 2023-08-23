@@ -54,6 +54,15 @@ constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status
 constexpr auto kRegulateService = "/regulate";
 constexpr auto kObjectDetectionStatusTopic = "/object_detection_status";
 
+// If we use a service to set a double variable in a command interface, we want to wait until the same variable appears
+// to have the same value in the corresponding state interface. We do not want to wait more than the give timeout.
+constexpr auto kServiceTimeout = 2000;
+
+// If we use a service to set a double variable in a command interface, we want to wait until the same variable appears
+// to have the same value in the corresponding state interface. We check the value of the variable and then we sleep
+// for this given amount of time before re-trying.
+constexpr auto kBusyWaitingSleepTime = 50;
+
 controller_interface::InterfaceConfiguration EpickController::command_interface_configuration() const
 {
   controller_interface::InterfaceConfiguration config;
@@ -156,9 +165,28 @@ bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPt
 {
   command_interfaces_[command::GRIPPER_REGULATE_ACTION].set_value(request->data ? 1.0 : 0.0);
 
-  // TODO: read the response.
+  auto start_time = std::chrono::steady_clock::now();
+  std::chrono::duration<double> timeout = std::chrono::milliseconds(kServiceTimeout);
 
-  return true;
+  // We wait until the regulate variable assumes the requested value.
+  bool regulate;
+  do
+  {
+    std::this_thread::sleep_for(std::chrono::milliseconds(kBusyWaitingSleepTime));
+    regulate = state_interfaces_[state::StateInterfaces::GRIPPER_REGULATE_ACTION].get_value() >= 0.5;
+  } while (request->data != regulate && (std::chrono::steady_clock::now() - start_time) < timeout);
+
+  if (request->data == regulate)
+  {
+    response->success = true;
+    response->message = "Regulate command succeded.";
+  }
+  else
+  {
+    response->success = false;
+    response->message = "Regulate command failed.";
+  }
+  return response->success;
 }
 
 }  // namespace epick_controllers
