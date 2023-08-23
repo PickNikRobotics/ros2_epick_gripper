@@ -55,23 +55,11 @@ void DefaultSerial::close()
 std::vector<uint8_t> DefaultSerial::read(size_t size)
 {
   std::vector<uint8_t> data(size);
-
-  // Wait until data is available or a timeout occurs.
-  if (serial_->waitReadable())
+  size_t bytes_read = serial_->read(data.data(), size);
+  if (bytes_read != size)
   {
-    // Further wait for the transmission time of expected bytes.
-    serial_->waitByteTimes(size);
-    size_t bytes_read = serial_->read(data.data(), size);
-
-    if (bytes_read != size)
-    {
-      const auto error_msg = "Requested " + std::to_string(size) + " bytes, but got " + std::to_string(bytes_read);
-      THROW(serial::IOException, error_msg.c_str());
-    }
-  }
-  else
-  {
-    THROW(serial::IOException, "Reading timeout.");
+    const auto error_msg = "Requested " + std::to_string(size) + " bytes, but got " + std::to_string(bytes_read);
+    THROW(serial::IOException, error_msg.c_str());
   }
   return data;
 }
