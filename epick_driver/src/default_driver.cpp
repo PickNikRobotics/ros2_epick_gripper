@@ -221,7 +221,8 @@ void DefaultDriver::release()
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, GripperMode::AutomaticMode);
-  default_driver_utils::set_gripper_regulate_action(action_request_register, GripperRegulateAction::StopVacuumGenerator);
+  default_driver_utils::set_gripper_automatic_release_action(action_request_register,
+                                                             GripperReleaseAction::ReleaseWithoutTimeout);
 
   std::vector<uint8_t> request = { slave_address_,
                                    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetSingleRegister),
@@ -244,6 +245,15 @@ void DefaultDriver::release()
     RCLCPP_ERROR(kLogger, "Failed to release: %s", e.what());
     throw;
   }
+
+  // NOTE: messy workaround!
+  // Wait a short duration for the object to fall away from the gripper
+  std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
+
+  // After releaasing in automatic mode, the gripper needs to be deactivated and then reactivated.
+  deactivate();
+  std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
+  activate();
 }
 
 void DefaultDriver::set_slave_address(const uint8_t slave_address)
