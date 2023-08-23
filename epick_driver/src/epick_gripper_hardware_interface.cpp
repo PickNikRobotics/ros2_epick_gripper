@@ -48,8 +48,6 @@ constexpr auto kRegulateCommandInterface = "regulate";
 constexpr auto kRegulateStateInterface = "regulate";
 constexpr auto kObjectDetectionStateInterface = "object_detection_status";
 
-constexpr auto kCommandInterval = std::chrono::milliseconds{ 10 };
-
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
   driver_factory_ = std::make_unique<DefaultDriverFactory>();
@@ -192,7 +190,6 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
   RCLCPP_DEBUG(kLogger, "on_activate");
   try
   {
-    driver_->deactivate();
     driver_->activate();
 
     // The following thread will be responsible for communicating directly with the driver.
@@ -294,11 +291,9 @@ void EpickGripperHardwareInterface::background_task()
     }
     catch (serial::IOException& e)
     {
-      RCLCPP_ERROR(kLogger, "Check Epick Gripper connection and restart drivers. Error: %s", e.what());
+      RCLCPP_ERROR(kLogger, "Error: %s", e.what());
       communication_thread_is_running_.store(false);
     }
-
-    std::this_thread::sleep_for(kCommandInterval);
   }
 }
 }  // namespace epick_driver
