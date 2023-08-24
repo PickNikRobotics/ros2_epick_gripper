@@ -28,7 +28,6 @@
 
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
-#include "epick_driver/default_driver_utils.hpp"
 
 #include "command_line_utility.hpp"
 
@@ -37,7 +36,10 @@
 #include <vector>
 #include <iostream>
 
-// This is a command to read the status of the gripper.
+// This command is used to reproduce an issue we have with writing and reading
+// on the serial port. It runs an infinite loop of write/read instructions and
+// stops if/when an error is encountered. It usually fails between 1 and 6
+// minutes.
 
 using namespace epick_driver;
 
