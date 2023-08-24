@@ -9,7 +9,7 @@
        <!-- Serial connection parameters. -->
         <param name="usb_port">/dev/ttyUSB0</param>
         <param name="baud_rate">9600</param>
-        <param name="timeout">2000</param>
+        <param name="timeout">200</param>
 
         <!-- Gripper parameters. -->
         <param name="slave_address">0x9</param>
