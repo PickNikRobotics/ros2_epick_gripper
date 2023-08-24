@@ -69,6 +69,8 @@ public:
   void release() override;
 
 private:
+  std::vector<uint8_t> send(const std::vector<uint8_t>& request, size_t response_size) const;
+
   std::unique_ptr<Serial> serial_ = nullptr;
   uint8_t slave_address_ = 0x00;
   GripperMode gripper_mode_ = GripperMode::AutomaticMode;

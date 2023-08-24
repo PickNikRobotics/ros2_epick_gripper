@@ -74,7 +74,10 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("DefaultDriver");
 
-constexpr float kAtmosphericPressure = 100;  // kPa.
+constexpr auto kAtmosphericPressure = 100.0f;  // kPa.
+
+// If the gripper connection is not stable we may want to try sending the command again.
+constexpr auto kMaxRetries = 5;
 
 // The register containing the status of the gripper.
 constexpr uint16_t kGripperStatusRegister = 0x07D0;
@@ -90,6 +93,37 @@ constexpr size_t kGetStatusResponseSize = 11;
 
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial) : serial_{ std::move(serial) }
 {
+}
+
+std::vector<uint8_t> DefaultDriver::send(const std::vector<uint8_t>& request, size_t response_size) const
+{
+  std::vector<uint8_t> response;
+  response.reserve(response_size);
+
+  int retry_count = 0;
+  while (retry_count < kMaxRetries)
+  {
+    try
+    {
+      serial_->write(request);
+      response = serial_->read(response_size);
+      break;
+    }
+    catch (const serial::IOException& e)
+    {
+      RCLCPP_WARN(kLogger, "Attempt %d of %d: failed to communicate with the gripper: %s", retry_count + 1, kMaxRetries,
+                  e.what());
+      retry_count++;
+    }
+  }
+
+  if (retry_count == kMaxRetries)
+  {
+    RCLCPP_ERROR(kLogger, "Reached maximum retries. Operation failed.");
+    return {};
+  }
+
+  return response;
 }
 
 bool DefaultDriver::connect()
@@ -138,14 +172,11 @@ void DefaultDriver::activate()
   auto crc = crc_utils::compute_crc(request);
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
-  try
+
+  auto response = send(request, kActivateResponseSize);
+  if (response.empty())
   {
-    serial_->write(request);
-    auto response = serial_->read(kActivateResponseSize);
-  }
-  catch (const serial::IOException& e)
-  {
-    RCLCPP_ERROR(kLogger, "Failed to activate the gripper: %s", e.what());
+    RCLCPP_ERROR(kLogger, "Failed to activate the gripper.");
     throw;
   }
 }
@@ -171,14 +202,10 @@ void DefaultDriver::deactivate()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  try
+  auto response = send(request, kDectivateResponseSize);
+  if (response.empty())
   {
-    serial_->write(request);
-    auto response = serial_->read(kDectivateResponseSize);
-  }
-  catch (const serial::IOException& e)
-  {
-    RCLCPP_ERROR(kLogger, "Failed to deactivate the gripper: %s", e.what());
+    RCLCPP_ERROR(kLogger, "Failed to deactivate the gripper.");
     throw;
   }
 }
@@ -203,15 +230,10 @@ void DefaultDriver::grip()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  std::vector<uint8_t> response;
-  try
+  auto response = send(request, kGripResponseSize);
+  if (response.empty())
   {
-    serial_->write(request);
-    response = serial_->read(kGripResponseSize);
-  }
-  catch (const serial::IOException& e)
-  {
-    RCLCPP_ERROR(kLogger, "Failed to grip: %s", e.what());
+    RCLCPP_ERROR(kLogger, "Failed to grip.");
     throw;
   }
 }
@@ -235,15 +257,10 @@ void DefaultDriver::release()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  std::vector<uint8_t> response;
-  try
+  auto response = send(request, kReleaseResponseSize);
+  if (response.empty())
   {
-    serial_->write(request);
-    response = serial_->read(kReleaseResponseSize);
-  }
-  catch (const serial::IOException& e)
-  {
-    RCLCPP_ERROR(kLogger, "Failed to release: %s", e.what());
+    RCLCPP_ERROR(kLogger, "Failed to release.");
     throw;
   }
 }
@@ -293,30 +310,10 @@ GripperStatus DefaultDriver::get_status()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  std::vector<uint8_t> response;
-  response.reserve(kGetStatusResponseSize);
-
-  const int MAX_RETRIES = 5;
-  int retry_count = 0;
-
-  while (retry_count < MAX_RETRIES)
+  auto response = send(request, kGetStatusResponseSize);
+  if (response.empty())
   {
-    try
-    {
-      serial_->write(request);
-      response = serial_->read(kGetStatusResponseSize);
-      break;
-    }
-    catch (const serial::IOException& e)
-    {
-      RCLCPP_ERROR(kLogger, "Attempt %d: Failed to read the gripper status: %s", retry_count + 1, e.what());
-      retry_count++;
-    }
-  }
-
-  if (retry_count == MAX_RETRIES)
-  {
-    RCLCPP_ERROR(kLogger, "Reached maximum retries. Operation failed.");
+    RCLCPP_ERROR(kLogger, "Failed to read the status.");
     throw;
   }
 
