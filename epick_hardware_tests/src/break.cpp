@@ -115,19 +115,30 @@ int main(int argc, char* argv[])
     std::cout << "The gripper is activated." << std::endl;
     std::cout << "Reading multiple times the gripper status..." << std::endl;
 
+    auto start = std::chrono::steady_clock::now();
+
+    uint32_t counter = 0;
     bool ok = true;
     while (ok)
     {
       try
       {
+        counter++;
         auto status = driver->get_status();
       }
       catch (serial::IOException& e)
       {
         ok = false;
-        std::cout << "Error: " << e.what() << std::endl;
+        std::cout << "Error at " << counter << " iteration: " << e.what() << std::endl;
       }
     }
+
+    auto end = std::chrono::steady_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    int minutes = duration.count() / 60;
+    int seconds = duration.count() % 60;
+
+    std::cout << "Execution time: " << minutes << "m:" << seconds << "s" << std::endl;
   }
   catch (const serial::IOException& e)
   {
