@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
     std::cout << "Checking if the gripper is connected..." << std::endl;
 
-    bool connected = driver->connect();
+    const bool connected = driver->connect();
     if (!connected)
     {
       std::cout << "The gripper is not connected" << std::endl;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
     std::cout << "The gripper is activated." << std::endl;
     std::cout << "Reading multiple times the gripper status..." << std::endl;
 
-    auto start = std::chrono::steady_clock::now();
+    const auto start = std::chrono::steady_clock::now();
 
     uint32_t counter = 0;
     bool ok = true;
@@ -135,10 +135,10 @@ int main(int argc, char* argv[])
       }
     }
 
-    auto end = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
-    int minutes = duration.count() / 60;
-    int seconds = duration.count() % 60;
+    const auto end = std::chrono::steady_clock::now();
+    const auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+    const int minutes = duration.count() / 60;
+    const int seconds = duration.count() % 60;
 
     std::cout << "Execution time: " << minutes << "m:" << seconds << "s" << std::endl;
   }
