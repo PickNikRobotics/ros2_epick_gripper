@@ -36,8 +36,10 @@
 #include <pluginlib/class_list_macros.hpp>
 #include <rclcpp/logging.hpp>
 
+#include <chrono>
 #include <cmath>
 #include <optional>
+#include <thread>
 
 namespace epick_driver
 {
@@ -47,6 +49,8 @@ constexpr auto kGripperGPIO = "gripper";
 constexpr auto kRegulateCommandInterface = "regulate";
 constexpr auto kRegulateStateInterface = "regulate";
 constexpr auto kObjectDetectionStateInterface = "object_detection_status";
+
+constexpr auto kGripperCommsLoopPeriod = std::chrono::milliseconds{ 10 };
 
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
@@ -263,38 +267,53 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
 
 void EpickGripperHardwareInterface::background_task()
 {
-  // Read from and write to the gripper at 100 Hz.
+  // Read from and write to the gripper at a fixed rate set by kGripperCommsLoopPeriod.
   while (communication_thread_is_running_.load())
   {
     try
     {
-      // Depending on the current gripper status decide to send or not a regulate command.
-      auto status = driver_->get_status();
-      auto regulate_action =
+      // Retrieve current status and update state interfaces
+      const auto status = driver_->get_status();
+      safe_gripper_status_.object_detection_status.store(
+          default_driver_utils::object_detection_to_double(status.object_detection_status));
+      safe_gripper_status_.gripper_regulate_action.store(
+          default_driver_utils::regulate_action_to_double(status.gripper_regulate_action));
+
+      // Given the command input and the current state of the gripper, decide what action to send.
+      const auto regulate_action =
           default_driver_utils::double_to_regulate_action(safe_gripper_cmd_.gripper_regulate_action.load());
+
+      // If the gripper's vacuum generator is not running and the command is to start regulating vacuum,
+      // tell the gripper to begin grasping.
       if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator &&
           regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters)
       {
         driver_->grip();
       }
-      if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters &&
-          regulate_action == GripperRegulateAction::StopVacuumGenerator)
+      // If the vacuum generator is running and the command is to stop regulating vacuum,
+      // tell the gripper to release any currently-held object and turn off the vacuum generator.
+      else if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters &&
+               regulate_action == GripperRegulateAction::StopVacuumGenerator)
       {
         driver_->release();
-      }
 
-      status = driver_->get_status();
-      safe_gripper_status_.object_detection_status.store(
-          default_driver_utils::object_detection_to_double(status.object_detection_status));
-      safe_gripper_status_.gripper_regulate_action.store(
-          default_driver_utils::regulate_action_to_double(status.gripper_regulate_action));
+        // NOTE: messy workaround!
+        // After releasing the object, wait a short duration for the object to fall away from the gripper.
+        std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
+
+        // The gripper then needs to be deactivated and then reactivated to reset for another grasp.
+        driver_->deactivate();
+        driver_->activate();
+      }
+      // If neither of the above conditions are true, then send no command.
     }
     catch (serial::IOException& e)
     {
       RCLCPP_ERROR(kLogger, "Error: %s", e.what());
-      communication_thread_is_running_.store(false);
     }
   }
+
+  std::this_thread::sleep_for(kGripperCommsLoopPeriod);
 }
 }  // namespace epick_driver
 
