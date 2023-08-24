@@ -305,6 +305,7 @@ GripperStatus DefaultDriver::get_status()
     {
       serial_->write(request);
       response = serial_->read(kGetStatusResponseSize);
+      break;
     }
     catch (const serial::IOException& e)
     {
