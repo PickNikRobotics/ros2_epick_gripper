@@ -54,6 +54,10 @@ void DefaultSerial::close()
 
 std::vector<uint8_t> DefaultSerial::read(size_t size)
 {
+  if (!serial_->isOpen())
+  {
+    THROW(serial::IOException, "Trying to read but the port is disconnected.");
+  }
   std::vector<uint8_t> data;
   size_t bytes_read = serial_->read(data, size);
   if (bytes_read != size)
@@ -66,6 +70,10 @@ std::vector<uint8_t> DefaultSerial::read(size_t size)
 
 void DefaultSerial::write(const std::vector<uint8_t>& data)
 {
+  if (!serial_->isOpen())
+  {
+    THROW(serial::IOException, "Trying to write but the port is disconnected.");
+  }
   std::size_t num_bytes_written = serial_->write(data);
   serial_->flush();
   if (num_bytes_written != data.size())
