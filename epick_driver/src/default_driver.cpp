@@ -111,8 +111,8 @@ std::vector<uint8_t> DefaultDriver::send(const std::vector<uint8_t>& request, si
     }
     catch (const serial::IOException& e)
     {
-      RCLCPP_WARN(kLogger, "Attempt %d of %d: failed to communicate with the gripper: %s", retry_count + 1, kMaxRetries,
-                  e.what());
+      RCLCPP_WARN(kLogger, "Resending the command because the previous attempt (%d of %d) failed: %s", retry_count + 1,
+                  kMaxRetries, e.what());
       retry_count++;
     }
   }
