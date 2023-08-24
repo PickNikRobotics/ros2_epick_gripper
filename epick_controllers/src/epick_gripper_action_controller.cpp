@@ -162,8 +162,8 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickG
 }
 
 rclcpp_action::GoalResponse
-EpickGripperActionController::goal_callback(const rclcpp_action::GoalUUID& uuid,
-                                            std::shared_ptr<const GripperCommandAction::Goal> goal)
+EpickGripperActionController::goal_callback([[maybe_unused]] const rclcpp_action::GoalUUID& uuid,
+                                            [[maybe_unused]] std::shared_ptr<const GripperCommandAction::Goal> goal)
 {
   return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
 }
