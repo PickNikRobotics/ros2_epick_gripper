@@ -26,48 +26,25 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <epick_controllers/epick_gripper_action_controller.hpp>
+
+#include <rclcpp/logging.hpp>
+#include <hardware_interface/loaned_command_interface.hpp>
+#include <hardware_interface/loaned_state_interface.hpp>
+
 #include <algorithm>
 #include <chrono>
-#include <epick_controllers/epick_gripper_action_controller.hpp>
 #include <limits>
 #include <optional>
-#include <rclcpp/logging.hpp>
-#include "hardware_interface/loaned_command_interface.hpp"
-#include "hardware_interface/loaned_state_interface.hpp"
-
-namespace
-{
-// auto findCommandInterface(const std::vector<hardware_interface::LoanedCommandInterface>& command_interfaces, const
-// std::string& name)
-// {
-//   auto interface_it = std::find_if(command_interfaces.cbegin(), command_interfaces.cend(), [&name](const
-//   hardware_interface::LoanedCommandInterface& interface){ return interface.get_interface_name() == name; }); if
-//   (interface_it == command_interfaces.cend())
-//   {
-//     return std::nullopt;
-//   }
-//   return interface_it;
-// }
-}
 
 namespace epick_controllers
 {
-enum CommandInterfaces : size_t
-{
-  REGULATE_GRIPPER_CMD = 0
-};
-
-enum StateInterfaces : size_t
-{
-  OBJECT_DETECTION_STATUS = 0
-};
-
 constexpr auto kRegulateCommandInterface = "gripper/regulate";
 constexpr auto kIsRegulatingStateInterface = "gripper/regulate";
-constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
 
-constexpr auto kRegulateService = "/regulate";
-constexpr auto kObjectDetectionStatusTopic = "/object_detection_status";
+constexpr auto kActionName = "~/gripper_cmd";
+
+constexpr auto kCheckGoalHandlePeriod = std::chrono::milliseconds{ 100 };
 
 controller_interface::InterfaceConfiguration EpickGripperActionController::command_interface_configuration() const
 {
@@ -92,8 +69,6 @@ controller_interface::return_type EpickGripperActionController::update([[maybe_u
 
   const double current_command = commands_rt_.regulate;
   const double current_state = is_regulating_state_interface_->get().get_value();
-
-  RCLCPP_INFO(get_node()->get_logger(), "command: %f; state: %f", current_command, current_state);
 
   check_for_success(current_state, current_command);
 
@@ -135,7 +110,7 @@ EpickGripperActionController::on_activate([[maybe_unused]] const rclcpp_lifecycl
   pre_alloc_result_->stalled = false;
 
   action_server_ = rclcpp_action::create_server<GripperCommandAction>(
-      get_node(), "~/gripper_cmd",
+      get_node(), kActionName,
       [this](const rclcpp_action::GoalUUID& uuid, std::shared_ptr<const GripperCommandAction::Goal> goal) {
         return goal_callback(uuid, goal);
       },
@@ -205,12 +180,10 @@ void EpickGripperActionController::accepted_callback(std::shared_ptr<GoalHandle>
   rt_goal->execute();
   rt_active_goal_.writeFromNonRT(rt_goal);
 
-  // Set smartpointer to expire for create_wall_timer to delete previous entry from timer list
+  // Replace previous timer with new one to handle the new action goal
   goal_handle_timer_.reset();
-
-  // Setup goal status checking timer
-  goal_handle_timer_ = get_node()->create_wall_timer(std::chrono::duration<double>{ 1.0 },
-                                                     std::bind(&RealtimeGoalHandle::runNonRealtime, rt_goal));
+  goal_handle_timer_ =
+      get_node()->create_wall_timer(kCheckGoalHandlePeriod, std::bind(&RealtimeGoalHandle::runNonRealtime, rt_goal));
 }
 
 void EpickGripperActionController::preempt_active_goal()
@@ -237,17 +210,13 @@ void EpickGripperActionController::check_for_success(const double current_regula
   const auto active_goal = *rt_active_goal_.readFromNonRT();
   if (!active_goal)
   {
-    // RCLCPP_INFO(get_node()->get_logger(), "has no active action goal");
     return;
   }
-
-  // RCLCPP_INFO(get_node()->get_logger(), "command: %f; state: %f", current_regulate_command, current_regulate_state);
 
   if (std::abs(current_regulate_command - current_regulate_state) < std::numeric_limits<double>::epsilon())
   {
     RCLCPP_INFO(get_node()->get_logger(), "success!");
 
-    // success
     pre_alloc_result_->position = current_regulate_state;
     pre_alloc_result_->reached_goal = true;
     pre_alloc_result_->stalled = false;
@@ -256,7 +225,6 @@ void EpickGripperActionController::check_for_success(const double current_regula
     rt_active_goal_.writeFromNonRT(std::shared_ptr<RealtimeGoalHandle>());
   }
 }
-
 }  // namespace epick_controllers
 
 #include "pluginlib/class_list_macros.hpp"
