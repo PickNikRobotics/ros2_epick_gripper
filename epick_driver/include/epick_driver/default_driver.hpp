@@ -69,6 +69,14 @@ public:
   void release() override;
 
 private:
+  /**
+   * Whith this command we send a request and wait for a response of given size.
+   * Behind the scene, if the response is not received, the software makes an attempt
+   * to resend the command up to 5 times before returning an empty response.
+   * @param request The command request.
+   * @param response_size The response expected size.
+   * @return The response or an empty vector if an en error occured.
+   */
   std::vector<uint8_t> send(const std::vector<uint8_t>& request, size_t response_size) const;
 
   std::unique_ptr<Serial> serial_ = nullptr;
