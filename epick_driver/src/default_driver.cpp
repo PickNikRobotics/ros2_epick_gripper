@@ -245,15 +245,6 @@ void DefaultDriver::release()
     RCLCPP_ERROR(kLogger, "Failed to release: %s", e.what());
     throw;
   }
-
-  // NOTE: messy workaround!
-  // Wait a short duration for the object to fall away from the gripper
-  std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
-
-  // After releaasing in automatic mode, the gripper needs to be deactivated and then reactivated.
-  deactivate();
-  std::this_thread::sleep_for(std::chrono::milliseconds{ 10 });
-  activate();
 }
 
 void DefaultDriver::set_slave_address(const uint8_t slave_address)
