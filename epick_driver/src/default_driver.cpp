@@ -31,6 +31,7 @@
 #include <epick_driver/crc_utils.hpp>
 #include <epick_driver/data_utils.hpp>
 #include <epick_driver/default_driver_utils.hpp>
+#include <epick_driver/driver_exception.hpp>
 
 #include <serial/serial.h>
 
@@ -176,8 +177,7 @@ void DefaultDriver::activate()
   auto response = send(request, kActivateResponseSize);
   if (response.empty())
   {
-    RCLCPP_ERROR(kLogger, "Failed to activate the gripper.");
-    throw;
+    throw DriverException{ "Failed to activate the gripper." };
   }
 }
 
@@ -205,8 +205,7 @@ void DefaultDriver::deactivate()
   auto response = send(request, kDectivateResponseSize);
   if (response.empty())
   {
-    RCLCPP_ERROR(kLogger, "Failed to deactivate the gripper.");
-    throw;
+    throw DriverException{ "Failed to deactivate the gripper." };
   }
 }
 
@@ -232,8 +231,7 @@ void DefaultDriver::grip()
   auto response = send(request, kGripResponseSize);
   if (response.empty())
   {
-    RCLCPP_ERROR(kLogger, "Failed to grip.");
-    throw;
+    throw DriverException{ "Failed to grip." };
   }
 }
 
@@ -259,8 +257,7 @@ void DefaultDriver::release()
   auto response = send(request, kReleaseResponseSize);
   if (response.empty())
   {
-    RCLCPP_ERROR(kLogger, "Failed to release.");
-    throw;
+    throw DriverException{ "Failed to release." };
   }
 }
 
@@ -312,8 +309,7 @@ GripperStatus DefaultDriver::get_status()
   auto response = send(request, kGetStatusResponseSize);
   if (response.empty())
   {
-    RCLCPP_ERROR(kLogger, "Failed to read the status.");
-    throw;
+    throw DriverException{ "Failed to read the status." };
   }
 
   // The content of the requested registers starts from byte 3.

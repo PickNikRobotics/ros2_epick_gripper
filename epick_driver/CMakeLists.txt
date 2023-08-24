@@ -40,6 +40,7 @@ add_library(
     include/epick_driver/default_serial.hpp
     include/epick_driver/default_serial_factory.hpp
     include/epick_driver/driver.hpp
+    include/epick_driver/driver_exception.hpp
     include/epick_driver/driver_factory.hpp
     include/epick_driver/epick_gripper_hardware_interface.hpp
     include/epick_driver/hardware_interface_utils.hpp

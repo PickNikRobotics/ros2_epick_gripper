@@ -200,7 +200,7 @@ EpickGripperHardwareInterface::on_activate([[maybe_unused]] const rclcpp_lifecyc
     communication_thread_is_running_.store(true);
     communication_thread_ = std::thread([this] { this->background_task(); });
   }
-  catch (const serial::IOException& e)
+  catch (const std::exception& e)
   {
     RCLCPP_FATAL(kLogger, "Failed to activate the Robotiq EPick gripper: %s", e.what());
     return CallbackReturn::ERROR;
@@ -307,7 +307,7 @@ void EpickGripperHardwareInterface::background_task()
       }
       // If neither of the above conditions are true, then send no command.
     }
-    catch (serial::IOException& e)
+    catch (std::exception& e)
     {
       RCLCPP_ERROR(kLogger, "Error: %s", e.what());
     }

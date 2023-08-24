@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
       try
       {
         counter++;
-        auto status = driver->get_status();
+        driver->get_status();
       }
       catch (serial::IOException& e)
       {
