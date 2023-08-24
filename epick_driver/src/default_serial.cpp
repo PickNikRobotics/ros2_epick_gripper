@@ -67,7 +67,7 @@ std::vector<uint8_t> DefaultSerial::read(size_t size)
 void DefaultSerial::write(const std::vector<uint8_t>& data)
 {
   std::size_t num_bytes_written = serial_->write(data);
-  serial_->flushOutput();
+  serial_->flush();
   if (num_bytes_written != data.size())
   {
     const auto error_msg =

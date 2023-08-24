@@ -293,15 +293,29 @@ GripperStatus DefaultDriver::get_status()
   request.push_back(data_utils::get_msb(crc));
   request.push_back(data_utils::get_lsb(crc));
 
-  std::vector<uint8_t> response(kGetStatusResponseSize);
-  try
+  std::vector<uint8_t> response;
+  response.reserve(kGetStatusResponseSize);
+
+  const int MAX_RETRIES = 5;
+  int retry_count = 0;
+
+  while (retry_count < MAX_RETRIES)
   {
-    serial_->write(request);
-    response = serial_->read(kGetStatusResponseSize);
+    try
+    {
+      serial_->write(request);
+      response = serial_->read(kGetStatusResponseSize);
+    }
+    catch (const serial::IOException& e)
+    {
+      RCLCPP_ERROR(kLogger, "Attempt %d: Failed to read the gripper status: %s", retry_count + 1, e.what());
+      retry_count++;
+    }
   }
-  catch (const serial::IOException& e)
+
+  if (retry_count == MAX_RETRIES)
   {
-    RCLCPP_ERROR(kLogger, "Failed to read the gripper status: %s", e.what());
+    RCLCPP_ERROR(kLogger, "Reached maximum retries. Operation failed.");
     throw;
   }
 
