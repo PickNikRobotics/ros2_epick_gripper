@@ -69,8 +69,8 @@ TEST(TestDefaultDriverFactory, create_with_default_parameters)
 
   EXPECT_CALL(*driver, set_slave_address(0x9));
   EXPECT_CALL(*driver, set_mode(GripperMode::AutomaticMode));
-  EXPECT_CALL(*driver, set_max_vacuum_pressure(-100));
-  EXPECT_CALL(*driver, set_min_vacuum_pressure(-10));
+  EXPECT_CALL(*driver, set_grip_max_vacuum_pressure(-100));
+  EXPECT_CALL(*driver, set_grip_min_vacuum_pressure(-10));
   EXPECT_CALL(*driver, set_gripper_timeout(std::chrono::milliseconds(500)));
   EXPECT_CALL(*driver, connect()).Times(0);
   EXPECT_CALL(*driver, disconnect()).Times(0);
@@ -104,8 +104,8 @@ TEST(TestDefaultDriverFactory, create_with_given_parameters)
 
   EXPECT_CALL(*driver, set_slave_address(0x1));
   EXPECT_CALL(*driver, set_mode(GripperMode::AdvancedMode));
-  EXPECT_CALL(*driver, set_max_vacuum_pressure(-50));
-  EXPECT_CALL(*driver, set_min_vacuum_pressure(-10));
+  EXPECT_CALL(*driver, set_grip_max_vacuum_pressure(-50));
+  EXPECT_CALL(*driver, set_grip_min_vacuum_pressure(-10));
   EXPECT_CALL(*driver, set_gripper_timeout(std::chrono::milliseconds(200)));
   EXPECT_CALL(*driver, connect()).Times(0);
   EXPECT_CALL(*driver, disconnect()).Times(0);

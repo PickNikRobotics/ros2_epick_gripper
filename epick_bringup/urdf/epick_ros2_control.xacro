@@ -14,8 +14,9 @@
         <!-- Gripper parameters. -->
         <param name="slave_address">0x9</param>
         <param name="mode">AutomaticMode</param>
-        <param name="max_vacuum_pressure">-100</param>
-        <param name="min_vacuum_pressure">-10</param>
+        <param name="grip_max_vacuum_pressure">-100</param>
+        <param name="grip_min_vacuum_pressure">-10</param>
+        <param name="release_vacuum_pressure">50</param>
         <param name="gripper_timeout">25000</param>
 
         <!-- Set use_dummy to true to connect to a dummy driver. -->

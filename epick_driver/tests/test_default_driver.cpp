@@ -82,8 +82,8 @@ TEST(TestDefaultDriver, activate)
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
   driver->set_slave_address(slave_address);
   driver->set_mode(GripperMode::AdvancedMode);
-  driver->set_max_vacuum_pressure(-100.0);  // -100kPa relative to atmospheric pressure.
-  driver->set_min_vacuum_pressure(-10.0);   // -10kPa relative to atmospheric pressure.
+  driver->set_grip_max_vacuum_pressure(-100.0);  // -100kPa relative to atmospheric pressure.
+  driver->set_grip_min_vacuum_pressure(-10.0);   // -10kPa relative to atmospheric pressure.
   driver->set_gripper_timeout(std::chrono::milliseconds(500));
 
   driver->activate();

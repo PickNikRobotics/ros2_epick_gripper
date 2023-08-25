@@ -49,11 +49,14 @@ constexpr uint8_t kSlaveAddressParamDefault = 0x9;
 constexpr auto kModeParamName = "mode";
 constexpr auto kModeParamDefault = GripperMode::AutomaticMode;
 
-constexpr auto kMaxVacuumPressureParamName = "max_vacuum_pressure";
-constexpr auto kMaxVacuumPressureParamDefault = -100.0;  // kPA
+constexpr auto kGripMaxVacuumPressureParamName = "grip_max_vacuum_pressure";
+constexpr auto kGripMaxVacuumPressureParamDefault = -100.0;  // kPA
 
-constexpr auto kMinVacuumPressureParamName = "min_vacuum_pressure";
-constexpr auto kMinVacuumPressureParamDefault = -10.0;  // kPA
+constexpr auto kGripMinVacuumPressureParamName = "grip_min_vacuum_pressure";
+constexpr auto kGripMinVacuumPressureParamDefault = -10.0;  // kPA
+
+constexpr auto kReleaseVacuumPressureParamName = "release_vacuum_pressure";
+constexpr auto kReleaseVacuumPressureParamDefault = 50.0;  // kPA
 
 constexpr auto kGripperTimeoutParamName = "gripper_timeout";
 constexpr auto kGripperTimeoutParamDefault = 500;  // ms
@@ -81,17 +84,23 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
                          kModeParamDefault;
   RCLCPP_INFO(kLogger, "mode: %s", default_driver_utils::gripper_mode_to_string(mode).c_str());
 
-  RCLCPP_INFO(kLogger, "Reading max vacuum pressure...");
-  double max_vacuum_pressure = info.hardware_parameters.count(kMaxVacuumPressureParamName) ?
-                                   std::stod(info.hardware_parameters.at(kMaxVacuumPressureParamName)) :
-                                   kMaxVacuumPressureParamDefault;
-  RCLCPP_INFO(kLogger, "%s: %fkPa", kMaxVacuumPressureParamName, max_vacuum_pressure);
+  RCLCPP_INFO(kLogger, "Reading grip max vacuum pressure...");
+  double grip_max_vacuum_pressure = info.hardware_parameters.count(kGripMaxVacuumPressureParamName) ?
+                                        std::stod(info.hardware_parameters.at(kGripMaxVacuumPressureParamName)) :
+                                        kGripMaxVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kGripMaxVacuumPressureParamName, grip_max_vacuum_pressure);
 
-  RCLCPP_INFO(kLogger, "Reading min vacuum pressure...");
-  double min_vacuum_pressure = info.hardware_parameters.count(kMinVacuumPressureParamName) ?
-                                   std::stod(info.hardware_parameters.at(kMinVacuumPressureParamName)) :
-                                   kMinVacuumPressureParamDefault;
-  RCLCPP_INFO(kLogger, "%s: %fkPa", kMinVacuumPressureParamName, min_vacuum_pressure);
+  RCLCPP_INFO(kLogger, "Reading grip min vacuum pressure...");
+  double grip_min_vacuum_pressure = info.hardware_parameters.count(kGripMinVacuumPressureParamName) ?
+                                        std::stod(info.hardware_parameters.at(kGripMinVacuumPressureParamName)) :
+                                        kGripMinVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kGripMinVacuumPressureParamName, grip_min_vacuum_pressure);
+
+  RCLCPP_INFO(kLogger, "Reading release vacuum pressure...");
+  double release_vacuum_pressure = info.hardware_parameters.count(kReleaseVacuumPressureParamName) ?
+                                       std::stod(info.hardware_parameters.at(kReleaseVacuumPressureParamName)) :
+                                       kReleaseVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kReleaseVacuumPressureParamName, release_vacuum_pressure);
 
   RCLCPP_INFO(kLogger, "Reading gripper timeout...");
   std::chrono::milliseconds gripper_timeout =
@@ -103,8 +112,9 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   auto driver = create_driver(info);
   driver->set_slave_address(slave_address);
   driver->set_mode(mode);
-  driver->set_max_vacuum_pressure(max_vacuum_pressure);
-  driver->set_min_vacuum_pressure(min_vacuum_pressure);
+  driver->set_grip_max_vacuum_pressure(grip_max_vacuum_pressure);
+  driver->set_grip_min_vacuum_pressure(grip_min_vacuum_pressure);
+  driver->set_release_vacuum_pressure(release_vacuum_pressure);
   driver->set_gripper_timeout(gripper_timeout);
 
   return driver;

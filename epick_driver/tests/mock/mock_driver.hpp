@@ -41,8 +41,9 @@ class MockDriver : public epick_driver::Driver
 public:
   MOCK_METHOD(void, set_slave_address, (const uint8_t slave_address), (override));
   MOCK_METHOD(void, set_mode, (const GripperMode mode), (override));
-  MOCK_METHOD(void, set_max_vacuum_pressure, (const float vacuum_pressure), (override));
-  MOCK_METHOD(void, set_min_vacuum_pressure, (const float vacuum_pressure), (override));
+  MOCK_METHOD(void, set_grip_max_vacuum_pressure, (const float vacuum_pressure), (override));
+  MOCK_METHOD(void, set_grip_min_vacuum_pressure, (const float vacuum_pressure), (override));
+  MOCK_METHOD(void, set_release_vacuum_pressure, (const float vacuum_pressure), (override));
   MOCK_METHOD(void, set_gripper_timeout, (const std::chrono::milliseconds gripper_timeout), (override));
   MOCK_METHOD(bool, connect, (), (override));
   MOCK_METHOD(void, disconnect, (), (override));
