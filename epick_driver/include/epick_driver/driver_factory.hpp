@@ -36,6 +36,15 @@
 
 namespace epick_driver
 {
+/**
+ * The hardware interface internally uses a factory to create and configure a
+ * driver to interact with the Epick Gripper.
+ * A factory is used to keep the code cleaner but also to simplify testing.
+ * With a factory, we can test that the parameters read by the hardware
+ * interface are correctly parsed and passed down to the driver.
+ * A factory can also be mocked to return different implementation of the
+ * Driver (or mocks) that do not require interaction with the real hardware.
+ */
 class DriverFactory
 {
 public:

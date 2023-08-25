@@ -34,7 +34,7 @@
 #include <vector>
 
 /**
- * Utility class to convert standard types into sequence of bytes and back.
+ * Utility class to convert between commonly used data types.
  */
 namespace epick_driver::data_utils
 {
@@ -57,7 +57,7 @@ std::string to_hex(const std::vector<uint16_t>& bytes);
  * @param byte The byte to decode.
  * @return The binary representation of the given byte.
  */
-std::string uint8_to_binary_string(const uint8_t byte);
+std::string to_binary_string(const uint8_t byte);
 
 /**
  * Get the Most Significant Byte (MSB) of the given value.

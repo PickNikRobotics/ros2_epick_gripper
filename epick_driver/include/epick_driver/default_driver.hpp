@@ -37,6 +37,9 @@
 
 namespace epick_driver
 {
+/**
+ * This is the default implementation of the Driver to control the Epick Gripper.
+ */
 class DefaultDriver : public Driver
 {
 public:

@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <epick_driver/data_utils.hpp>
+
 #include <array>
 #include <string>
 #include <vector>
@@ -74,7 +76,7 @@ std::string to_hex(const std::vector<uint16_t>& bytes)
   return hex;
 }
 
-std::string uint8_to_binary_string(const uint8_t byte)
+std::string to_binary_string(const uint8_t byte)
 {
   std::string result = "0x";
   for (int i = 7; i >= 0; --i)

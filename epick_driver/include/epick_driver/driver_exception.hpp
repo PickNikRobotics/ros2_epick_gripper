@@ -35,6 +35,9 @@
 
 namespace epick_driver
 {
+/**
+ * This is a custom exception thrown by the Driver.
+ */
 class DriverException : public std::exception
 {
   std::string what_;

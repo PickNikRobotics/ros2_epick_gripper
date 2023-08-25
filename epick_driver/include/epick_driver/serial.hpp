@@ -34,6 +34,13 @@
 
 namespace epick_driver
 {
+/**
+ * The driver talks to the hardware through an implementation of the
+ * serial interface.
+ * We can mock the serial connection to check that a high level command
+ * (e.g activate) is converted into the correct sequence of bytes
+ * including CRC.
+ */
 class Serial
 {
 public:

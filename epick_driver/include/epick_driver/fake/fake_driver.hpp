@@ -30,6 +30,17 @@
 
 namespace epick_driver
 {
+/**
+ * This is a fake driver that can be used for testing interactions with the
+ * hardware interface or the controller without being connected to the real
+ * hardware. At the moment the fake driver is very basic but it can be
+ * improved to behave as close as possible to the real hardware.
+ * To use this driver you have to enable the following parameter in your
+ * hardware interface configuration in the robot URDF.
+ *
+ * <!-- Set use_dummy to true to connect to a dummy driver. -->
+ * <param name="use_dummy">true</param>
+ */
 class FakeDriver : public Driver
 {
 public:
