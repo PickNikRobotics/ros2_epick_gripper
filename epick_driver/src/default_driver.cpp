@@ -225,13 +225,13 @@ void DefaultDriver::grip()
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
-    0x00,              // Number of registers to write MSB.
-    0x02,              // Number of registers to write LSB.
-    0x04,              // Number of bytes to write.
-    0x00,              // Action register.
-    0x00,              // Reserved.
-    0x00,              // Reserved.
-    absolute_pressure  // Grip max absolute pressure.
+    0x00,                     // Number of registers to write MSB.
+    0x02,                     // Number of registers to write LSB.
+    0x04,                     // Number of bytes to write.
+    action_request_register,  // Action register.
+    0x00,                     // Reserved.
+    0x00,                     // Reserved.
+    absolute_pressure         // Grip max absolute pressure.
   };
 
   auto crc = crc_utils::compute_crc(request);
@@ -262,13 +262,13 @@ void DefaultDriver::release()
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
-    0x00,              // Number of registers to write MSB.
-    0x02,              // Number of registers to write LSB.
-    0x04,              // Number of bytes to write.
-    0x00,              // Action register.
-    0x00,              // Reserved.
-    0x00,              // Reserved.
-    absolute_pressure  // Grip max absolute pressure.
+    0x00,                     // Number of registers to write MSB.
+    0x02,                     // Number of registers to write LSB.
+    0x04,                     // Number of bytes to write.
+    action_request_register,  // Action register.
+    0x00,                     // Reserved.
+    0x00,                     // Reserved.
+    absolute_pressure         // Grip max absolute pressure.
   };
 
   auto crc = crc_utils::compute_crc(request);
