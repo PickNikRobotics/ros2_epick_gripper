@@ -117,7 +117,7 @@ struct GripperStatus
 
 /**
  * This is the interface of the driver to control the Epick Gripper.
- * The Driver interface can be asily mock for testing or implemented to
+ * The Driver interface can be easily mocked for testing or implemented to
  * fake the behavior of the real hardware.
  */
 class Driver

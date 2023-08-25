@@ -35,7 +35,7 @@
 namespace epick_driver
 {
 /**
- * The driver interact with the hardware using an implementation of the
+ * The driver talks to the hardware through an implementation of the
  * serial interface.
  * We can mock the serial connection to check that a high level command
  * (e.g activate) is converted into the correct sequence of bytes
