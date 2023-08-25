@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
 
     std::cout << "Checking if the gripper is connected..." << std::endl;
 
-    bool connected = driver->connect();
+    const bool connected = driver->connect();
     if (!connected)
     {
       std::cout << "The gripper is not connected" << std::endl;
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     std::cout << "The gripper is connected." << std::endl;
     std::cout << "Reading the gripper status..." << std::endl;
 
-    epick_driver::GripperStatus status = driver->get_status();
+    const auto status = driver->get_status();
 
     std::cout << "Status retrieved:" << std::endl;
 

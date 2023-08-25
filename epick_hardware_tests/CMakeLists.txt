@@ -76,4 +76,14 @@ target_include_directories(release
 target_link_libraries(release epick_driver::epick_driver)
 ament_target_dependencies(release epick_driver)
 
+add_executable(break
+    src/break.cpp
+    src/command_line_utility.hpp
+    src/command_line_utility.cpp
+)
+target_include_directories(break
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(break epick_driver::epick_driver)
+ament_target_dependencies(break epick_driver)
+
 ament_package()

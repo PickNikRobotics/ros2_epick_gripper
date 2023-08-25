@@ -49,7 +49,8 @@ TEST(TestDefaultDriver, activate)
   uint8_t slave_address = 0x09;
 
   // clang-format off
-  const std::vector<uint8_t> expected_command{
+
+  const std::vector<uint8_t> expected_request{
     slave_address,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     0x03, 0xE8, // Address of the first requested register - MSB, LSB.
@@ -63,12 +64,20 @@ TEST(TestDefaultDriver, activate)
     0x5A,       // Min absolute pressure
     0xE6, 0x58  // CRC-16 - MSB, LSB.
   };
-  // clang-format on
 
-  std::vector<uint8_t> actual_command;
+  const std::vector<uint8_t> expected_response {
+    slave_address,
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
+    0x03, 0xE8, // Address of the first requested register - MSB, LSB.
+    0x00, 0x03, // Number of registers requested - MSB, LSB.
+    0x01, 0x30  // CRC-16 - MSB, LSB.
+  };
+
+  std::vector<uint8_t> actual_request;
+  std::vector<uint8_t> actual_response;
   auto serial = std::make_unique<MockSerial>();
-  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
-  EXPECT_CALL(*serial, read(_)).Times(1);
+  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_request));
+  EXPECT_CALL(*serial, read(_)).WillOnce(Return(expected_response));
 
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
   driver->set_slave_address(slave_address);
@@ -79,7 +88,7 @@ TEST(TestDefaultDriver, activate)
 
   driver->activate();
 
-  ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
+  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 /**
@@ -90,7 +99,7 @@ TEST(TestDefaultDriver, deactivate)
   const uint8_t slave_address = 0x09;
 
   // clang-format off
-  const std::vector<uint8_t> expected_command{
+  const std::vector<uint8_t> expected_request{
     slave_address,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     0x03, 0xE8, // Address of the first requested register - MSB, LSB.
@@ -104,17 +113,26 @@ TEST(TestDefaultDriver, deactivate)
     0x00,       // Min absolute pressure
     0x73, 0x30  // CRC-16 - MSB, LSB.
   };
+
+  const std::vector<uint8_t> expected_response {
+    slave_address,
+    static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
+    0x03, 0xE8, // Address of the first requested register - MSB, LSB.
+    0x00, 0x03, // Number of registers requested - MSB, LSB.
+    0x01, 0x30  // CRC-16 - MSB, LSB.
+  };
   // clang-format on
 
-  std::vector<uint8_t> actual_command;
+  std::vector<uint8_t> actual_request;
   auto serial = std::make_unique<MockSerial>();
-  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_command));
+  EXPECT_CALL(*serial, write(_)).WillOnce(SaveArg<0>(&actual_request));
+  EXPECT_CALL(*serial, read(_)).WillOnce(Return(expected_response));
 
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
   driver->set_slave_address(0x9);
   driver->deactivate();
 
-  ASSERT_THAT(data_utils::to_hex(actual_command), data_utils::to_hex(expected_command));
+  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 }  // namespace epick_driver::test
