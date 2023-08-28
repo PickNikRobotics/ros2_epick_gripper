@@ -259,17 +259,17 @@ void DefaultDriver::grip()
 void DefaultDriver::release()
 {
   RCLCPP_INFO(kLogger, "Releasing...");
-  RCLCPP_INFO(kLogger, " - release_vacuum_pressure_: %fkPa", release_vacuum_pressure_);
+  RCLCPP_INFO(kLogger, " - release_vacuum_pressure: %fkPa", release_vacuum_pressure_);
 
   const uint8_t release_absolute_pressure_ =
       static_cast<uint8_t>(std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
   const uint8_t grip_min_absolute_pressure =
       static_cast<uint8_t>(std::clamp(std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
 
-  std::chrono::milliseconds clamped_grip_timeout =
-      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+  std::chrono::milliseconds clamped_release_timeout =
+      std::clamp(release_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
   auto timeout_in_hundredths = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_release_timeout).count());
 
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
