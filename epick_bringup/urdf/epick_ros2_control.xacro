@@ -26,8 +26,8 @@
       </hardware>
 
       <gpio name="gripper">
-        <command_interface name="regulate"/>
-        <state_interface name="regulate"/>
+        <command_interface name="grip_cmd"/>
+        <state_interface name="grip_cmd"/>
         <state_interface name="object_detection_status"/>
       </gpio>
 

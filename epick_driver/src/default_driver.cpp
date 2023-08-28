@@ -151,7 +151,8 @@ void DefaultDriver::activate()
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
-  default_driver_utils::set_gripper_regulate_action(action_request_register, GripperRegulateAction::StopVacuumGenerator);
+  default_driver_utils::set_gripper_regulate_action(action_request_register,
+                                                    GripperRegulateAction::FollowRequestedVacuumParameters);
 
   std::vector<uint8_t> request = {
     slave_address_,

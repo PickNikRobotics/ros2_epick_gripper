@@ -46,8 +46,10 @@ namespace epick_driver
 const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
 constexpr auto kGripperGPIO = "gripper";
-constexpr auto kRegulateCommandInterface = "regulate";
-constexpr auto kRegulateStateInterface = "regulate";
+
+constexpr auto kGripCommandInterface = "grip_cmd";
+
+constexpr auto kGripStateInterface = "grip_cmd";
 constexpr auto kObjectDetectionStateInterface = "object_detection_status";
 
 constexpr auto kGripperCommsLoopPeriod = std::chrono::milliseconds{ 10 };
@@ -144,14 +146,14 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
     {
       RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kObjectDetectionStateInterface);
     }
-    if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kRegulateStateInterface, info_).has_value())
+    if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kGripStateInterface, info_).has_value())
     {
-      state_interfaces.emplace_back(hardware_interface::StateInterface(kGripperGPIO, kRegulateStateInterface,
-                                                                       &gripper_status_.gripper_regulate_action));
+      state_interfaces.emplace_back(
+          hardware_interface::StateInterface(kGripperGPIO, kGripStateInterface, &gripper_status_.grip_cmd));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kRegulateStateInterface);
+      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kGripStateInterface);
     }
   }
   catch (const std::exception& ex)
@@ -169,14 +171,14 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    if (hardware_interface_utils::get_gpios_command_interface(kGripperGPIO, kRegulateCommandInterface, info_).has_value())
+    if (hardware_interface_utils::get_gpios_command_interface(kGripperGPIO, kGripCommandInterface, info_).has_value())
     {
-      command_interfaces.emplace_back(hardware_interface::CommandInterface(kGripperGPIO, kRegulateCommandInterface,
-                                                                           &gripper_cmds_.gripper_regulate_action));
+      command_interfaces.emplace_back(
+          hardware_interface::CommandInterface(kGripperGPIO, kGripCommandInterface, &gripper_cmds_.grip_cmd));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "Command interface %s/%s not found.", kGripperGPIO, kRegulateCommandInterface);
+      RCLCPP_ERROR(kLogger, "Command interface %s/%s not found.", kGripperGPIO, kGripCommandInterface);
     }
   }
   catch (const std::exception& ex)
@@ -237,7 +239,7 @@ hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unus
 {
   try
   {
-    gripper_status_.gripper_regulate_action = safe_gripper_status_.gripper_regulate_action.load();
+    gripper_status_.grip_cmd = safe_gripper_status_.grip_cmd.load();
     gripper_status_.object_detection_status = safe_gripper_status_.object_detection_status.load();
   }
   catch (const std::exception& ex)
@@ -254,7 +256,7 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
 {
   try
   {
-    safe_gripper_cmd_.gripper_regulate_action.store(gripper_cmds_.gripper_regulate_action);
+    safe_gripper_cmd_.grip_cmd.store(gripper_cmds_.grip_cmd);
   }
   catch (const std::exception& ex)
   {
@@ -276,34 +278,31 @@ void EpickGripperHardwareInterface::background_task()
       const auto status = driver_->get_status();
       safe_gripper_status_.object_detection_status.store(
           default_driver_utils::object_detection_to_double(status.object_detection_status));
-      safe_gripper_status_.gripper_regulate_action.store(
+      safe_gripper_status_.grip_cmd.store(
           default_driver_utils::regulate_action_to_double(status.gripper_regulate_action));
 
       // Given the command input and the current state of the gripper, decide what action to send.
-      const auto regulate_action =
-          default_driver_utils::double_to_regulate_action(safe_gripper_cmd_.gripper_regulate_action.load());
+      const auto grip_cmd = safe_gripper_cmd_.grip_cmd.load();
 
       // If the gripper's vacuum generator is not running and the command is to start regulating vacuum,
       // tell the gripper to begin grasping.
-      if (status.gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator &&
-          regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters)
+      if (status.actuator_status != ActuatorStatus::Gripping && grip_cmd >= 0.5)
       {
         driver_->grip();
       }
       // If the vacuum generator is running and the command is to stop regulating vacuum,
       // tell the gripper to release any currently-held object and turn off the vacuum generator.
-      else if (status.gripper_regulate_action == GripperRegulateAction::FollowRequestedVacuumParameters &&
-               regulate_action == GripperRegulateAction::StopVacuumGenerator)
+      else if (status.actuator_status == ActuatorStatus::Gripping && grip_cmd < 0.5)
       {
         driver_->release();
 
         // NOTE: messy workaround!
         // After releasing the object, wait a short duration for the object to fall away from the gripper.
-        std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
+        //        std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
 
-        // The gripper then needs to be deactivated and then reactivated to reset for another grasp.
-        driver_->deactivate();
-        driver_->activate();
+        //        // The gripper then needs to be deactivated and then reactivated to reset for another grasp.
+        //        driver_->deactivate();
+        //        driver_->activate();
       }
       // If neither of the above conditions are true, then send no command.
     }

@@ -48,10 +48,11 @@ enum StateInterfaces : size_t
 };
 }
 
-constexpr auto kRegulateCommandInterface = "gripper/regulate";
+constexpr auto kGripCommandInterface = "gripper/grip_cmd";
+constexpr auto kGripStateInterface = "gripper/grip_cmd";
 constexpr auto kObjectDetectionStateInterface = "gripper/object_detection_status";
 
-constexpr auto kRegulateService = "/regulate";
+constexpr auto kGripService = "/grip_cmd";
 constexpr auto kObjectDetectionStatusTopic = "/object_detection_status";
 
 // If we use a service to set a double variable in a command interface, we want to wait until the same variable appears
@@ -67,7 +68,7 @@ controller_interface::InterfaceConfiguration EpickController::command_interface_
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back(kRegulateCommandInterface);
+  config.names.emplace_back(kGripCommandInterface);
   return config;
 }
 
@@ -75,7 +76,7 @@ controller_interface::InterfaceConfiguration EpickController::state_interface_co
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back(kRegulateCommandInterface);
+  config.names.emplace_back(kGripStateInterface);
   config.names.emplace_back(kObjectDetectionStateInterface);
   return config;
 }
@@ -127,10 +128,8 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
   {
     // Create a service to regulate the gripper.
     regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
-        kRegulateService,
-        [this](std_srvs::srv::SetBool::Request::SharedPtr req, std_srvs::srv::SetBool::Response::SharedPtr resp) {
-          this->regulate_gripper(req, resp);
-        });
+        kGripService, [this](std_srvs::srv::SetBool::Request::SharedPtr req,
+                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
     object_detection_status_pub_ =
         get_node()->create_publisher<epick_msgs::msg::ObjectDetectionStatus>(kObjectDetectionStatusTopic, 10);
   }

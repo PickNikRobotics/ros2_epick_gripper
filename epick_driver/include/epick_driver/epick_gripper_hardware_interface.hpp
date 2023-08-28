@@ -52,27 +52,27 @@ namespace epick_driver
 // We use this structure to hold our state interface values.
 struct State
 {
-  double gripper_regulate_action;
+  double grip_cmd;
   double object_detection_status;
 };
 
 // We use this structure to hold a thread-safe copy of our state interface values.
 struct SafeState
 {
-  std::atomic<double> gripper_regulate_action;
+  std::atomic<double> grip_cmd;
   std::atomic<double> object_detection_status;
 };
 
 // We use this structure to hold our command interface values.
 struct Command
 {
-  double gripper_regulate_action;
+  double grip_cmd;
 };
 
 // We use this structure to hold a thread-safe copy of our command interface values.
 struct SafeCommand
 {
-  std::atomic<double> gripper_regulate_action;
+  std::atomic<double> grip_cmd;
 };
 
 class EpickGripperHardwareInterface : public hardware_interface::SystemInterface
