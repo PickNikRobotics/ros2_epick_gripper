@@ -92,6 +92,14 @@ constexpr size_t kGripResponseSize = 8;
 constexpr size_t kReleaseResponseSize = 8;
 constexpr size_t kGetStatusResponseSize = 11;
 
+// Min and max timeout.
+constexpr auto kMinTimeout = 0;      // ms
+constexpr auto kMaxTimeout = 25500;  // ms
+
+// Min and max absolute pressure.
+constexpr auto kMinAbsolutePressure = 0.0f;    // kPa
+constexpr auto kMaxAbsolutePressure = 255.0f;  // kPa
+
 DefaultDriver::DefaultDriver(std::unique_ptr<Serial> serial) : serial_{ std::move(serial) }
 {
 }
@@ -144,7 +152,7 @@ void DefaultDriver::activate()
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
 
   std::chrono::milliseconds clamped_grip_timeout =
-      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(kMaxTimeout));
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
 
@@ -214,13 +222,13 @@ void DefaultDriver::grip()
   RCLCPP_INFO(kLogger, " - grip_max_vacuum_pressure: %fkPa", grip_max_vacuum_pressure_);
   RCLCPP_INFO(kLogger, " - grip_min_vacuum_pressure: %fkPa", grip_min_vacuum_pressure_);
 
-  const uint8_t grip_max_absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
-  const uint8_t grip_min_absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+  const uint8_t grip_max_absolute_pressure = static_cast<uint8_t>(std::clamp(
+      std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
+  const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
+      std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
 
   std::chrono::milliseconds clamped_grip_timeout =
-      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+      std::clamp(grip_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout));
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
 
@@ -261,13 +269,15 @@ void DefaultDriver::release()
   RCLCPP_INFO(kLogger, "Releasing...");
   RCLCPP_INFO(kLogger, " - release_vacuum_pressure: %fkPa", release_vacuum_pressure_);
 
-  const uint8_t release_absolute_pressure_ =
-      static_cast<uint8_t>(std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
-  const uint8_t grip_min_absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+  const uint8_t release_absolute_pressure = static_cast<uint8_t>(std::clamp(
+      std::round(release_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
+  const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
+      std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
+
+  RCLCPP_INFO(kLogger, " - release_absolute_vacuum_pressure: %hhukPa", release_absolute_pressure);
 
   std::chrono::milliseconds clamped_release_timeout =
-      std::clamp(release_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+      std::clamp(release_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout));
   auto timeout_in_hundredths = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_release_timeout).count());
 
@@ -282,15 +292,15 @@ void DefaultDriver::release()
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
-    0x00,                        // Number of registers to write MSB.
-    0x03,                        // Number of registers to write LSB.
-    0x06,                        // Number of bytes to write.
-    action_request_register,     // Action register.
-    0x00,                        // Reserved.
-    0x00,                        // Reserved.
-    release_absolute_pressure_,  // Grip max absolute pressure.
-    timeout_in_hundredths,       // Gripper Timeout.
-    grip_min_absolute_pressure   // Min absolute pressure
+    0x00,                       // Number of registers to write MSB.
+    0x03,                       // Number of registers to write LSB.
+    0x06,                       // Number of bytes to write.
+    action_request_register,    // Action register.
+    0x00,                       // Reserved.
+    0x00,                       // Reserved.
+    release_absolute_pressure,  // Grip max absolute pressure.
+    timeout_in_hundredths,      // Gripper Timeout.
+    grip_min_absolute_pressure  // Min absolute pressure
   };
 
   auto crc = crc_utils::compute_crc(request);
