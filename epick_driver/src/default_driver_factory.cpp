@@ -56,13 +56,13 @@ constexpr auto kGripMinVacuumPressureParamName = "grip_min_vacuum_pressure";
 constexpr auto kGripMinVacuumPressureParamDefault = -10.0;  // kPA
 
 constexpr auto kGripTimeoutParamName = "grip_timeout";
-constexpr auto kGripTimeoutParamDefault = 500;  // ms
+constexpr auto kGripTimeoutParamDefault = 0.5;
 
 constexpr auto kReleaseVacuumPressureParamName = "release_vacuum_pressure";
 constexpr auto kReleaseVacuumPressureParamDefault = 50.0;  // kPA
 
 constexpr auto kReleaseTimeoutParamName = "release_timeout";
-constexpr auto kReleaseTimeoutParamDefault = 500;  // ms
+constexpr auto kReleaseTimeoutParamDefault = 0.5;
 
 constexpr auto kUseDummyParamName = "use_dummy";
 constexpr auto kUseDummyParamDefault = "false";
@@ -100,10 +100,10 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   RCLCPP_INFO(kLogger, "%s: %fkPa", kGripMinVacuumPressureParamName, grip_min_vacuum_pressure);
 
   RCLCPP_INFO(kLogger, "Reading grip timeout...");
-  std::chrono::milliseconds grip_timeout =
+  std::chrono::milliseconds grip_timeout = std::chrono::duration_cast<std::chrono::milliseconds>(
       info.hardware_parameters.count(kGripTimeoutParamName) ?
-          std::chrono::milliseconds(std::stoi(info.hardware_parameters.at(kGripTimeoutParamName))) :
-          std::chrono::milliseconds(kGripTimeoutParamDefault);
+          std::chrono::duration<double>(std::stod(info.hardware_parameters.at(kGripTimeoutParamName))) :
+          std::chrono::duration<double>(kGripTimeoutParamDefault));
   RCLCPP_INFO(kLogger, "%s: %ldms", kGripTimeoutParamName, grip_timeout.count());
 
   RCLCPP_INFO(kLogger, "Reading release vacuum pressure...");
@@ -113,10 +113,10 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
   RCLCPP_INFO(kLogger, "%s: %fkPa", kReleaseVacuumPressureParamName, release_vacuum_pressure);
 
   RCLCPP_INFO(kLogger, "Reading release timeout...");
-  std::chrono::milliseconds release_timeout =
+  std::chrono::milliseconds release_timeout = std::chrono::duration_cast<std::chrono::milliseconds>(
       info.hardware_parameters.count(kReleaseTimeoutParamName) ?
-          std::chrono::milliseconds(std::stoi(info.hardware_parameters.at(kReleaseTimeoutParamName))) :
-          std::chrono::milliseconds(kReleaseTimeoutParamDefault);
+          std::chrono::duration<double>(std::stod(info.hardware_parameters.at(kReleaseTimeoutParamName))) :
+          std::chrono::duration<double>(kReleaseTimeoutParamDefault));
   RCLCPP_INFO(kLogger, "%s: %ldms", kReleaseTimeoutParamName, release_timeout.count());
 
   auto driver = create_driver(info);

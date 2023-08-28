@@ -97,9 +97,9 @@ TEST(TestDefaultDriverFactory, create_with_given_parameters)
   info.hardware_parameters.emplace("mode", "AdvancedMode");
   info.hardware_parameters.emplace("grip_max_vacuum_pressure", "-50");
   info.hardware_parameters.emplace("grip_min_vacuum_pressure", "-10");
-  info.hardware_parameters.emplace("grip_timeout", "1000");
+  info.hardware_parameters.emplace("grip_timeout", "1.0");
   info.hardware_parameters.emplace("release_vacuum_pressure", "50");
-  info.hardware_parameters.emplace("release_timeout", "200");
+  info.hardware_parameters.emplace("release_timeout", "0.2");
 
   auto driver = std::make_unique<MockDriver>();
 
