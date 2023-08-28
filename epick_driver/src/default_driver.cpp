@@ -274,8 +274,6 @@ void DefaultDriver::release()
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
 
-  RCLCPP_INFO(kLogger, " - release_absolute_vacuum_pressure: %hhukPa", release_absolute_pressure);
-
   std::chrono::milliseconds clamped_release_timeout =
       std::clamp(release_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout));
   auto timeout_in_hundredths = static_cast<uint8_t>(
