@@ -286,10 +286,14 @@ void EpickGripperHardwareInterface::background_task()
 
       if (status.actuator_status != ActuatorStatus::Gripping && grip_cmd >= 0.5)
       {
+        RCLCPP_INFO(kLogger, "Current actuator status: %s",
+                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->grip();
       }
       else if (status.actuator_status == ActuatorStatus::Gripping && grip_cmd < 0.5)
       {
+        RCLCPP_INFO(kLogger, "Current actuator status: %s",
+                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->release();
 
         // NOTE: messy workaround!
