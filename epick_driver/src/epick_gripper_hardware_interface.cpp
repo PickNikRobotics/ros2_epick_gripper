@@ -287,14 +287,10 @@ void EpickGripperHardwareInterface::background_task()
       RCLCPP_INFO(kLogger, "Current actuator status: %s",
                   default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
 
-      // If the gripper's vacuum generator is not running and the command is to start regulating vacuum,
-      // tell the gripper to begin grasping.
       if (status.actuator_status != ActuatorStatus::Gripping && grip_cmd >= 0.5)
       {
         driver_->grip();
       }
-      // If the vacuum generator is running and the command is to stop regulating vacuum,
-      // tell the gripper to release any currently-held object and turn off the vacuum generator.
       else if (status.actuator_status == ActuatorStatus::Gripping && grip_cmd < 0.5)
       {
         driver_->release();
