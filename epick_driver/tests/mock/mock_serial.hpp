@@ -45,8 +45,8 @@ public:
   MOCK_METHOD(void, write, (const std::vector<uint8_t>& buffer), (override));
   MOCK_METHOD(void, set_port, (const std::string& port), (override));
   MOCK_METHOD(std::string, get_port, (), (override, const));
-  MOCK_METHOD(void, set_timeout, (uint32_t timeout), (override));
-  MOCK_METHOD(uint32_t, get_timeout, (), (override, const));
+  MOCK_METHOD(void, set_timeout, (std::chrono::milliseconds timeout), (override));
+  MOCK_METHOD(std::chrono::milliseconds, get_timeout, (), (override, const));
   MOCK_METHOD(void, set_baudrate, (uint32_t baudrate), (override));
   MOCK_METHOD(uint32_t, get_baudrate, (), (override, const));
 };

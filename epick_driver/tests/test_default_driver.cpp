@@ -56,13 +56,13 @@ TEST(TestDefaultDriver, activate)
     0x03, 0xE8, // Address of the first requested register - MSB, LSB.
     0x00, 0x03, // Number of registers requested - MSB, LSB.
     0x06,       // Number of data bytes to follow.
-    0x03,       // Action Register - MSB, LSB.
+    0x0B,       // Action Register - MSB, LSB.
     0x00,       // Reserved.
     0x00,       // Reserved.
     0x64,       // Max absolute pressure (100kPa).
     0x32,       // Grip Timeout (500ms)
     0x64,       // Min absolute pressure (100kPa).
-    0x26, 0x57  // CRC-16 - MSB, LSB.
+    0x27, 0x1F  // CRC-16 - MSB, LSB.
   };
 
   const std::vector<uint8_t> expected_response {

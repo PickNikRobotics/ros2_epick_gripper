@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -99,13 +100,13 @@ public:
    * Set read timeout in milliseconds.
    * @param timeout Read timeout in milliseconds.
    */
-  virtual void set_timeout(uint32_t timeout) = 0;
+  virtual void set_timeout(const std::chrono::milliseconds timeout) = 0;
 
   /**
    * Get read timeout in milliseconds.
    * @return Read timeout in milliseconds.
    */
-  [[nodiscard]] virtual uint32_t get_timeout() const = 0;
+  [[nodiscard]] virtual std::chrono::milliseconds get_timeout() const = 0;
 
   /**
    * Sets the baudrate for the serial port.
