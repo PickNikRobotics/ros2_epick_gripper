@@ -284,15 +284,16 @@ void EpickGripperHardwareInterface::background_task()
       // Given the command input and the current state of the gripper, decide what action to send.
       const auto grip_cmd = safe_gripper_cmd_.grip_cmd.load();
 
-      RCLCPP_INFO(kLogger, "Current actuator status: %s",
-                  default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
-
       if (status.actuator_status != ActuatorStatus::Gripping && grip_cmd >= 0.5)
       {
+        RCLCPP_INFO(kLogger, "Current actuator status: %s",
+                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->grip();
       }
       else if (status.actuator_status == ActuatorStatus::Gripping && grip_cmd < 0.5)
       {
+        RCLCPP_INFO(kLogger, "Current actuator status: %s",
+                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->release();
 
         // NOTE: messy workaround!
