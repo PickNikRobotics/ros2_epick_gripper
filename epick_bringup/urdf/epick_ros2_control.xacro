@@ -13,7 +13,7 @@
 
         <!-- Gripper parameters. -->
         <param name="slave_address">0x9</param>
-        <param name="mode">AutomaticMode</param>
+        <param name="mode">AdvancedMode</param>
         <param name="grip_max_vacuum_pressure">-100</param>
         <param name="grip_min_vacuum_pressure">-10</param>
         <param name="grip_timeout">25000</param>
