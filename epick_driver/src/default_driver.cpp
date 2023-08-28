@@ -274,11 +274,7 @@ void DefaultDriver::release()
   default_driver_utils::set_gripper_regulate_action(action_request_register,
                                                     GripperRegulateAction::FollowRequestedVacuumParameters);
 
-  const uint8_t release_absolute_pressure =
-      static_cast<uint8_t>(gripper_mode_ == GripperMode::AdvancedMode ?
-                               std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure),
-                                          kMinAbsolutePressure, kMaxAbsolutePressure) :
-                               kMaxAbsolutePressure);
+  const uint8_t release_absolute_pressure = static_cast<uint8_t>(kMaxAbsolutePressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const auto timeout = static_cast<uint8_t>(
@@ -342,11 +338,6 @@ void DefaultDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
 void DefaultDriver::set_grip_timeout(const std::chrono::milliseconds grip_timeout)
 {
   grip_timeout_ = grip_timeout;
-}
-
-void DefaultDriver::set_release_vacuum_pressure(const float vacuum_pressure)
-{
-  release_vacuum_pressure_ = vacuum_pressure;
 }
 
 void DefaultDriver::set_release_timeout(const std::chrono::milliseconds release_timeout)

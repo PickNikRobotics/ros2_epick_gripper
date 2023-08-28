@@ -44,7 +44,6 @@ public:
   MOCK_METHOD(void, set_grip_max_vacuum_pressure, (const float vacuum_pressure), (override));
   MOCK_METHOD(void, set_grip_min_vacuum_pressure, (const float vacuum_pressure), (override));
   MOCK_METHOD(void, set_grip_timeout, (const std::chrono::milliseconds grip_timeout), (override));
-  MOCK_METHOD(void, set_release_vacuum_pressure, (const float vacuum_pressure), (override));
   MOCK_METHOD(void, set_release_timeout, (const std::chrono::milliseconds release_timeout), (override));
   MOCK_METHOD(bool, connect, (), (override));
   MOCK_METHOD(void, disconnect, (), (override));

@@ -65,12 +65,6 @@ void FakeDriver::set_grip_timeout(const std::chrono::milliseconds timeout)
   RCLCPP_INFO(kLogger, "grip timeout set to: %ldms", timeout.count());
 }
 
-void FakeDriver::set_release_vacuum_pressure(const float vacuum_pressure)
-{
-  release_vacuum_pressure_ = vacuum_pressure;
-  RCLCPP_INFO(kLogger, "release vacuum pressure set to: %fkPa", vacuum_pressure);
-}
-
 void FakeDriver::set_release_timeout(const std::chrono::milliseconds timeout)
 {
   release_timeout_ = timeout;

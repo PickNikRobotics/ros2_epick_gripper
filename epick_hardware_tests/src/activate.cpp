@@ -48,8 +48,8 @@ constexpr auto kSlaveAddress = 0x09;
 constexpr auto kGripperMode = GripperMode::AutomaticMode;
 constexpr auto kGripMaxVacuumPressure = -100.0f;  // kPa
 constexpr auto kGripMinVacuumPressure = -10.0f;   // kPa
-constexpr auto kReleaseVacuumPressure = 50.0f;    // kPa
-constexpr auto kGripperTimeout = 2.0;
+constexpr auto kGripTimeout = 2.0;
+constexpr auto kReleaseTimeout = 2.0;
 
 int main(int argc, char* argv[])
 {
@@ -94,14 +94,13 @@ int main(int argc, char* argv[])
       [&grip_min_vacuum_pressure](const char* value) { grip_min_vacuum_pressure = std::strtof(value, nullptr); },
       false);
 
-  float release_vacuum_pressure = kReleaseVacuumPressure;  // pKa
+  double grip_timeout = kGripTimeout;
   cli.registerHandler(
-      "--release-vacuum-pressure",
-      [&release_vacuum_pressure](const char* value) { release_vacuum_pressure = std::strtof(value, nullptr); }, false);
+      "--grip-timeout", [&grip_timeout](const char* value) { grip_timeout = std::stod(value); }, false);
 
-  double gripper_timeout = kGripperTimeout;
+  double release_timeout = kReleaseTimeout;
   cli.registerHandler(
-      "--gripper-timeout", [&gripper_timeout](const char* value) { gripper_timeout = std::stod(value); }, false);
+      "--release-timeout", [&release_timeout](const char* value) { release_timeout = std::stod(value); }, false);
 
   cli.registerHandler("-h", [&]() {
     std::cout << "Usage: ./set_relative_pressure [OPTIONS]\n"
@@ -118,9 +117,8 @@ int main(int argc, char* argv[])
               << ")\n"
               << "  --grip-min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kGripMinVacuumPressure
               << ")\n"
-              << "  --release-vacuum-pressure VALUE   Set the min vacuum pressure (default " << kGripMinVacuumPressure
-              << ")\n"
-              << "  --gripper-timeout VALUE           Set the gripper timeput in millis (default " << kGripperTimeout
+              << "  --grip-timeout VALUE              Set the grip timeput in millis (default " << kGripTimeout << ")\n"
+              << "  --release-timeout VALUE           Set the release timeput in millis (default " << kReleaseTimeout
               << ")\n"
               << "  -h                                Show this help message\n";
     exit(0);
@@ -143,20 +141,21 @@ int main(int argc, char* argv[])
     driver->set_mode(gripper_mode);
     driver->set_grip_max_vacuum_pressure(grip_max_vacuum_pressure);
     driver->set_grip_min_vacuum_pressure(grip_min_vacuum_pressure);
-    driver->set_release_vacuum_pressure(release_vacuum_pressure);
     driver->set_grip_timeout(
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(gripper_timeout)));
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(grip_timeout)));
+    driver->set_release_timeout(
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(release_timeout)));
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
-    std::cout << " - read/write timeut: " << timeout << "s" << std::endl;
+    std::cout << " - read/write timeout: " << timeout << "s" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
     std::cout << " - gripper mode: " << default_driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
     std::cout << " - grip max vacuum pressure: " << grip_max_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - grip min vacuum pressure: " << grip_min_vacuum_pressure << "kPa" << std::endl;
-    std::cout << " - release vacuum pressure: " << release_vacuum_pressure << "kPa" << std::endl;
-    std::cout << " - gripper timeout: " << gripper_timeout << "s" << std::endl;
+    std::cout << " - grip timeout: " << grip_timeout << "s" << std::endl;
+    std::cout << " - release timeout: " << release_timeout << "s" << std::endl;
 
     std::cout << "Checking if the gripper is connected..." << std::endl;
 

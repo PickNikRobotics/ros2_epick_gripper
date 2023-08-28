@@ -72,7 +72,6 @@ TEST(TestDefaultDriverFactory, create_with_default_parameters)
   EXPECT_CALL(*driver, set_grip_max_vacuum_pressure(-100));
   EXPECT_CALL(*driver, set_grip_min_vacuum_pressure(-10));
   EXPECT_CALL(*driver, set_grip_timeout(std::chrono::milliseconds(500)));
-  EXPECT_CALL(*driver, set_release_vacuum_pressure(50));
   EXPECT_CALL(*driver, set_release_timeout(std::chrono::milliseconds(500)));
   EXPECT_CALL(*driver, connect()).Times(0);
   EXPECT_CALL(*driver, disconnect()).Times(0);
@@ -98,7 +97,6 @@ TEST(TestDefaultDriverFactory, create_with_given_parameters)
   info.hardware_parameters.emplace("grip_max_vacuum_pressure", "-50");
   info.hardware_parameters.emplace("grip_min_vacuum_pressure", "-10");
   info.hardware_parameters.emplace("grip_timeout", "1.0");
-  info.hardware_parameters.emplace("release_vacuum_pressure", "50");
   info.hardware_parameters.emplace("release_timeout", "0.2");
 
   auto driver = std::make_unique<MockDriver>();
@@ -111,7 +109,6 @@ TEST(TestDefaultDriverFactory, create_with_given_parameters)
   EXPECT_CALL(*driver, set_grip_max_vacuum_pressure(-50));
   EXPECT_CALL(*driver, set_grip_min_vacuum_pressure(-10));
   EXPECT_CALL(*driver, set_grip_timeout(std::chrono::milliseconds(1000)));
-  EXPECT_CALL(*driver, set_release_vacuum_pressure(50));
   EXPECT_CALL(*driver, set_release_timeout(std::chrono::milliseconds(200)));
   EXPECT_CALL(*driver, connect()).Times(0);
   EXPECT_CALL(*driver, disconnect()).Times(0);

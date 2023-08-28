@@ -85,7 +85,6 @@ TEST(TestDefaultDriver, activate)
   driver->set_grip_max_vacuum_pressure(-100.0);  // -100kPa below atmospheric pressure.
   driver->set_grip_min_vacuum_pressure(-10.0);   // -10kPa below atmospheric pressure.
   driver->set_grip_timeout(std::chrono::milliseconds(500));
-  driver->set_release_vacuum_pressure(50.0);    // 50kPa above atmospheric pressure.
   driver->set_grip_timeout(std::chrono::milliseconds(500));
 
   driver->activate();

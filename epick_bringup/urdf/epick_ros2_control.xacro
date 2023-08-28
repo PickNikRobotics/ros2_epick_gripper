@@ -17,7 +17,6 @@
         <param name="grip_max_vacuum_pressure">-60</param>
         <param name="grip_min_vacuum_pressure">-10</param>
         <param name="grip_timeout">25.0</param>
-        <param name="release_vacuum_pressure">50</param>
         <param name="release_timeout">2.0</param>
 
         <!-- Set use_dummy to true to connect to a dummy driver. -->
