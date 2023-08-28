@@ -126,9 +126,6 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 {
   auto driver = std::make_unique<FakeDriver>();
 
-  // We get our hands on the raw pointer to check expectations later.
-  auto driver_handle = driver.get();
-
   auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>(
       std::make_unique<TestDriverFactory>(std::move(driver)));
 
