@@ -219,8 +219,6 @@ void DefaultDriver::deactivate()
 void DefaultDriver::grip()
 {
   RCLCPP_INFO(kLogger, "Gripping...");
-  RCLCPP_INFO(kLogger, " - grip_max_vacuum_pressure: %fkPa", grip_max_vacuum_pressure_);
-  RCLCPP_INFO(kLogger, " - grip_min_vacuum_pressure: %fkPa", grip_min_vacuum_pressure_);
 
   const uint8_t grip_max_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
@@ -266,7 +264,6 @@ void DefaultDriver::grip()
 void DefaultDriver::release()
 {
   RCLCPP_INFO(kLogger, "Releasing...");
-  RCLCPP_INFO(kLogger, " - release_vacuum_pressure: %fkPa", release_vacuum_pressure_);
 
   const uint8_t release_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(release_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));

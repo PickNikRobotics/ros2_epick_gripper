@@ -160,26 +160,31 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 
   EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/grip_cmd")));
 
-  // Claim the regulate interface.
-  hardware_interface::LoanedCommandInterface regulate_cmd = rm.claim_command_interface("gripper/grip_cmd");
+  // Claim the grip_cmd command interface.
+  hardware_interface::LoanedCommandInterface gripper_command_interface = rm.claim_command_interface("gripper/grip_cmd");
+
+  // Claim the grip_cmd state interface.
+  hardware_interface::LoanedStateInterface gripper_state_interface = rm.claim_state_interface("gripper/grip_cmd");
+  ASSERT_TRUE(gripper_state_interface.get_value() < 0.5);
 
   // Ask the gripper to grip.
-  regulate_cmd.set_value(1.0);
+  gripper_command_interface.set_value(1.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
-  auto gripper_gripping = [driver_handle]() {
-    return driver_handle->get_status().gripper_regulate_action ==
-           GripperRegulateAction::FollowRequestedVacuumParameters;
+  auto gripper_gripping = [&]() {
+    rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
+    return gripper_state_interface.get_value() >= 0.5;
   };
   ASSERT_TRUE(wait_for_condition(gripper_gripping, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to grip.";
 
   // Ask the gripper to release.
-  regulate_cmd.set_value(std::numeric_limits<double>::quiet_NaN());
+  gripper_command_interface.set_value(0.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
-  auto gripper_released = [driver_handle]() {
-    return driver_handle->get_status().gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator;
+  auto gripper_released = [&]() {
+    rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
+    return gripper_state_interface.get_value() < 0.5;
   };
   ASSERT_TRUE(wait_for_condition(gripper_released, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to release.";

@@ -149,7 +149,7 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
     if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kGripStateInterface, info_).has_value())
     {
       state_interfaces.emplace_back(
-          hardware_interface::StateInterface(kGripperGPIO, kGripStateInterface, &gripper_status_.grip_state));
+          hardware_interface::StateInterface(kGripperGPIO, kGripStateInterface, &gripper_status_.grip_cmd));
     }
     else
     {
@@ -239,7 +239,7 @@ hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unus
 {
   try
   {
-    gripper_status_.grip_state = safe_gripper_status_.grip_state.load();
+    gripper_status_.grip_cmd = safe_gripper_status_.grip_cmd.load();
     gripper_status_.object_detection_status = safe_gripper_status_.object_detection_status.load();
   }
   catch (const std::exception& ex)
@@ -279,23 +279,18 @@ void EpickGripperHardwareInterface::background_task()
       safe_gripper_status_.object_detection_status.store(
           default_driver_utils::object_detection_to_double(status.object_detection_status));
 
-      // Given the command input and the current state of the gripper, decide what action to send.
-      const auto grip_state = safe_gripper_status_.grip_state.load();
       const auto grip_cmd = safe_gripper_cmd_.grip_cmd.load();
+      const auto grip_state = safe_gripper_status_.grip_cmd.load();
 
       if (grip_state < 0.5 && grip_cmd >= 0.5)
       {
-        RCLCPP_INFO(kLogger, "Current actuator status: %s",
-                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->grip();
-        safe_gripper_status_.grip_state.store(grip_cmd);
+        safe_gripper_status_.grip_cmd.store(grip_cmd);
       }
       else if (grip_state >= 0.5 && grip_cmd < 0.5)
       {
-        RCLCPP_INFO(kLogger, "Current actuator status: %s",
-                    default_driver_utils::actuator_status_to_string(status.actuator_status).c_str());
         driver_->release();
-        safe_gripper_status_.grip_state.store(grip_cmd);
+        safe_gripper_status_.grip_cmd.store(grip_cmd);
 
         // NOTE: messy workaround!
         // After releasing the object, wait a short duration for the object to fall away from the gripper.

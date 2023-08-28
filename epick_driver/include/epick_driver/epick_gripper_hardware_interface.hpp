@@ -64,14 +64,14 @@ struct SafeCommand
 // We use this structure to hold our state interface values.
 struct State
 {
-  double grip_state;
+  double grip_cmd;
   double object_detection_status;
 };
 
 // We use this structure to hold a thread-safe copy of our state interface values.
 struct SafeState
 {
-  std::atomic<double> grip_state;
+  std::atomic<double> grip_cmd;
   std::atomic<double> object_detection_status;
 };
 
