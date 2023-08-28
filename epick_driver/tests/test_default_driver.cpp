@@ -59,10 +59,10 @@ TEST(TestDefaultDriver, activate)
     0x03,       // Action Register - MSB, LSB.
     0x00,       // Reserved.
     0x00,       // Reserved.
-    0x00,       // Max absolute pressure.
-    0x32,       // Grip Timeout.
-    0x5A,       // Min absolute pressure
-    0xE6, 0x58  // CRC-16 - MSB, LSB.
+    0x64,       // Max absolute pressure (100kPa).
+    0x32,       // Grip Timeout (500ms)
+    0x64,       // Min absolute pressure (100kPa).
+    0x26, 0x57  // CRC-16 - MSB, LSB.
   };
 
   const std::vector<uint8_t> expected_response {
@@ -82,9 +82,11 @@ TEST(TestDefaultDriver, activate)
   auto driver = std::make_unique<epick_driver::DefaultDriver>(std::move(serial));
   driver->set_slave_address(slave_address);
   driver->set_mode(GripperMode::AdvancedMode);
-  driver->set_grip_max_vacuum_pressure(-100.0);  // -100kPa relative to atmospheric pressure.
-  driver->set_grip_min_vacuum_pressure(-10.0);   // -10kPa relative to atmospheric pressure.
-  driver->set_gripper_timeout(std::chrono::milliseconds(500));
+  driver->set_grip_max_vacuum_pressure(-100.0);  // -100kPa below atmospheric pressure.
+  driver->set_grip_min_vacuum_pressure(-10.0);   // -10kPa below atmospheric pressure.
+  driver->set_grip_timeout(std::chrono::milliseconds(500));
+  driver->set_release_vacuum_pressure(50.0);    // 50kPa above atmospheric pressure.
+  driver->set_grip_timeout(std::chrono::milliseconds(500));
 
   driver->activate();
 

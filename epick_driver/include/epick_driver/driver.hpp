@@ -149,6 +149,8 @@ public:
    */
   virtual void set_grip_min_vacuum_pressure(const float vacuum_pressure) = 0;
 
+  virtual void set_grip_timeout(const std::chrono::milliseconds timeout) = 0;
+
   /**
    * Set the gripper maximum vacuum pressure to release an object.
    * The vacuum pressure is measured in kPa below the atmospheric pressure
@@ -159,7 +161,7 @@ public:
    */
   virtual void set_release_vacuum_pressure(const float vacuum_pressure) = 0;
 
-  virtual void set_gripper_timeout(const std::chrono::milliseconds timeout) = 0;
+  virtual void set_release_timeout(const std::chrono::milliseconds timeout) = 0;
 
   /** Connect to the gripper serial connection. */
   virtual bool connect() = 0;

@@ -48,8 +48,9 @@ public:
   void set_mode(const GripperMode gripper_mode) override;
   void set_grip_max_vacuum_pressure(const float vacuum_pressure) override;
   void set_grip_min_vacuum_pressure(const float vacuum_pressure) override;
+  void set_grip_timeout(const std::chrono::milliseconds timeout) override;
   void set_release_vacuum_pressure(const float vacuum_pressure) override;
-  void set_gripper_timeout(const std::chrono::milliseconds timeout) override;
+  void set_release_timeout(const std::chrono::milliseconds timeout) override;
   bool connect() override;
   void disconnect() override;
   void activate() override;
@@ -61,10 +62,14 @@ public:
 private:
   uint8_t slave_address_ = 0x00;
   GripperMode gripper_mode_ = GripperMode::Unknown;
+
   float grip_max_vacuum_pressure_ = 0.0f;
   float grip_min_vacuum_pressure_ = 0.0f;
+  std::chrono::milliseconds grip_timeout_ = std::chrono::milliseconds(100);
+
   float release_vacuum_pressure_ = 0.0f;
-  std::chrono::milliseconds gripper_timeout_ = std::chrono::milliseconds(100);
+  std::chrono::milliseconds release_timeout_ = std::chrono::milliseconds(100);
+
   bool connected_ = false;
   bool activated_ = false;
   bool regulate_ = false;

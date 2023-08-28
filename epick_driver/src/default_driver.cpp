@@ -143,16 +143,15 @@ void DefaultDriver::activate()
   const uint8_t grip_max_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
 
-  std::chrono::milliseconds clamped_gripper_timeout =
-      std::clamp(gripper_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+  std::chrono::milliseconds clamped_grip_timeout =
+      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
   auto timeout_in_hundredths = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_gripper_timeout).count());
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
 
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
-  default_driver_utils::set_gripper_regulate_action(action_request_register,
-                                                    GripperRegulateAction::FollowRequestedVacuumParameters);
+  default_driver_utils::set_gripper_regulate_action(action_request_register, GripperRegulateAction::StopVacuumGenerator);
 
   std::vector<uint8_t> request = {
     slave_address_,
@@ -211,27 +210,36 @@ void DefaultDriver::deactivate()
 void DefaultDriver::grip()
 {
   RCLCPP_INFO(kLogger, "Gripping...");
+
+  const uint8_t grip_max_absolute_pressure =
+      static_cast<uint8_t>(std::clamp(std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+  const uint8_t grip_min_absolute_pressure =
+      static_cast<uint8_t>(std::clamp(std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+
+  std::chrono::milliseconds clamped_grip_timeout =
+      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+  auto timeout_in_hundredths = static_cast<uint8_t>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
+
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
   default_driver_utils::set_gripper_regulate_action(action_request_register,
                                                     GripperRegulateAction::FollowRequestedVacuumParameters);
-
-  const uint8_t absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
-
   std::vector<uint8_t> request = {
     slave_address_,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
-    0x00,                     // Number of registers to write MSB.
-    0x02,                     // Number of registers to write LSB.
-    0x04,                     // Number of bytes to write.
-    action_request_register,  // Action register.
-    0x00,                     // Reserved.
-    0x00,                     // Reserved.
-    absolute_pressure         // Grip max absolute pressure.
+    0x00,                        // Number of registers to write MSB.
+    0x03,                        // Number of registers to write LSB.
+    0x06,                        // Number of bytes to write.
+    action_request_register,     // Action register.
+    0x00,                        // Reserved.
+    0x00,                        // Reserved.
+    grip_max_absolute_pressure,  // Grip max absolute pressure.
+    timeout_in_hundredths,       // Gripper Timeout.
+    grip_min_absolute_pressure   // Min absolute pressure
   };
 
   auto crc = crc_utils::compute_crc(request);
@@ -248,27 +256,37 @@ void DefaultDriver::grip()
 void DefaultDriver::release()
 {
   RCLCPP_INFO(kLogger, "Releasing...");
+
+  const uint8_t release_absolute_pressure_ =
+      static_cast<uint8_t>(std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+  const uint8_t grip_min_absolute_pressure =
+      static_cast<uint8_t>(std::clamp(std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
+
+  std::chrono::milliseconds clamped_grip_timeout =
+      std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(25500));
+  auto timeout_in_hundredths = static_cast<uint8_t>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
+
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
   default_driver_utils::set_gripper_regulate_action(action_request_register,
                                                     GripperRegulateAction::FollowRequestedVacuumParameters);
 
-  const uint8_t absolute_pressure =
-      static_cast<uint8_t>(std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure), 0.0f, 255.0f));
-
   std::vector<uint8_t> request = {
     slave_address_,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),
     data_utils::get_msb(kActionRequestRegisterAddress),
     data_utils::get_lsb(kActionRequestRegisterAddress),
-    0x00,                     // Number of registers to write MSB.
-    0x02,                     // Number of registers to write LSB.
-    0x04,                     // Number of bytes to write.
-    action_request_register,  // Action register.
-    0x00,                     // Reserved.
-    0x00,                     // Reserved.
-    absolute_pressure         // Grip max absolute pressure.
+    0x00,                        // Number of registers to write MSB.
+    0x03,                        // Number of registers to write LSB.
+    0x06,                        // Number of bytes to write.
+    action_request_register,     // Action register.
+    0x00,                        // Reserved.
+    0x00,                        // Reserved.
+    release_absolute_pressure_,  // Grip max absolute pressure.
+    timeout_in_hundredths,       // Gripper Timeout.
+    grip_min_absolute_pressure   // Min absolute pressure
   };
 
   auto crc = crc_utils::compute_crc(request);
@@ -308,14 +326,19 @@ void DefaultDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
   grip_min_vacuum_pressure_ = vacuum_pressure;
 }
 
+void DefaultDriver::set_grip_timeout(const std::chrono::milliseconds grip_timeout)
+{
+  grip_timeout_ = grip_timeout;
+}
+
 void DefaultDriver::set_release_vacuum_pressure(const float vacuum_pressure)
 {
   release_vacuum_pressure_ = vacuum_pressure;
 }
 
-void DefaultDriver::set_gripper_timeout(const std::chrono::milliseconds gripper_timeout)
+void DefaultDriver::set_release_timeout(const std::chrono::milliseconds release_timeout)
 {
-  gripper_timeout_ = gripper_timeout;
+  release_timeout_ = release_timeout;
 }
 
 GripperStatus DefaultDriver::get_status()

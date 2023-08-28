@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     driver->set_grip_max_vacuum_pressure(grip_max_vacuum_pressure);
     driver->set_grip_min_vacuum_pressure(grip_min_vacuum_pressure);
     driver->set_release_vacuum_pressure(release_vacuum_pressure);
-    driver->set_gripper_timeout(gripper_timeout);
+    driver->set_grip_timeout(gripper_timeout);
 
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;

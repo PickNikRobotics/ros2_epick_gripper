@@ -57,8 +57,9 @@ public:
   void set_mode(const GripperMode gripper_mode) override;
   void set_grip_max_vacuum_pressure(const float vacuum_pressure) override;
   void set_grip_min_vacuum_pressure(const float vacuum_pressure) override;
+  void set_grip_timeout(const std::chrono::milliseconds grip_timeout) override;
   void set_release_vacuum_pressure(const float vacuum_pressure) override;
-  void set_gripper_timeout(const std::chrono::milliseconds gripper_timeout) override;
+  void set_release_timeout(const std::chrono::milliseconds release_timeout) override;
 
   GripperStatus get_status() override;
 
@@ -86,9 +87,12 @@ private:
   std::unique_ptr<Serial> serial_ = nullptr;
   uint8_t slave_address_ = 0x00;
   GripperMode gripper_mode_ = GripperMode::AutomaticMode;
+
   float grip_max_vacuum_pressure_ = 0.0;
   float grip_min_vacuum_pressure_ = 0.0;
+  std::chrono::milliseconds grip_timeout_ = std::chrono::milliseconds(0);
+
   float release_vacuum_pressure_ = 0.0;
-  std::chrono::milliseconds gripper_timeout_ = std::chrono::milliseconds(0);
+  std::chrono::milliseconds release_timeout_ = std::chrono::milliseconds(0);
 };
 }  // namespace epick_driver

@@ -59,16 +59,22 @@ void FakeDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
   RCLCPP_INFO(kLogger, "grip min vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
+void FakeDriver::set_grip_timeout(const std::chrono::milliseconds timeout)
+{
+  grip_timeout_ = timeout;
+  RCLCPP_INFO(kLogger, "grip timeout set to: %ldms", timeout.count());
+}
+
 void FakeDriver::set_release_vacuum_pressure(const float vacuum_pressure)
 {
   release_vacuum_pressure_ = vacuum_pressure;
   RCLCPP_INFO(kLogger, "release vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
-void FakeDriver::set_gripper_timeout(const std::chrono::milliseconds timeout)
+void FakeDriver::set_release_timeout(const std::chrono::milliseconds timeout)
 {
-  gripper_timeout_ = timeout;
-  RCLCPP_INFO(kLogger, "timeout set to: %ldms", timeout.count());
+  release_timeout_ = timeout;
+  RCLCPP_INFO(kLogger, "release timeout set to: %ldms", timeout.count());
 }
 
 bool FakeDriver::connect()

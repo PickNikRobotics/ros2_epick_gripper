@@ -16,8 +16,9 @@
         <param name="mode">AutomaticMode</param>
         <param name="grip_max_vacuum_pressure">-100</param>
         <param name="grip_min_vacuum_pressure">-10</param>
-        <param name="release_vacuum_pressure">155</param>
-        <param name="gripper_timeout">25000</param>
+        <param name="grip_timeout">25000</param>
+        <param name="release_vacuum_pressure">50</param>
+        <param name="release_timeout">2000</param>
 
         <!-- Set use_dummy to true to connect to a dummy driver. -->
         <param name="use_dummy">false</param>
