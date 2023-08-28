@@ -88,7 +88,7 @@ std::string DefaultSerial::get_port() const
 
 void DefaultSerial::set_timeout(std::chrono::milliseconds timeout)
 {
-  serial::Timeout simple_timeout = serial::Timeout::simpleTimeout(timeout.count());
+  serial::Timeout simple_timeout = serial::Timeout::simpleTimeout(static_cast<uint32_t>(timeout.count()));
   serial_->setTimeout(simple_timeout);
 }
 

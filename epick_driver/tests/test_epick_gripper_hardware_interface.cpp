@@ -101,11 +101,11 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
              <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
              <param name="usb_port">/dev/whatever</param>
              <param name="baudrate">9600</param>
-             <param name="timeout">500</param>
+             <param name="timeout">0.5</param>
            </hardware>
            <gpio name="gripper">
-               <command_interface name="regulate"/>
-               <state_interface name="regulate"/>
+               <command_interface name="grip_cmd"/>
+               <state_interface name="grip_cmd"/>
                <state_interface name="object_detection_status"/>
            </gpio>
          </ros2_control>
@@ -142,8 +142,8 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
     // GPIOs
     { { "gripper",
         "GPIO",
-        { { "regulate", "", "", "", "double", 1 } },
-        { { "regulate", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
+        { { "grip_cmd", "", "", "", "double", 1 } },
+        { { "grip_cmd", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
         { {} } } },
     {},  // Transmission.
     ""   // original xml.
@@ -158,10 +158,10 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
                                         hardware_interface::lifecycle_state_names::ACTIVE };
   rm.set_component_state("EpickGripperHardwareInterface", active_state);
 
-  EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/regulate")));
+  EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/grip_cmd")));
 
   // Claim the regulate interface.
-  hardware_interface::LoanedCommandInterface regulate_cmd = rm.claim_command_interface("gripper/regulate");
+  hardware_interface::LoanedCommandInterface regulate_cmd = rm.claim_command_interface("gripper/grip_cmd");
 
   // Ask the gripper to grip.
   regulate_cmd.set_value(1.0);

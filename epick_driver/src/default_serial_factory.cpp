@@ -60,16 +60,15 @@ std::unique_ptr<Serial> DefaultSerialFactory::create(const hardware_interface::H
   RCLCPP_INFO(kLogger, "baudrate: %dbps", baudrate);
 
   RCLCPP_INFO(kLogger, "Reading timeout...");
-  std::chrono::milliseconds timeout = std::chrono::duration_cast<std::chrono::milliseconds>(
-      info.hardware_parameters.count(kTimeoutParamName) ?
-          std::chrono::duration<double>(std::stod(info.hardware_parameters.at(kTimeoutParamName))) :
-          std::chrono::duration<double>(kTimeoutParamDefault));
-  RCLCPP_INFO(kLogger, "timeout: %ldms", timeout.count());
+  double timeout = info.hardware_parameters.count(kTimeoutParamName) ?
+                       std::stod(info.hardware_parameters.at(kTimeoutParamName)) :
+                       kTimeoutParamDefault;
+  RCLCPP_INFO(kLogger, "timeout: %fs", timeout);
 
   auto serial = create_serial();
   serial->set_port(usb_port);
   serial->set_baudrate(baudrate);
-  serial->set_timeout(timeout);
+  serial->set_timeout(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(timeout)));
   return serial;
 }
 
