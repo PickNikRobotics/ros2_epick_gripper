@@ -226,11 +226,10 @@ void DefaultDriver::grip()
       std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
-
-  std::chrono::milliseconds clamped_grip_timeout =
-      std::clamp(grip_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout));
-  auto timeout_in_hundredths = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_grip_timeout).count());
+  const auto timeout = static_cast<uint8_t>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
+          std::clamp(grip_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout)))
+          .count());
 
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
@@ -249,7 +248,7 @@ void DefaultDriver::grip()
     0x00,                        // Reserved.
     0x00,                        // Reserved.
     grip_max_absolute_pressure,  // Grip max absolute pressure.
-    timeout_in_hundredths,       // Gripper Timeout.
+    timeout,                     // Gripper timeout (hundredths of a second).
     grip_min_absolute_pressure   // Min absolute pressure
   };
 
@@ -273,11 +272,10 @@ void DefaultDriver::release()
       std::round(release_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
-
-  std::chrono::milliseconds clamped_release_timeout =
-      std::clamp(release_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout));
-  auto timeout_in_hundredths = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(clamped_release_timeout).count());
+  const auto timeout = static_cast<uint8_t>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
+          std::clamp(release_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout)))
+          .count());
 
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
@@ -297,7 +295,7 @@ void DefaultDriver::release()
     0x00,                       // Reserved.
     0x00,                       // Reserved.
     release_absolute_pressure,  // Grip max absolute pressure.
-    timeout_in_hundredths,      // Gripper Timeout.
+    timeout,                    // Gripper timeout (hundredths of a second).
     grip_min_absolute_pressure  // Min absolute pressure
   };
 
