@@ -226,10 +226,10 @@ void DefaultDriver::grip()
                                                     GripperRegulateAction::FollowRequestedVacuumParameters);
 
   const uint8_t grip_max_absolute_pressure =
-      gripper_mode_ == GripperMode::AdvancedMode ?
-          static_cast<uint8_t>(std::clamp(std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure),
-                                          kMinAbsolutePressure, kMaxAbsolutePressure)) :
-          kMinAbsolutePressure;
+      static_cast<uint8_t>(gripper_mode_ == GripperMode::AdvancedMode ?
+                               std::clamp(std::round(grip_max_vacuum_pressure_ + kAtmosphericPressure),
+                                          kMinAbsolutePressure, kMaxAbsolutePressure) :
+                               kMinAbsolutePressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const auto timeout = static_cast<uint8_t>(
@@ -275,10 +275,10 @@ void DefaultDriver::release()
                                                     GripperRegulateAction::FollowRequestedVacuumParameters);
 
   const uint8_t release_absolute_pressure =
-      gripper_mode_ == GripperMode::AdvancedMode ?
-          static_cast<uint8_t>(std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure),
-                                          kMinAbsolutePressure, kMaxAbsolutePressure)) :
-          kMaxAbsolutePressure;
+      static_cast<uint8_t>(gripper_mode_ == GripperMode::AdvancedMode ?
+                               std::clamp(std::round(release_vacuum_pressure_ + kAtmosphericPressure),
+                                          kMinAbsolutePressure, kMaxAbsolutePressure) :
+                               kMaxAbsolutePressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const auto timeout = static_cast<uint8_t>(
