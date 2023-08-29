@@ -301,14 +301,6 @@ void EpickGripperHardwareInterface::background_task()
       {
         driver_->release();
         safe_gripper_status_.grip_cmd.store(grip_cmd);
-
-        // NOTE: messy workaround!
-        // After releasing the object, wait a short duration for the object to fall away from the gripper.
-        //        std::this_thread::sleep_for(std::chrono::milliseconds{ 500 });
-
-        //        // The gripper then needs to be deactivated and then reactivated to reset for another grasp.
-        //        driver_->deactivate();
-        //        driver_->activate();
       }
     }
     catch (std::exception& e)
