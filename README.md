@@ -55,7 +55,7 @@ Below is a sample configuration that outlines various parameters for this interf
         <!--
           State interface that follow the value of the command interface:
           1.0 = successful grip
-          0.0 = sucessful release
+          0.0 = successful release
         -->
         <state_interface name="grip_cmd"/>
 
