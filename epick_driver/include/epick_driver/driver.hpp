@@ -125,32 +125,33 @@ class Driver
 public:
   Driver() = default;
 
-  virtual void set_slave_address(const uint8_t slave_address) = 0;
+  virtual void set_slave_address(uint8_t slave_address) = 0;
 
-  virtual void set_mode(const GripperMode gripper_mode) = 0;
+  virtual void set_mode(GripperMode gripper_mode) = 0;
 
   /**
-   * Set the gripper maximum vacuum pressure to hold an object.
+   * Set the gripper maximum vacuum pressure to hold an object relative to the
+   * atmospheric pressure.
    * The vacuum pressure is measured in kPa below the atmospheric pressure
-   * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
-   * (maximum acceptable value above the atmospheric pressure).
-   * @param vacuum_pressure The maximum vacuum pressure between -100kPa and
-   * 155kPa.
+   * (100KpA) and must fall between -100kPa (perfect vacuum) and 0kPa.
+   * @param vacuum_pressure The maximum grip vacuum pressure between
+   * -100kPa and 0kPa.
    */
-  virtual void set_max_vacuum_pressure(const float vacuum_pressure) = 0;
+  virtual void set_grip_max_vacuum_pressure(float vacuum_pressure) = 0;
 
   /**
-   * Set the gripper minimum acceptable vacuum pressure to hold an object.
+   * Set the gripper minimum acceptable vacuum pressure to hold an object
+   * relative to the atmospheric pressure.
    * The vacuum pressure is measured in kPa below the atmospheric pressure
-   * (100KpA) and must fall between -100kPa (perfect vacuum) and 155kPa
-   * (maximum acceptable value above the atmospheric pressure).
+   * (100KpA) and must fall between -100kPa (perfect vacuum) and 0kPa.
    * @param vacuum_pressure The minimum acceptable vacuum pressure between
-   * -100kPa and
-   * 155kPa.
+   * -100kPa and 0kPa.
    */
-  virtual void set_min_vacuum_pressure(const float vacuum_pressure) = 0;
+  virtual void set_grip_min_vacuum_pressure(float vacuum_pressure) = 0;
 
-  virtual void set_gripper_timeout(const std::chrono::milliseconds timeout) = 0;
+  virtual void set_grip_timeout(std::chrono::milliseconds timeout) = 0;
+
+  virtual void set_release_timeout(std::chrono::milliseconds timeout) = 0;
 
   /** Connect to the gripper serial connection. */
   virtual bool connect() = 0;

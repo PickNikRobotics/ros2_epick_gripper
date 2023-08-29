@@ -49,14 +49,17 @@ constexpr uint8_t kSlaveAddressParamDefault = 0x9;
 constexpr auto kModeParamName = "mode";
 constexpr auto kModeParamDefault = GripperMode::AutomaticMode;
 
-constexpr auto kMaxVacuumPressureParamName = "max_vacuum_pressure";
-constexpr auto kMaxVacuumPressureParamDefault = -100.0;  // kPA
+constexpr auto kGripMaxVacuumPressureParamName = "grip_max_vacuum_pressure";
+constexpr auto kGripMaxVacuumPressureParamDefault = -100.0;  // kPA
 
-constexpr auto kMinVacuumPressureParamName = "min_vacuum_pressure";
-constexpr auto kMinVacuumPressureParamDefault = -10.0;  // kPA
+constexpr auto kGripMinVacuumPressureParamName = "grip_min_vacuum_pressure";
+constexpr auto kGripMinVacuumPressureParamDefault = -10.0;  // kPA
 
-constexpr auto kGripperTimeoutParamName = "gripper_timeout";
-constexpr auto kGripperTimeoutParamDefault = 500;  // ms
+constexpr auto kGripTimeoutParamName = "grip_timeout";
+constexpr auto kGripTimeoutParamDefault = 0.5;
+
+constexpr auto kReleaseTimeoutParamName = "release_timeout";
+constexpr auto kReleaseTimeoutParamDefault = 0.5;
 
 constexpr auto kUseDummyParamName = "use_dummy";
 constexpr auto kUseDummyParamDefault = "false";
@@ -81,32 +84,39 @@ epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInf
                          kModeParamDefault;
   RCLCPP_INFO(kLogger, "mode: %s", default_driver_utils::gripper_mode_to_string(mode).c_str());
 
-  RCLCPP_INFO(kLogger, "Reading max vacuum pressure...");
-  double max_vacuum_pressure = info.hardware_parameters.count(kMaxVacuumPressureParamName) ?
-                                   std::stod(info.hardware_parameters.at(kMaxVacuumPressureParamName)) :
-                                   kMaxVacuumPressureParamDefault;
-  RCLCPP_INFO(kLogger, "%s: %fkPa", kMaxVacuumPressureParamName, max_vacuum_pressure);
+  RCLCPP_INFO(kLogger, "Reading grip max vacuum pressure...");
+  double grip_max_vacuum_pressure = info.hardware_parameters.count(kGripMaxVacuumPressureParamName) ?
+                                        std::stod(info.hardware_parameters.at(kGripMaxVacuumPressureParamName)) :
+                                        kGripMaxVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kGripMaxVacuumPressureParamName, grip_max_vacuum_pressure);
 
-  RCLCPP_INFO(kLogger, "Reading min vacuum pressure...");
-  double min_vacuum_pressure = info.hardware_parameters.count(kMinVacuumPressureParamName) ?
-                                   std::stod(info.hardware_parameters.at(kMinVacuumPressureParamName)) :
-                                   kMinVacuumPressureParamDefault;
-  RCLCPP_INFO(kLogger, "%s: %fkPa", kMinVacuumPressureParamName, min_vacuum_pressure);
+  RCLCPP_INFO(kLogger, "Reading grip min vacuum pressure...");
+  double grip_min_vacuum_pressure = info.hardware_parameters.count(kGripMinVacuumPressureParamName) ?
+                                        std::stod(info.hardware_parameters.at(kGripMinVacuumPressureParamName)) :
+                                        kGripMinVacuumPressureParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fkPa", kGripMinVacuumPressureParamName, grip_min_vacuum_pressure);
 
-  RCLCPP_INFO(kLogger, "Reading gripper timeout...");
-  std::chrono::milliseconds gripper_timeout =
-      info.hardware_parameters.count(kGripperTimeoutParamName) ?
-          std::chrono::milliseconds(std::stoi(info.hardware_parameters.at(kGripperTimeoutParamName))) :
-          std::chrono::milliseconds(kGripperTimeoutParamDefault);
-  RCLCPP_INFO(kLogger, "%s: %ldms", kGripperTimeoutParamName, gripper_timeout.count());
+  RCLCPP_INFO(kLogger, "Reading grip timeout...");
+  double grip_timeout = info.hardware_parameters.count(kGripTimeoutParamName) ?
+                            std::stod(info.hardware_parameters.at(kGripTimeoutParamName)) :
+                            kGripTimeoutParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fs", kGripTimeoutParamName, grip_timeout);
+
+  RCLCPP_INFO(kLogger, "Reading release timeout...");
+  double release_timeout = info.hardware_parameters.count(kReleaseTimeoutParamName) ?
+                               std::stod(info.hardware_parameters.at(kReleaseTimeoutParamName)) :
+                               kReleaseTimeoutParamDefault;
+  RCLCPP_INFO(kLogger, "%s: %fs", kReleaseTimeoutParamName, release_timeout);
 
   auto driver = create_driver(info);
   driver->set_slave_address(slave_address);
   driver->set_mode(mode);
-  driver->set_max_vacuum_pressure(max_vacuum_pressure);
-  driver->set_min_vacuum_pressure(min_vacuum_pressure);
-  driver->set_gripper_timeout(gripper_timeout);
-
+  driver->set_grip_max_vacuum_pressure(grip_max_vacuum_pressure);
+  driver->set_grip_min_vacuum_pressure(grip_min_vacuum_pressure);
+  driver->set_grip_timeout(
+      std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(grip_timeout)));
+  driver->set_release_timeout(
+      std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(release_timeout)));
   return driver;
 }
 

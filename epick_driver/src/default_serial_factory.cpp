@@ -43,7 +43,7 @@ constexpr auto kBaudrateParamName = "baudrate";
 constexpr auto kBaudrateAddressParamDefault = 115200;
 
 constexpr auto kTimeoutParamName = "timeout";
-constexpr auto kTimeoutParamDefault = 500;
+constexpr auto kTimeoutParamDefault = 0.5;
 
 std::unique_ptr<Serial> DefaultSerialFactory::create(const hardware_interface::HardwareInfo& info) const
 {
@@ -60,15 +60,15 @@ std::unique_ptr<Serial> DefaultSerialFactory::create(const hardware_interface::H
   RCLCPP_INFO(kLogger, "baudrate: %dbps", baudrate);
 
   RCLCPP_INFO(kLogger, "Reading timeout...");
-  uint32_t timeout = static_cast<uint32_t>(info.hardware_parameters.count(kTimeoutParamName) ?
-                                               std::stoul(info.hardware_parameters.at(kTimeoutParamName)) :
-                                               kTimeoutParamDefault);
-  RCLCPP_INFO(kLogger, "timeout: %dms", timeout);
+  double timeout = info.hardware_parameters.count(kTimeoutParamName) ?
+                       std::stod(info.hardware_parameters.at(kTimeoutParamName)) :
+                       kTimeoutParamDefault;
+  RCLCPP_INFO(kLogger, "timeout: %fs", timeout);
 
   auto serial = create_serial();
   serial->set_port(usb_port);
   serial->set_baudrate(baudrate);
-  serial->set_timeout(timeout);
+  serial->set_timeout(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(timeout)));
   return serial;
 }
 

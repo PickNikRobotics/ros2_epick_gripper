@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="epick_driver_ros2_control" params="name">
+
+    <ros2_control name="${name}" type="system">
+      <hardware>
+        <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
+
+       <!-- Serial connection parameters ////////////////////////////////// -->
+
+        <param name="usb_port">/dev/ttyUSB0</param>
+        <param name="baud_rate">115200</param>
+        <param name="timeout">0.2</param>
+
+        <!-- Gripper parameters /////////////////////////////////////////// -->
+
+        <!-- Set use_dummy to true to connect to a dummy driver for testing purposes. -->
+        <param name="use_dummy">false</param>
+
+        <!-- The address of the gripper. -->
+        <param name="slave_address">0x9</param>
+
+        <!-- The gripper operation mode: AutomaticMode or AdvancedMode. -->
+        <param name="mode">AdvancedMode</param>
+
+        <!-- The following parameters are only required for the AdvancedMode. -->
+        <param name="grip_max_vacuum_pressure">-60</param>
+        <param name="grip_min_vacuum_pressure">-10</param>
+        <param name="grip_timeout">25.0</param>
+        <param name="release_timeout">2.0</param>
+
+      </hardware>
+
+      <gpio name="gripper">
+        <!-- 
+          Commmand interface to control the gripper: 
+          1.0 = grip
+          0.0 = release
+        -->
+        <command_interface name="grip_cmd"/>
+
+        <!-- 
+          State interface that follow the value of the command interface:
+          1.0 = successful grip
+          0.0 = sucessful release
+        -->
+        <state_interface name="grip_cmd"/>
+
+        <!-- 
+          Return the object detection status:
+          0.0 = unknown
+          1.0 = object detected at minimum pressure
+          2.0 = object detected at maximum pressure
+          3.0 = no object detected
+        -->
+        <state_interface name="object_detection_status"/>
+      </gpio>
+
+    </ros2_control>
+
+  </xacro:macro>
+</robot>

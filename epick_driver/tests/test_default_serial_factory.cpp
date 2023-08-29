@@ -56,7 +56,7 @@ private:
 };
 
 /**
- * Here we test the factory with default parameters.
+ * Here we test the serial factory with default parameters.
  */
 TEST(TestDefaultSerialFactory, create_with_default_parameters)
 {
@@ -69,21 +69,21 @@ TEST(TestDefaultSerialFactory, create_with_default_parameters)
 
   EXPECT_CALL(*serial, set_port("/dev/ttyUSB0"));
   EXPECT_CALL(*serial, set_baudrate(115200));
-  EXPECT_CALL(*serial, set_timeout(500));
+  EXPECT_CALL(*serial, set_timeout(std::chrono::milliseconds{ 500 }));
 
   StubSerialFactory serial_factory(std::move(serial));
   auto created_serial = serial_factory.create(info);
 }
 
 /**
- * Here we test the factory with default parameters.
+ * Here we test the serial factory with default parameters.
  */
 TEST(TestDefaultSerialFactory, create_with_given_parameters)
 {
   hardware_interface::HardwareInfo info;
   info.hardware_parameters.emplace("usb_port", "/dev/ttyUSB1");
   info.hardware_parameters.emplace("baudrate", "9600");
-  info.hardware_parameters.emplace("timeout", "100");
+  info.hardware_parameters.emplace("timeout", "0.1");
 
   auto serial = std::make_unique<MockSerial>();
 
@@ -92,7 +92,7 @@ TEST(TestDefaultSerialFactory, create_with_given_parameters)
 
   EXPECT_CALL(*serial, set_port("/dev/ttyUSB1"));
   EXPECT_CALL(*serial, set_baudrate(9600));
-  EXPECT_CALL(*serial, set_timeout(100));
+  EXPECT_CALL(*serial, set_timeout(std::chrono::milliseconds(100)));
 
   StubSerialFactory serial_factory(std::move(serial));
   auto created_serial = serial_factory.create(info);

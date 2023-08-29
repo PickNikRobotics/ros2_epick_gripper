@@ -43,7 +43,7 @@ using namespace epick_driver;
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
-constexpr auto kTimeout = 500;  // milliseconds
+constexpr auto kTimeout = 0.5;
 constexpr auto kSlaveAddress = 0x09;
 
 int main(int argc, char* argv[])
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
               << "Options:\n"
               << "  --port VALUE                 Set the com port (default " << kComPort << ")\n"
               << "  --baudrate VALUE             Set the baudrate (default " << kBaudRate << "bps)\n"
-              << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "ms)\n"
+              << "  --timeout VALUE              Set the read/write timeout (default " << kTimeout << "s)\n"
               << "  --slave-address VALUE        Set the slave address (default " << kSlaveAddress << ")\n"
               << "  -h                           Show this help message\n";
     exit(0);
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     auto serial = std::make_unique<DefaultSerial>();
     serial->set_port(port);
     serial->set_baudrate(baudrate);
-    serial->set_timeout(timeout);
+    serial->set_timeout(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::duration<double>(timeout)));
 
     auto driver = std::make_unique<DefaultDriver>(std::move(serial));
     driver->set_slave_address(slave_address);
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
-    std::cout << " - read/write timeut: " << timeout << "ms" << std::endl;
+    std::cout << " - read/write timeout: " << timeout << "s" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
 
     std::cout << "Checking if the gripper is connected..." << std::endl;

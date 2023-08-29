@@ -30,8 +30,8 @@
 #include <gmock/gmock.h>
 
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
+#include <epick_driver/hardware_interface_utils.hpp>
 #include <epick_driver/default_driver_factory.hpp>
-
 #include <epick_driver/fake/fake_driver.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
@@ -49,6 +49,8 @@ namespace epick_driver::test
 {
 using ::testing::Contains;
 using ::testing::Eq;
+
+using namespace hardware_interface_utils;
 
 // This factory will populate the injected driver with data read form the HardwareInfo.
 class TestDriverFactory : public DefaultDriverFactory
@@ -101,11 +103,11 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
              <plugin>epick_driver/EpickGripperHardwareInterface</plugin>
              <param name="usb_port">/dev/whatever</param>
              <param name="baudrate">9600</param>
-             <param name="timeout">500</param>
+             <param name="timeout">0.5</param>
            </hardware>
            <gpio name="gripper">
-               <command_interface name="regulate"/>
-               <state_interface name="regulate"/>
+               <command_interface name="grip_cmd"/>
+               <state_interface name="grip_cmd"/>
                <state_interface name="object_detection_status"/>
            </gpio>
          </ros2_control>
@@ -126,9 +128,6 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 {
   auto driver = std::make_unique<FakeDriver>();
 
-  // We get our hands on the raw pointer to check expectations later.
-  auto driver_handle = driver.get();
-
   auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>(
       std::make_unique<TestDriverFactory>(std::move(driver)));
 
@@ -142,8 +141,8 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
     // GPIOs
     { { "gripper",
         "GPIO",
-        { { "regulate", "", "", "", "double", 1 } },
-        { { "regulate", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
+        { { "grip_cmd", "", "", "", "double", 1 } },
+        { { "grip_cmd", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
         { {} } } },
     {},  // Transmission.
     ""   // original xml.
@@ -158,28 +157,43 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
                                         hardware_interface::lifecycle_state_names::ACTIVE };
   rm.set_component_state("EpickGripperHardwareInterface", active_state);
 
-  EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/regulate")));
+  EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/grip_cmd")));
 
-  // Claim the regulate interface.
-  hardware_interface::LoanedCommandInterface regulate_cmd = rm.claim_command_interface("gripper/regulate");
+  // The gripper/grip_cmd GPIO interface is intended to be used as a boolean.
+  // Unfortunately, because of limitations of ros2_controls, it is implemented
+  // as a double. We use the convention that 0.0 means false and 1.0 means true.
+  // To avoid possible comparison issues with double, to check if a value is
+  // false or true we use the following formula: bool is_true = value >= 0.5;
+
+  // The gripper/grip_cmd GPIO state interface follows the value of the
+  // corresponding gripper/grip_cmd GPIO command interface with a small delay.
+
+  // Claim the grip_cmd command interface.
+  hardware_interface::LoanedCommandInterface gripper_command_interface = rm.claim_command_interface("gripper/grip_cmd");
+  ASSERT_TRUE(is_false(gripper_command_interface.get_value()));
+
+  // Claim the grip_cmd state interface.
+  hardware_interface::LoanedStateInterface gripper_state_interface = rm.claim_state_interface("gripper/grip_cmd");
+  ASSERT_TRUE(is_false(gripper_state_interface.get_value()));
 
   // Ask the gripper to grip.
-  regulate_cmd.set_value(1.0);
+  gripper_command_interface.set_value(1.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
-  auto gripper_gripping = [driver_handle]() {
-    return driver_handle->get_status().gripper_regulate_action ==
-           GripperRegulateAction::FollowRequestedVacuumParameters;
+  auto gripper_gripping = [&]() {
+    rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
+    return is_true(gripper_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_gripping, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to grip.";
 
   // Ask the gripper to release.
-  regulate_cmd.set_value(std::numeric_limits<double>::quiet_NaN());
+  gripper_command_interface.set_value(0.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
-  auto gripper_released = [driver_handle]() {
-    return driver_handle->get_status().gripper_regulate_action == GripperRegulateAction::StopVacuumGenerator;
+  auto gripper_released = [&]() {
+    rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
+    return is_false(gripper_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_released, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to release.";
