@@ -9,9 +9,7 @@ find_package(ament_cmake REQUIRED)
 # Install directories
 install(
   DIRECTORY
-    config
     launch
-    urdf
   DESTINATION share/epick_bringup
 )
 

@@ -66,6 +66,8 @@ def launch_setup(context, *args, **kwargs):
 
     robot_description_content = xacro.process_file(description_file).toxml()
 
+    print(robot_description_content)
+
     # The Controller Manager (CM) connects the controllers’ and hardware-abstraction sides of the ros2_control
     # framework. It also serves as the entry-point for users through ROS services.
     # https://control.ros.org/master/doc/getting_started/getting_started.html#architecture
@@ -120,12 +122,12 @@ def generate_launch_description():
     declared_arguments = [
         DeclareLaunchArgument(
             "description_package",
-            default_value="epick_bringup",
+            default_value="epick_description",
             description="Package containing all robot configuration files.",
         ),
         DeclareLaunchArgument(
             "description_file",
-            default_value="urdf.xacro",
+            default_value="example.urdf.xacro",
             description="URDF/XACRO description file for the robot.",
         ),
         DeclareLaunchArgument(
