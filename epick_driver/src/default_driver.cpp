@@ -156,7 +156,7 @@ void DefaultDriver::activate()
 
   const uint8_t grip_max_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
-  const auto tiemout = static_cast<uint8_t>(
+  const auto timeout = static_cast<uint8_t>(
       std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
           std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(kMaxTimeout)))
           .count());
@@ -173,7 +173,7 @@ void DefaultDriver::activate()
     0x00,                        // Reserved.
     0x00,                        // Reserved.
     grip_max_absolute_pressure,  // Max absolute pressure.
-    tiemout,                     // Gripper Timeout.
+    timeout,                     // Gripper Timeout.
     grip_min_absolute_pressure   // Min absolute pressure
   };
   auto crc = crc_utils::compute_crc(request);
