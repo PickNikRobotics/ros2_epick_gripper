@@ -111,6 +111,6 @@ The `epick_hardware_tests` package includes a set of terminal-based commands des
 
 - `activate`: Establishes a connection to the gripper and activates it.
 - `deactivate`: Connects to the gripper and deactivates it.
-- `get_status`: Obtains the current status of the gripper after - activation.
+- `get_status`: Obtains the current status of the gripper after activation.
 - `grip`: Initiates the gripping action.
 - `release`: Executes the release operation.
