@@ -53,4 +53,30 @@ get_gpios_command_interface(std::string gpio_name, std::string interface_name,
 std::optional<hardware_interface::InterfaceInfo>
 get_gpios_state_interface(std::string gpio_name, std::string interface_name,
                           const hardware_interface::HardwareInfo& info);
+
+/**
+ * All command and state interfaces work with double values. We can
+ * use double value to represent boolean values:
+ * 0.0 = true
+ * 1.0 = false
+ * To avoid directly comparing double, to determine if a double represents
+ * a false or a true, we use a simple formula:
+ * bool is_true = value >= 0.5
+ * @param value The value to be converted into a boolean.
+ * @return The boolean linked to the given double value.
+ */
+bool is_true(double value);
+
+/**
+ * All command and state interfaces work with double values. We can
+ * use double value to represent boolean values:
+ * 0.0 = true
+ * 1.0 = false
+ * To avoid directly comparing double, to determine if a double represents
+ * a false or a true, we use a simple formula:
+ * bool is_true = value >= 0.5
+ * @param value The value to be converted into a boolean.
+ * @return The boolean linked to the given double value.
+ */
+bool is_false(double value);
 }  // namespace epick_driver::hardware_interface_utils

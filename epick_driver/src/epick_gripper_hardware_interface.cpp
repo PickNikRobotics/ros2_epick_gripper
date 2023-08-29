@@ -54,6 +54,8 @@ constexpr auto kObjectDetectionStateInterface = "object_detection_status";
 
 constexpr auto kGripperCommsLoopPeriod = std::chrono::milliseconds{ 10 };
 
+using namespace epick_driver::hardware_interface_utils;
+
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {
   driver_factory_ = std::make_unique<DefaultDriverFactory>();
@@ -136,8 +138,7 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
   std::vector<hardware_interface::StateInterface> state_interfaces;
   try
   {
-    if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kObjectDetectionStateInterface, info_)
-            .has_value())
+    if (get_gpios_state_interface(kGripperGPIO, kObjectDetectionStateInterface, info_).has_value())
     {
       state_interfaces.emplace_back(hardware_interface::StateInterface(kGripperGPIO, kObjectDetectionStateInterface,
                                                                        &gripper_status_.object_detection_status));
@@ -146,7 +147,7 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
     {
       RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kObjectDetectionStateInterface);
     }
-    if (hardware_interface_utils::get_gpios_state_interface(kGripperGPIO, kGripStateInterface, info_).has_value())
+    if (get_gpios_state_interface(kGripperGPIO, kGripStateInterface, info_).has_value())
     {
       state_interfaces.emplace_back(
           hardware_interface::StateInterface(kGripperGPIO, kGripStateInterface, &gripper_status_.grip_cmd));
@@ -171,7 +172,7 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    if (hardware_interface_utils::get_gpios_command_interface(kGripperGPIO, kGripCommandInterface, info_).has_value())
+    if (get_gpios_command_interface(kGripperGPIO, kGripCommandInterface, info_).has_value())
     {
       command_interfaces.emplace_back(
           hardware_interface::CommandInterface(kGripperGPIO, kGripCommandInterface, &gripper_cmds_.grip_cmd));
@@ -291,12 +292,12 @@ void EpickGripperHardwareInterface::background_task()
       const auto grip_cmd = safe_gripper_cmd_.grip_cmd.load();
       const auto grip_state = safe_gripper_status_.grip_cmd.load();
 
-      if (grip_state < 0.5 && grip_cmd >= 0.5)
+      if (is_false(grip_state) && is_true(grip_cmd))
       {
         driver_->grip();
         safe_gripper_status_.grip_cmd.store(grip_cmd);
       }
-      else if (grip_state >= 0.5 && grip_cmd < 0.5)
+      else if (is_true(grip_state) && is_false(grip_cmd))
       {
         driver_->release();
         safe_gripper_status_.grip_cmd.store(grip_cmd);

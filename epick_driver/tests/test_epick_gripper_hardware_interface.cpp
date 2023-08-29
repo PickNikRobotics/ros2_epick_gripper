@@ -30,8 +30,8 @@
 #include <gmock/gmock.h>
 
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
+#include <epick_driver/hardware_interface_utils.hpp>
 #include <epick_driver/default_driver_factory.hpp>
-
 #include <epick_driver/fake/fake_driver.hpp>
 
 #include <hardware_interface/loaned_command_interface.hpp>
@@ -49,6 +49,8 @@ namespace epick_driver::test
 {
 using ::testing::Contains;
 using ::testing::Eq;
+
+using namespace hardware_interface_utils;
 
 // This factory will populate the injected driver with data read form the HardwareInfo.
 class TestDriverFactory : public DefaultDriverFactory
@@ -168,10 +170,11 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 
   // Claim the grip_cmd command interface.
   hardware_interface::LoanedCommandInterface gripper_command_interface = rm.claim_command_interface("gripper/grip_cmd");
+  ASSERT_TRUE(is_false(gripper_command_interface.get_value()));
 
   // Claim the grip_cmd state interface.
   hardware_interface::LoanedStateInterface gripper_state_interface = rm.claim_state_interface("gripper/grip_cmd");
-  ASSERT_TRUE(gripper_state_interface.get_value() < 0.5);
+  ASSERT_TRUE(is_false(gripper_state_interface.get_value()));
 
   // Ask the gripper to grip.
   gripper_command_interface.set_value(1.0);
@@ -179,7 +182,7 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 
   auto gripper_gripping = [&]() {
     rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
-    return gripper_state_interface.get_value() >= 0.5;
+    return is_true(gripper_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_gripping, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to grip.";
@@ -190,7 +193,7 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 
   auto gripper_released = [&]() {
     rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
-    return gripper_state_interface.get_value() < 0.5;
+    return is_false(gripper_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_released, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to release.";

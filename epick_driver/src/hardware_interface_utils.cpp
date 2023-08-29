@@ -79,4 +79,14 @@ std::optional<hardware_interface::InterfaceInfo> get_gpios_state_interface(std::
   return std::nullopt;
 }
 
+bool is_true(double value)
+{
+  return value >= 0.5;
+}
+
+bool is_false(double value)
+{
+  return value < 0.5;
+}
+
 }  // namespace epick_driver::hardware_interface_utils
