@@ -309,12 +309,12 @@ void DefaultDriver::release()
   }
 }
 
-void DefaultDriver::set_slave_address(const uint8_t slave_address)
+void DefaultDriver::set_slave_address(uint8_t slave_address)
 {
   slave_address_ = slave_address;
 }
 
-void DefaultDriver::set_mode(const GripperMode gripper_mode)
+void DefaultDriver::set_mode(GripperMode gripper_mode)
 {
   if (gripper_mode == GripperMode::Unknown)
   {
@@ -325,7 +325,7 @@ void DefaultDriver::set_mode(const GripperMode gripper_mode)
   gripper_mode_ = gripper_mode;
 }
 
-void DefaultDriver::set_grip_max_vacuum_pressure(const float vacuum_pressure)
+void DefaultDriver::set_grip_max_vacuum_pressure(float vacuum_pressure)
 {
   if (vacuum_pressure > 0)
   {
@@ -336,7 +336,7 @@ void DefaultDriver::set_grip_max_vacuum_pressure(const float vacuum_pressure)
   grip_max_vacuum_pressure_ = vacuum_pressure;
 }
 
-void DefaultDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
+void DefaultDriver::set_grip_min_vacuum_pressure(float vacuum_pressure)
 {
   if (vacuum_pressure > 0)
   {
@@ -347,12 +347,12 @@ void DefaultDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
   grip_min_vacuum_pressure_ = vacuum_pressure;
 }
 
-void DefaultDriver::set_grip_timeout(const std::chrono::milliseconds grip_timeout)
+void DefaultDriver::set_grip_timeout(std::chrono::milliseconds grip_timeout)
 {
   grip_timeout_ = grip_timeout;
 }
 
-void DefaultDriver::set_release_timeout(const std::chrono::milliseconds release_timeout)
+void DefaultDriver::set_release_timeout(std::chrono::milliseconds release_timeout)
 {
   release_timeout_ = release_timeout;
 }

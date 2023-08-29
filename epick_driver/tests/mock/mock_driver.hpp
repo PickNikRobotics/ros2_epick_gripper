@@ -39,12 +39,12 @@ namespace epick_driver::test
 class MockDriver : public epick_driver::Driver
 {
 public:
-  MOCK_METHOD(void, set_slave_address, (const uint8_t slave_address), (override));
-  MOCK_METHOD(void, set_mode, (const GripperMode mode), (override));
-  MOCK_METHOD(void, set_grip_max_vacuum_pressure, (const float vacuum_pressure), (override));
-  MOCK_METHOD(void, set_grip_min_vacuum_pressure, (const float vacuum_pressure), (override));
-  MOCK_METHOD(void, set_grip_timeout, (const std::chrono::milliseconds grip_timeout), (override));
-  MOCK_METHOD(void, set_release_timeout, (const std::chrono::milliseconds release_timeout), (override));
+  MOCK_METHOD(void, set_slave_address, (uint8_t slave_address), (override));
+  MOCK_METHOD(void, set_mode, (GripperMode mode), (override));
+  MOCK_METHOD(void, set_grip_max_vacuum_pressure, (float vacuum_pressure), (override));
+  MOCK_METHOD(void, set_grip_min_vacuum_pressure, (float vacuum_pressure), (override));
+  MOCK_METHOD(void, set_grip_timeout, (std::chrono::milliseconds grip_timeout), (override));
+  MOCK_METHOD(void, set_release_timeout, (std::chrono::milliseconds release_timeout), (override));
   MOCK_METHOD(bool, connect, (), (override));
   MOCK_METHOD(void, disconnect, (), (override));
   MOCK_METHOD(void, activate, (), (override));

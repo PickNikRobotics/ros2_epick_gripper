@@ -35,7 +35,7 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("FakeDriver");
 
-void FakeDriver::set_slave_address(const uint8_t slave_address)
+void FakeDriver::set_slave_address(uint8_t slave_address)
 {
   slave_address_ = slave_address;
   RCLCPP_INFO(kLogger, "slave_address set to: %d", slave_address);
@@ -47,25 +47,25 @@ void FakeDriver::set_mode(const GripperMode gripper_mode)
   RCLCPP_INFO(kLogger, "mode set to: %s", default_driver_utils::gripper_mode_to_string(gripper_mode).c_str());
 }
 
-void FakeDriver::set_grip_max_vacuum_pressure(const float vacuum_pressure)
+void FakeDriver::set_grip_max_vacuum_pressure(float vacuum_pressure)
 {
   grip_max_vacuum_pressure_ = vacuum_pressure;
   RCLCPP_INFO(kLogger, "grip max vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
-void FakeDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
+void FakeDriver::set_grip_min_vacuum_pressure(float vacuum_pressure)
 {
   grip_min_vacuum_pressure_ = vacuum_pressure;
   RCLCPP_INFO(kLogger, "grip min vacuum pressure set to: %fkPa", vacuum_pressure);
 }
 
-void FakeDriver::set_grip_timeout(const std::chrono::milliseconds timeout)
+void FakeDriver::set_grip_timeout(std::chrono::milliseconds timeout)
 {
   grip_timeout_ = timeout;
   RCLCPP_INFO(kLogger, "grip timeout set to: %ldms", timeout.count());
 }
 
-void FakeDriver::set_release_timeout(const std::chrono::milliseconds timeout)
+void FakeDriver::set_release_timeout(std::chrono::milliseconds timeout)
 {
   release_timeout_ = timeout;
   RCLCPP_INFO(kLogger, "release timeout set to: %ldms", timeout.count());
