@@ -171,15 +171,17 @@ private:
   // This stores the double values of our GPIO command interfaces.
   Command gripper_cmds_{ default_driver_utils::regulate_action_to_double(GripperRegulateAction::StopVacuumGenerator) };
 
+  // This stores thread-safe copies of our GPIO command interfaces values.
+  // This is required because a command interface cannot be linked to an atomic double.
+  SafeCommand safe_gripper_cmd_{ default_driver_utils::regulate_action_to_double(
+      GripperRegulateAction::StopVacuumGenerator) };
+
   // This stores the double values of our GPIO state interfaces.
   State gripper_status_{ default_driver_utils::regulate_action_to_double(GripperRegulateAction::StopVacuumGenerator),
                          default_driver_utils::object_detection_to_double(ObjectDetectionStatus::Unknown) };
 
-  // This stores thread-safe copies the double values of our GPIO command interfaces.
-  SafeCommand safe_gripper_cmd_{ default_driver_utils::regulate_action_to_double(
-      GripperRegulateAction::StopVacuumGenerator) };
-
-  // This stores thread-safe copies the double values of our GPIO state interfaces.
+  // This stores thread-safe copies of our GPIO state interfaces values.
+  // This is required because a command interface cannot be linked to an atomic double.
   SafeState safe_gripper_status_{ default_driver_utils::regulate_action_to_double(
                                       GripperRegulateAction::StopVacuumGenerator),
                                   default_driver_utils::object_detection_to_double(ObjectDetectionStatus::Unknown) };

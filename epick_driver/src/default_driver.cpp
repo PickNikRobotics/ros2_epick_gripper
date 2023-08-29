@@ -327,11 +327,23 @@ void DefaultDriver::set_mode(const GripperMode gripper_mode)
 
 void DefaultDriver::set_grip_max_vacuum_pressure(const float vacuum_pressure)
 {
+  if (vacuum_pressure > 0)
+  {
+    RCLCPP_ERROR(kLogger, "Invalid grip max vacuum pressure: %f. Must be a value between -100kPa and 0kPa.",
+                 vacuum_pressure);
+    return;
+  }
   grip_max_vacuum_pressure_ = vacuum_pressure;
 }
 
 void DefaultDriver::set_grip_min_vacuum_pressure(const float vacuum_pressure)
 {
+  if (vacuum_pressure > 0)
+  {
+    RCLCPP_ERROR(kLogger, "Invalid grip min vacuum pressure: %f. Must be a value between -100kPa and 0kPa.",
+                 vacuum_pressure);
+    return;
+  }
   grip_min_vacuum_pressure_ = vacuum_pressure;
 }
 

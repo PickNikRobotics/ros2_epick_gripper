@@ -43,6 +43,9 @@ using ::testing::SaveArg;
 
 /**
  * Here we test the driver activation command.
+ * We mock the serial interface, send an activate command to the driver and
+ * check that the sequence of bytes received by the serial interface is
+ * correctly generated.
  */
 TEST(TestDefaultDriver, activate)
 {
@@ -94,6 +97,9 @@ TEST(TestDefaultDriver, activate)
 
 /**
  * Here we test the driver deactivation command.
+ * We mock the serial interface, send an deactivate command to the driver and
+ * check that the sequence of bytes received by the serial interface is
+ * correctly generated.
  */
 TEST(TestDefaultDriver, deactivate)
 {

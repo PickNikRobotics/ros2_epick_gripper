@@ -56,7 +56,7 @@ private:
 };
 
 /**
- * Here we test the factory with default parameters.
+ * Here we test the driver factory with default parameters.
  */
 TEST(TestDefaultDriverFactory, create_with_default_parameters)
 {
@@ -86,7 +86,7 @@ TEST(TestDefaultDriverFactory, create_with_default_parameters)
 }
 
 /**
- * Here we test with given parameters.
+ * Here we test the driver factory with given parameters.
  */
 TEST(TestDefaultDriverFactory, create_with_given_parameters)
 {

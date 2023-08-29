@@ -237,6 +237,9 @@ EpickGripperHardwareInterface::on_deactivate([[maybe_unused]] const rclcpp_lifec
 hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unused]] const rclcpp::Time& time,
                                                                     [[maybe_unused]] const rclcpp::Duration& period)
 {
+  // A state interface cannot be linked to atomic double values, only
+  // double values. We must transfer the content of the atomic value, which is
+  // set by the background thread, into the state interface value.
   try
   {
     gripper_status_.grip_cmd = safe_gripper_status_.grip_cmd.load();
@@ -254,6 +257,10 @@ hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unus
 hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unused]] const rclcpp::Time& time,
                                                                      [[maybe_unused]] const rclcpp::Duration& period)
 {
+  // A command interface cannot be linked to atomic double values, only
+  // double values. We must transfer the content of the command interface
+  // double value into an atomic double so it can be read by the background
+  // thread.
   try
   {
     safe_gripper_cmd_.grip_cmd.store(gripper_cmds_.grip_cmd);
@@ -279,6 +286,8 @@ void EpickGripperHardwareInterface::background_task()
       safe_gripper_status_.object_detection_status.store(
           default_driver_utils::object_detection_to_double(status.object_detection_status));
 
+      // If the gripper or release command is successful, the gripper_cmd state
+      // interface value will follow the gripper_cmd command interface value.
       const auto grip_cmd = safe_gripper_cmd_.grip_cmd.load();
       const auto grip_state = safe_gripper_status_.grip_cmd.load();
 
@@ -300,7 +309,6 @@ void EpickGripperHardwareInterface::background_task()
         //        driver_->deactivate();
         //        driver_->activate();
       }
-      // If neither of the above conditions are true, then send no command.
     }
     catch (std::exception& e)
     {

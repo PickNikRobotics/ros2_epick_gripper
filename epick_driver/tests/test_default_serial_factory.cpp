@@ -56,7 +56,7 @@ private:
 };
 
 /**
- * Here we test the factory with default parameters.
+ * Here we test the serial factory with default parameters.
  */
 TEST(TestDefaultSerialFactory, create_with_default_parameters)
 {
@@ -76,7 +76,7 @@ TEST(TestDefaultSerialFactory, create_with_default_parameters)
 }
 
 /**
- * Here we test the factory with default parameters.
+ * Here we test the serial factory with default parameters.
  */
 TEST(TestDefaultSerialFactory, create_with_given_parameters)
 {

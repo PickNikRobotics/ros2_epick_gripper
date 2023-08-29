@@ -157,6 +157,15 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
 
   EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/grip_cmd")));
 
+  // The gripper/grip_cmd GPIO interface is intended to be used as a boolean.
+  // Unfortunately, because of limitations of ros2_controls, it is implemented
+  // as a double. We use the convention that 0.0 means false and 1.0 means true.
+  // To avoid possible comparison issues with double, to check if a value is
+  // false or true we use the following formula: bool is_true = value >= 0.5;
+
+  // The gripper/grip_cmd GPIO state interface follows the value of the
+  // corresponding gripper/grip_cmd GPIO command interface with a small delay.
+
   // Claim the grip_cmd command interface.
   hardware_interface::LoanedCommandInterface gripper_command_interface = rm.claim_command_interface("gripper/grip_cmd");
 
