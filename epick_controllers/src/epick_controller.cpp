@@ -34,7 +34,7 @@ namespace command
 {
 enum CommandInterfaces : size_t
 {
-  GRIPPER_REGULATE_ACTION = 0
+  GRIP_CMD = 0
 };
 }
 
@@ -42,7 +42,7 @@ namespace state
 {
 enum StateInterfaces : size_t
 {
-  GRIPPER_REGULATE_ACTION = 0,
+  GRIP_CMD = 0,
   OBJECT_DETECTION_STATUS = 1
 
 };
@@ -126,10 +126,10 @@ EpickController::on_activate([[maybe_unused]] const rclcpp_lifecycle::State& pre
 
   try
   {
-    // Create a service to regulate the gripper.
-    regulate_gripper_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
+    // Create a service to control the gripper.
+    grip_srv_ = get_node()->create_service<std_srvs::srv::SetBool>(
         kGripService, [this](std_srvs::srv::SetBool::Request::SharedPtr req,
-                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->regulate_gripper(req, resp); });
+                             std_srvs::srv::SetBool::Response::SharedPtr resp) { this->grip_cmd(req, resp); });
     object_detection_status_pub_ =
         get_node()->create_publisher<epick_msgs::msg::ObjectDetectionStatus>(kObjectDetectionStatusTopic, 10);
   }
@@ -145,7 +145,7 @@ EpickController::on_deactivate([[maybe_unused]] const rclcpp_lifecycle::State& p
 {
   try
   {
-    regulate_gripper_srv_.reset();
+    grip_srv_.reset();
   }
   catch (...)
   {
@@ -159,31 +159,31 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn EpickC
   return LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
-bool EpickController::regulate_gripper(std_srvs::srv::SetBool::Request::SharedPtr request,
-                                       [[maybe_unused]] std_srvs::srv::SetBool::Response::SharedPtr response)
+bool EpickController::grip_cmd(std_srvs::srv::SetBool::Request::SharedPtr request,
+                               [[maybe_unused]] std_srvs::srv::SetBool::Response::SharedPtr response)
 {
-  command_interfaces_[command::GRIPPER_REGULATE_ACTION].set_value(request->data ? 1.0 : 0.0);
+  command_interfaces_[command::GRIP_CMD].set_value(request->data ? 1.0 : 0.0);
 
   auto start_time = std::chrono::steady_clock::now();
   std::chrono::duration<double> timeout = std::chrono::milliseconds(kServiceTimeout);
 
-  // We wait until the regulate variable assumes the requested value.
-  bool regulate;
+  // We wait until the grip_cmd variable assumes the requested value.
+  bool grip_cmd;
   do
   {
     std::this_thread::sleep_for(std::chrono::milliseconds(kBusyWaitingSleepTime));
-    regulate = state_interfaces_[state::StateInterfaces::GRIPPER_REGULATE_ACTION].get_value() >= 0.5;
-  } while (request->data != regulate && (std::chrono::steady_clock::now() - start_time) < timeout);
+    grip_cmd = state_interfaces_[state::StateInterfaces::GRIP_CMD].get_value() >= 0.5;
+  } while (request->data != grip_cmd && (std::chrono::steady_clock::now() - start_time) < timeout);
 
-  if (request->data == regulate)
+  if (request->data == grip_cmd)
   {
     response->success = true;
-    response->message = "Regulate command succeded.";
+    response->message = "The command succeeded.";
   }
   else
   {
     response->success = false;
-    response->message = "Regulate command failed.";
+    response->message = "The command failed.";
   }
   return response->success;
 }

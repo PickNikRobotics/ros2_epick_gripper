@@ -66,8 +66,6 @@ def launch_setup(context, *args, **kwargs):
 
     robot_description_content = xacro.process_file(description_file).toxml()
 
-    print(robot_description_content)
-
     # The Controller Manager (CM) connects the controllers’ and hardware-abstraction sides of the ros2_control
     # framework. It also serves as the entry-point for users through ROS services.
     # https://control.ros.org/master/doc/getting_started/getting_started.html#architecture

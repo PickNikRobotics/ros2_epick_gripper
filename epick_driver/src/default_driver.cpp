@@ -157,7 +157,7 @@ void DefaultDriver::activate()
   const uint8_t grip_max_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(kAtmosphericPressure);
   const auto timeout = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 10>>>(
           std::clamp(grip_timeout_, std::chrono::milliseconds(0), std::chrono::milliseconds(kMaxTimeout)))
           .count());
 
@@ -233,7 +233,7 @@ void DefaultDriver::grip()
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const auto timeout = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 10>>>(
           std::clamp(grip_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout)))
           .count());
 
@@ -278,7 +278,7 @@ void DefaultDriver::release()
   const uint8_t grip_min_absolute_pressure = static_cast<uint8_t>(std::clamp(
       std::round(grip_min_vacuum_pressure_ + kAtmosphericPressure), kMinAbsolutePressure, kMaxAbsolutePressure));
   const auto timeout = static_cast<uint8_t>(
-      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 100>>>(
+      std::chrono::duration_cast<std::chrono::duration<int, std::ratio<1, 10>>>(
           std::clamp(release_timeout_, std::chrono::milliseconds(kMinTimeout), std::chrono::milliseconds(kMaxTimeout)))
           .count());
 

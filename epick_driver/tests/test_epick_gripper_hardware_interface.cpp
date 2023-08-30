@@ -124,7 +124,7 @@ TEST(TestEpickGripperHardwareInterface, load_urdf)
  * In this test we startup the hardware interface with a fake driver so we can
  * test read and write operations.
  */
-TEST(TestEpickGripperHardwareInterface, regulate_interface)
+TEST(TestEpickGripperHardwareInterface, grip)
 {
   auto driver = std::make_unique<FakeDriver>();
 
@@ -138,8 +138,8 @@ TEST(TestEpickGripperHardwareInterface, regulate_interface)
     {},  // parameters.
     {},  // joints.
     {},  // Sensors.
-    // GPIOs
-    { { "gripper",
+    {    // GPIOs
+      { "gripper",
         "GPIO",
         { { "grip_cmd", "", "", "", "double", 1 } },
         { { "grip_cmd", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
