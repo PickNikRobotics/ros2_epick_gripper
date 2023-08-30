@@ -178,7 +178,7 @@ bool EpickController::grip_cmd(std_srvs::srv::SetBool::Request::SharedPtr reques
   if (request->data == grip_cmd)
   {
     response->success = true;
-    response->message = "The command succeded.";
+    response->message = "The command succeeded.";
   }
   else
   {
