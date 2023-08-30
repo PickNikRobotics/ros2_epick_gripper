@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     std::cout << "Using the following parameters: " << std::endl;
     std::cout << " - port: " << port << std::endl;
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
-    std::cout << " - read/write timeout: " << timeout << "ms" << std::endl;
+    std::cout << " - read/write timeout: " << timeout << "s" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
 
     std::cout << "Checking if the gripper is connected..." << std::endl;
