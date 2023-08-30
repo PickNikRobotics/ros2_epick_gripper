@@ -15,7 +15,7 @@
         <!-- Gripper parameters /////////////////////////////////////////// -->
 
         <!-- Set use_dummy to true to connect to a dummy driver for testing purposes. -->
-        <param name="use_dummy">true</param>
+        <param name="use_dummy">false</param>
 
         <!-- The address of the gripper. -->
         <param name="slave_address">0x9</param>
@@ -26,7 +26,7 @@
         <!-- The following parameters are only required for the AdvancedMode. -->
         <param name="grip_max_vacuum_pressure">-60</param>
         <param name="grip_min_vacuum_pressure">-10</param>
-        <param name="grip_timeout">7.0</param>
+        <param name="grip_timeout">25.0</param>
         <param name="release_timeout">2.0</param>
 
       </hardware>
