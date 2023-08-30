@@ -39,8 +39,8 @@
 
 namespace epick_controllers
 {
-constexpr auto kRegulateCommandInterface = "gripper/regulate";
-constexpr auto kIsRegulatingStateInterface = "gripper/regulate";
+constexpr auto kGripCommandInterface = "gripper/grip_cmd";
+constexpr auto kGripStateInterface = "gripper/grip_cmd";
 
 constexpr auto kActionName = "~/gripper_cmd";
 
@@ -50,7 +50,7 @@ controller_interface::InterfaceConfiguration EpickGripperActionController::comma
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back(kRegulateCommandInterface);
+  config.names.emplace_back(kGripCommandInterface);
   return config;
 }
 
@@ -58,7 +58,7 @@ controller_interface::InterfaceConfiguration EpickGripperActionController::state
 {
   controller_interface::InterfaceConfiguration config;
   config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-  config.names.emplace_back(kIsRegulatingStateInterface);
+  config.names.emplace_back(kGripStateInterface);
   return config;
 }
 
@@ -67,7 +67,7 @@ controller_interface::return_type EpickGripperActionController::update([[maybe_u
 {
   commands_rt_ = *(commands_buffer_.readFromRT());
 
-  const double current_command = commands_rt_.regulate;
+  const double current_command = commands_rt_.grip_cmd;
   const double current_state = is_regulating_state_interface_->get().get_value();
 
   check_for_success(current_state, current_command);
@@ -82,7 +82,7 @@ EpickGripperActionController::on_activate([[maybe_unused]] const rclcpp_lifecycl
 {
   auto regulate_command_interface_it = std::find_if(command_interfaces_.begin(), command_interfaces_.end(),
                                                     [](const hardware_interface::LoanedCommandInterface& interface) {
-                                                      return interface.get_interface_name() == "regulate";
+                                                      return interface.get_interface_name() == "grip_cmd";
                                                     });
   if (regulate_command_interface_it == command_interfaces_.end())
   {
@@ -92,7 +92,7 @@ EpickGripperActionController::on_activate([[maybe_unused]] const rclcpp_lifecycl
 
   auto is_regulating_state_interface_it = std::find_if(state_interfaces_.begin(), state_interfaces_.end(),
                                                        [](const hardware_interface::LoanedStateInterface& interface) {
-                                                         return interface.get_interface_name() == "regulate";
+                                                         return interface.get_interface_name() == "grip_cmd";
                                                        });
   if (is_regulating_state_interface_it == state_interfaces_.end())
   {
@@ -100,12 +100,12 @@ EpickGripperActionController::on_activate([[maybe_unused]] const rclcpp_lifecycl
   }
   is_regulating_state_interface_ = *is_regulating_state_interface_it;
 
-  commands_.regulate = regulate_command_interface_->get().get_value();
+  commands_.grip_cmd = regulate_command_interface_->get().get_value();
 
   commands_buffer_.initRT(commands_);
 
   pre_alloc_result_ = std::make_shared<GripperCommandAction::Result>();
-  pre_alloc_result_->position = commands_.regulate;
+  pre_alloc_result_->position = commands_.grip_cmd;
   pre_alloc_result_->reached_goal = false;
   pre_alloc_result_->stalled = false;
 
@@ -171,7 +171,7 @@ void EpickGripperActionController::accepted_callback(std::shared_ptr<GoalHandle>
   auto rt_goal = std::make_shared<RealtimeGoalHandle>(goal_handle);
 
   const auto& goal = goal_handle->get_goal();
-  commands_.regulate = goal->command.position;
+  commands_.grip_cmd = goal->command.position;
   commands_buffer_.writeFromNonRT(commands_);
 
   pre_alloc_result_->reached_goal = false;
@@ -200,7 +200,7 @@ void EpickGripperActionController::preempt_active_goal()
 
 void EpickGripperActionController::set_hold_position()
 {
-  commands_.regulate = regulate_command_interface_->get().get_value();
+  commands_.grip_cmd = regulate_command_interface_->get().get_value();
   commands_buffer_.writeFromNonRT(commands_);
 }
 

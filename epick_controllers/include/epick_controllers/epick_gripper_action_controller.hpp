@@ -49,7 +49,12 @@ public:
 
   struct Commands
   {
-    double regulate;
+    /**
+     * @brief Represents the binary flag send to the gripper hardware interface to actuate the vacuum gripper.
+     * @details If grip_cmd == 0.0, the gripper releases any held object. If grip_cmd == 1.0, the gripper activates its
+     * vacuum pump and attempts to grasp an object.
+     */
+    double grip_cmd;
   };
 
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
