@@ -74,7 +74,7 @@ public:
 
 private:
   /**
-   * Whith this command we send a request and wait for a response of given size.
+   * With this command we send a request and wait for a response of given size.
    * Behind the scene, if the response is not received, the software makes an attempt
    * to resend the command up to 5 times before returning an empty response.
    * @param request The command request.
