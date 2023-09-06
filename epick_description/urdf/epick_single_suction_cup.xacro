@@ -3,6 +3,7 @@
 
   <!-- Include EPick Body and helper macros -->
   <xacro:include filename="epick_body.xacro"/>
+  <xacro:include filename="$(find epick_description)/urdf/epick_driver_ros2_control.xacro" />
 
   <!-- Robotiq EPick + Suction Cup with optional extension
 
@@ -34,6 +35,9 @@
                        extension_radius:=0.0
                        extension_length:=0.0
                        tcp_stroke_compensation:=0.0">
+
+
+    <xacro:epick_driver_ros2_control name="epick_driver_ros2_control" />
 
     <!-- Body -->
     <!-- inherits prefix, parent and origin_*, exposes body_link, body_length, body_color -->
@@ -75,6 +79,5 @@
     <xacro:joint parent="${prefix}epick_tip"
                  child="${prefix}epick_tcp"
                  xyz="0 0 ${-tcp_stroke_compensation}"/>
-
   </xacro:macro>
 </robot>
