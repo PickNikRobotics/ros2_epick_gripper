@@ -1,0 +1,5 @@
+<library path="epick_gripper_controller_allocator">
+    <class name="epick_controllers/EpickGripperActionController" type="epick_moveit_plugin::EpickGripperControllerAllocator" base_class_type="moveit_ros_control_interface::ControllerHandleAllocator">
+        <description></description>
+    </class>
+</library>
