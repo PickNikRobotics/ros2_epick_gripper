@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <string>
+
 #include <epick_driver/driver.hpp>
 
 /**

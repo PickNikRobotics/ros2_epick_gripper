@@ -44,7 +44,6 @@ enum StateInterfaces : size_t
 {
   GRIP_CMD = 0,
   OBJECT_DETECTION_STATUS = 1
-
 };
 }
 

@@ -28,9 +28,12 @@
 
 #pragma once
 
-#include "epick_driver/serial.hpp"
-
 #include <gmock/gmock.h>
+
+#include <string>
+#include <vector>
+
+#include <epick_driver/serial.hpp>
 
 namespace epick_driver::test
 {

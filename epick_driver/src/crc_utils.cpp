@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <epick_driver/crc_utils.hpp>
-
 #include <array>
+
+#include <epick_driver/crc_utils.hpp>
 
 namespace epick_driver::crc_utils
 {

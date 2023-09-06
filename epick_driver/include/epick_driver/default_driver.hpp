@@ -28,12 +28,13 @@
 
 #pragma once
 
-#include <epick_driver/driver.hpp>
-#include <epick_driver/serial.hpp>
-
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <vector>
+
+#include <epick_driver/driver.hpp>
+#include <epick_driver/serial.hpp>
 
 namespace epick_driver
 {

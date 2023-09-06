@@ -29,6 +29,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <chrono>
+
 #include <epick_driver/epick_gripper_hardware_interface.hpp>
 #include <epick_driver/hardware_interface_utils.hpp>
 #include <epick_driver/default_driver_factory.hpp>
@@ -43,14 +45,13 @@
 #include <ros2_control_test_assets/components_urdfs.hpp>
 #include <ros2_control_test_assets/descriptions.hpp>
 
-#include <chrono>
-
 namespace epick_driver::test
 {
 using ::testing::Contains;
 using ::testing::Eq;
 
-using namespace hardware_interface_utils;
+using hardware_interface_utils::is_false;
+using hardware_interface_utils::is_true;
 
 // This factory will populate the injected driver with data read form the HardwareInfo.
 class TestDriverFactory : public DefaultDriverFactory
