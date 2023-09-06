@@ -26,9 +26,9 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <epick_driver/hardware_interface_utils.hpp>
-
 #include <algorithm>
+
+#include <epick_driver/hardware_interface_utils.hpp>
 
 namespace epick_driver::hardware_interface_utils
 {

@@ -26,6 +26,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
+
 #include <epick_driver/default_driver_factory.hpp>
 
 #include <epick_driver/default_driver.hpp>
@@ -35,8 +37,6 @@
 #include <epick_driver/default_serial_factory.hpp>
 
 #include <rclcpp/logging.hpp>
-
-#include <cmath>
 
 namespace epick_driver
 {

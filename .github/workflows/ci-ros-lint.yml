@@ -1,0 +1,43 @@
+name: ROS Lint
+on:
+  pull_request:
+
+jobs:
+  ament_lint:
+    name: ament_${{ matrix.linter }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        linter: [copyright, lint_cmake]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ros-tooling/setup-ros@0.6.2
+      - uses: ros-tooling/action-ros-lint@v0.1
+        with:
+          distribution: humble
+          linter: ${{ matrix.linter }}
+          package-name: epick_driver
+            epick_controllers
+            epick_description
+            epick_hardware_tests
+
+  ament_lint_121:
+    name: ament_${{ matrix.linter }}
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        linter: [cpplint]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ros-tooling/setup-ros@0.6.2
+      - uses: ros-tooling/action-ros-lint@v0.1
+        with:
+          distribution: humble
+          linter: cpplint
+          arguments: "--linelength=121 --filter=-whitespace/newline"
+          package-name: epick_driver
+            epick_controllers
+            epick_description
+            epick_hardware_tests

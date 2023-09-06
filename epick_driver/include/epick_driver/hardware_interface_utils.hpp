@@ -28,9 +28,10 @@
 
 #pragma once
 
-#include <hardware_interface/hardware_info.hpp>
-
 #include <optional>
+#include <string>
+
+#include <hardware_interface/hardware_info.hpp>
 
 namespace epick_driver::hardware_interface_utils
 {

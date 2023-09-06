@@ -26,20 +26,28 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <vector>
+
 #include "epick_driver/default_driver.hpp"
 #include "epick_driver/default_serial.hpp"
 #include "epick_driver/default_driver_utils.hpp"
 
 #include "command_line_utility.hpp"
 
-#include <chrono>
-#include <memory>
-#include <vector>
-#include <iostream>
-
 // This is a command to activate the gripper and read its status.
 
-using namespace epick_driver;
+using epick_driver::DefaultDriver;
+using epick_driver::DefaultSerial;
+using epick_driver::GripperMode;
+using epick_driver::default_driver_utils::actuator_status_to_string;
+using epick_driver::default_driver_utils::fault_status_to_string;
+using epick_driver::default_driver_utils::gripper_activation_action_to_string;
+using epick_driver::default_driver_utils::gripper_mode_to_string;
+using epick_driver::default_driver_utils::gripper_regulate_action_to_string;
+using epick_driver::default_driver_utils::object_detection_to_string;
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;
@@ -110,9 +118,9 @@ int main(int argc, char* argv[])
               << "  --timeout VALUE                   Set the read/write timeout (default " << kTimeout << "ms)\n"
               << "  --slave-address VALUE             Set the slave address (default " << kSlaveAddress << ")\n"
               << "  --gripper-mode VALUE              Set the gripper mode (default "
-              << default_driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << gripper_mode_to_string(kGripperMode) << ")\n"
               << "                                    Valid values AutomaticMode, AdvancedMode\n"
-              << default_driver_utils::gripper_mode_to_string(kGripperMode) << ")\n"
+              << gripper_mode_to_string(kGripperMode) << ")\n"
               << "  --grip-max-vacuum-pressure VALUE  Set the max vacuum pressure (default " << kGripMaxVacuumPressure
               << ")\n"
               << "  --grip-min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kGripMinVacuumPressure
@@ -151,7 +159,7 @@ int main(int argc, char* argv[])
     std::cout << " - baudrate: " << baudrate << "bps" << std::endl;
     std::cout << " - read/write timeout: " << timeout << "s" << std::endl;
     std::cout << " - slave address: " << slave_address << std::endl;
-    std::cout << " - gripper mode: " << default_driver_utils::gripper_mode_to_string(gripper_mode) << std::endl;
+    std::cout << " - gripper mode: " << gripper_mode_to_string(gripper_mode) << std::endl;
     std::cout << " - grip max vacuum pressure: " << grip_max_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - grip min vacuum pressure: " << grip_min_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - grip timeout: " << grip_timeout << "s" << std::endl;
@@ -180,17 +188,14 @@ int main(int argc, char* argv[])
     std::cout << "Status retrieved:" << std::endl;
 
     std::cout << " - gripper activation action: "
-              << default_driver_utils::gripper_activation_action_to_string(status.gripper_activation_action)
+              << gripper_activation_action_to_string(status.gripper_activation_action) << std::endl;
+    std::cout << " - gripper regulate action: " << gripper_regulate_action_to_string(status.gripper_regulate_action)
               << std::endl;
-    std::cout << " - gripper regulate action: "
-              << default_driver_utils::gripper_regulate_action_to_string(status.gripper_regulate_action) << std::endl;
-    std::cout << " - gripper mode: " << default_driver_utils::gripper_mode_to_string(status.gripper_mode) << std::endl;
-    std::cout << " - object detection status: "
-              << default_driver_utils::object_detection_to_string(status.object_detection_status) << std::endl;
-    std::cout << " - gripper fault status: "
-              << default_driver_utils::fault_status_to_string(status.gripper_fault_status) << std::endl;
-    std::cout << " - actuator status: " << default_driver_utils::actuator_status_to_string(status.actuator_status)
+    std::cout << " - gripper mode: " << gripper_mode_to_string(status.gripper_mode) << std::endl;
+    std::cout << " - object detection status: " << object_detection_to_string(status.object_detection_status)
               << std::endl;
+    std::cout << " - gripper fault status: " << fault_status_to_string(status.gripper_fault_status) << std::endl;
+    std::cout << " - actuator status: " << actuator_status_to_string(status.actuator_status) << std::endl;
     std::cout << " - max vacuum pressure: " << status.max_vacuum_pressure << "kPa" << std::endl;
     std::cout << " - actual vacuum pressure: " << status.actual_vacuum_pressure << "kPa" << std::endl;
   }

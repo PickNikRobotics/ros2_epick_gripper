@@ -28,9 +28,9 @@
 
 #pragma once
 
-#include <epick_driver/driver.hpp>
-
 #include <gmock/gmock.h>
+
+#include <epick_driver/driver.hpp>
 
 #include <rclcpp/rclcpp.hpp>
 

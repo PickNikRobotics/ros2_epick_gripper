@@ -26,20 +26,20 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <epick_driver/epick_gripper_hardware_interface.hpp>
-
-#include <epick_driver/default_driver_factory.hpp>
-#include <epick_driver/hardware_interface_utils.hpp>
-
 #include <serial/serial.h>
-
-#include <pluginlib/class_list_macros.hpp>
-#include <rclcpp/logging.hpp>
 
 #include <chrono>
 #include <cmath>
 #include <optional>
 #include <thread>
+
+#include <epick_driver/epick_gripper_hardware_interface.hpp>
+
+#include <epick_driver/default_driver_factory.hpp>
+#include <epick_driver/hardware_interface_utils.hpp>
+
+#include <pluginlib/class_list_macros.hpp>
+#include <rclcpp/logging.hpp>
 
 namespace epick_driver
 {
@@ -54,7 +54,10 @@ constexpr auto kObjectDetectionStateInterface = "object_detection_status";
 
 constexpr auto kGripperCommsLoopPeriod = std::chrono::milliseconds{ 10 };
 
-using namespace epick_driver::hardware_interface_utils;
+using epick_driver::hardware_interface_utils::get_gpios_command_interface;
+using epick_driver::hardware_interface_utils::get_gpios_state_interface;
+using epick_driver::hardware_interface_utils::is_false;
+using epick_driver::hardware_interface_utils::is_true;
 
 EpickGripperHardwareInterface::EpickGripperHardwareInterface()
 {

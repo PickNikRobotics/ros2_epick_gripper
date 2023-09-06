@@ -26,6 +26,12 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <serial/serial.h>
+
+#include <algorithm>
+#include <cmath>
+#include <iostream>
+
 #include <epick_driver/default_driver.hpp>
 
 #include <epick_driver/crc_utils.hpp>
@@ -33,13 +39,7 @@
 #include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/driver_exception.hpp>
 
-#include <serial/serial.h>
-
 #include <rclcpp/logging.hpp>
-
-#include <algorithm>
-#include <cmath>
-#include <iostream>
 
 // +-------------------------------+-------------------------------+
 // | Gripper Input Registers       | Gripper Output Registers      |
@@ -191,7 +191,7 @@ void DefaultDriver::activate()
 
 void DefaultDriver::deactivate()
 {
-  RCLCPP_INFO(kLogger, "Dectivate...");
+  RCLCPP_INFO(kLogger, "Deactivate...");
 
   std::vector<uint8_t> request = {
     slave_address_,

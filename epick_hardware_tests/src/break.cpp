@@ -26,22 +26,24 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "epick_driver/default_driver.hpp"
-#include "epick_driver/default_serial.hpp"
-
-#include "command_line_utility.hpp"
-
 #include <chrono>
+#include <iostream>
 #include <memory>
 #include <vector>
-#include <iostream>
+
+#include <epick_driver/default_driver.hpp>
+#include <epick_driver/default_serial.hpp>
+
+#include "command_line_utility.hpp"
 
 // This command is used to reproduce an issue we have with writing and reading
 // on the serial port. It runs an infinite loop of write/read instructions and
 // stops if/when an error is encountered. It usually fails between 1 and 6
 // minutes.
 
-using namespace epick_driver;
+using epick_driver::DefaultDriver;
+using epick_driver::DefaultSerial;
+using epick_driver::GripperMode;
 
 constexpr auto kComPort = "/dev/ttyUSB0";
 constexpr auto kBaudRate = 115200;

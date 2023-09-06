@@ -26,13 +26,13 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <epick_driver/default_driver_utils.hpp>
-
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <map>
 #include <unordered_map>
+
+#include <epick_driver/default_driver_utils.hpp>
 
 namespace epick_driver::default_driver_utils
 {
@@ -326,22 +326,22 @@ GripperFaultStatus get_gripper_fault_status(const uint8_t& reg)
 {
   // clang-format off
   static const std::unordered_map<uint8_t, GripperFaultStatus> map{
-    { 0b00000000, GripperFaultStatus::NoFault },                            // 0x0
-    { 0b00000001, GripperFaultStatus::Unknown },                            // 0x1
-    { 0b00000010, GripperFaultStatus::Unknown },                            // 0x2
-    { 0b00000011, GripperFaultStatus::PorousMaterialDetected },             // 0x3
-    { 0b00000100, GripperFaultStatus::Unknown },                            // 0x4
-    { 0b00000101, GripperFaultStatus::ActionDelayed },                      // 0x5
-    { 0b00000110, GripperFaultStatus::GrippingTimeout },                    // 0x6
-    { 0b00000111, GripperFaultStatus::ActivationBitNotSet },                // 0x7
-    { 0b00001000, GripperFaultStatus::MaximumTemperatureExceeded },         // 0x8
-    { 0b00001001, GripperFaultStatus::NoCommunicationForAtLeastOneSecond }, // 0x9
-    { 0b00001010, GripperFaultStatus::UnderMinimumOperatingVoltage },       // 0xA
-    { 0b00001011, GripperFaultStatus::AutomaticReleaseInProgress },         // 0xB
-    { 0b00001100, GripperFaultStatus::InternalFault },                      // 0xC
-    { 0b00001101, GripperFaultStatus::Unknown },                            // 0xD
-    { 0b00001110, GripperFaultStatus::Unknown },                            // 0xE
-    { 0b00001111, GripperFaultStatus::AutomaticReleaseCompleted }           // 0xF
+    { 0b00000000, GripperFaultStatus::NoFault },                             // 0x0
+    { 0b00000001, GripperFaultStatus::Unknown },                             // 0x1
+    { 0b00000010, GripperFaultStatus::Unknown },                             // 0x2
+    { 0b00000011, GripperFaultStatus::PorousMaterialDetected },              // 0x3
+    { 0b00000100, GripperFaultStatus::Unknown },                             // 0x4
+    { 0b00000101, GripperFaultStatus::ActionDelayed },                       // 0x5
+    { 0b00000110, GripperFaultStatus::GrippingTimeout },                     // 0x6
+    { 0b00000111, GripperFaultStatus::ActivationBitNotSet },                 // 0x7
+    { 0b00001000, GripperFaultStatus::MaximumTemperatureExceeded },          // 0x8
+    { 0b00001001, GripperFaultStatus::NoCommunicationForAtLeastOneSecond },  // 0x9
+    { 0b00001010, GripperFaultStatus::UnderMinimumOperatingVoltage },        // 0xA
+    { 0b00001011, GripperFaultStatus::AutomaticReleaseInProgress },          // 0xB
+    { 0b00001100, GripperFaultStatus::InternalFault },                       // 0xC
+    { 0b00001101, GripperFaultStatus::Unknown },                             // 0xD
+    { 0b00001110, GripperFaultStatus::Unknown },                             // 0xE
+    { 0b00001111, GripperFaultStatus::AutomaticReleaseCompleted }            // 0xF
   };
   // clang-format on
   return map.at(reg & default_driver_utils::gFLT_mask);

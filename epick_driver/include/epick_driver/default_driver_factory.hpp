@@ -28,11 +28,11 @@
 
 #pragma once
 
+#include <memory>
+
 #include <epick_driver/driver_factory.hpp>
 #include <epick_driver/default_driver_factory.hpp>
 #include <hardware_interface/hardware_info.hpp>
-
-#include <memory>
 
 namespace epick_driver
 {

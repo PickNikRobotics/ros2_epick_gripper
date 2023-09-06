@@ -28,6 +28,11 @@
 
 #pragma once
 
+#include <atomic>
+#include <thread>
+#include <memory>
+#include <vector>
+
 #include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/driver.hpp>
 #include <epick_driver/driver_factory.hpp>
@@ -37,12 +42,8 @@
 #include <hardware_interface/types/hardware_interface_type_values.hpp>
 #include <hardware_interface/handle.hpp>
 #include <hardware_interface/hardware_info.hpp>
-#include <hardware_interface/system_interface.hpp>
 #include <hardware_interface/types/hardware_interface_return_values.hpp>
 #include <rclcpp/macros.hpp>
-
-#include <atomic>
-#include <thread>
 
 #include "visibility_control.hpp"
 
