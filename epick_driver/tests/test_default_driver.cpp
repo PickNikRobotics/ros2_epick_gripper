@@ -29,11 +29,11 @@
 
 #include <gtest/gtest.h>
 
-#include "epick_driver/data_utils.hpp"
-#include "epick_driver/default_driver.hpp"
-#include "epick_driver/default_driver_utils.hpp"
+#include <epick_driver/data_utils.hpp>
+#include <epick_driver/default_driver.hpp>
+#include <epick_driver/default_driver_utils.hpp>
 
-#include "mock/mock_serial.hpp"
+#include <mock/mock_serial.hpp>
 
 namespace epick_driver::test
 {
@@ -92,7 +92,7 @@ TEST(TestDefaultDriver, activate)
 
   driver->activate();
 
-  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
+  ASSERT_EQ(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 /**
@@ -139,7 +139,7 @@ TEST(TestDefaultDriver, deactivate)
   driver->set_slave_address(0x9);
   driver->deactivate();
 
-  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
+  ASSERT_EQ(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 /**
@@ -193,7 +193,7 @@ TEST(TestDefaultDriver, grip)
 
   driver->grip();
 
-  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
+  ASSERT_EQ(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 /**
@@ -247,7 +247,7 @@ TEST(TestDefaultDriver, release)
 
   driver->release();
 
-  ASSERT_THAT(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
+  ASSERT_EQ(data_utils::to_hex(actual_request), data_utils::to_hex(expected_request));
 }
 
 }  // namespace epick_driver::test
