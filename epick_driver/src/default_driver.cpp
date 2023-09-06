@@ -191,7 +191,7 @@ void DefaultDriver::activate()
 
 void DefaultDriver::deactivate()
 {
-  RCLCPP_INFO(kLogger, "Dectivate...");
+  RCLCPP_INFO(kLogger, "Deactivate...");
 
   std::vector<uint8_t> request = {
     slave_address_,
