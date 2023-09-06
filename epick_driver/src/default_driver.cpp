@@ -148,6 +148,8 @@ void DefaultDriver::disconnect()
 
 void DefaultDriver::activate()
 {
+  RCLCPP_INFO(kLogger, "Activate...");
+
   uint8_t action_request_register = 0b00000000;
   default_driver_utils::set_gripper_activation_action(action_request_register, GripperActivationAction::Activate);
   default_driver_utils::set_gripper_mode(action_request_register, gripper_mode_);
@@ -189,6 +191,8 @@ void DefaultDriver::activate()
 
 void DefaultDriver::deactivate()
 {
+  RCLCPP_INFO(kLogger, "Dectivate...");
+
   std::vector<uint8_t> request = {
     slave_address_,
     static_cast<uint8_t>(default_driver_utils::FunctionCode::PresetMultipleRegisters),

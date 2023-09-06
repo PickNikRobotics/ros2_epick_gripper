@@ -46,7 +46,7 @@ Below is a sample configuration that outlines various parameters for this interf
 
       <gpio name="gripper">
         <!--
-          Commmand interface to control the gripper:
+          Command interface to control the gripper:
           1.0 = grip
           0.0 = release
         -->

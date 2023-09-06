@@ -117,8 +117,8 @@ int main(int argc, char* argv[])
               << ")\n"
               << "  --grip-min-vacuum-pressure VALUE  Set the min vacuum pressure (default " << kGripMinVacuumPressure
               << ")\n"
-              << "  --grip-timeout VALUE              Set the grip timeput (default " << kGripTimeout << "s)\n"
-              << "  --release-timeout VALUE           Set the release timeput (default " << kReleaseTimeout << "s)\n"
+              << "  --grip-timeout VALUE              Set the grip timeout (default " << kGripTimeout << "s)\n"
+              << "  --release-timeout VALUE           Set the release timeout (default " << kReleaseTimeout << "s)\n"
               << "  -h                                Show this help message\n";
     exit(0);
   });
