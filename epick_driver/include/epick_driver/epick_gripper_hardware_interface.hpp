@@ -151,7 +151,7 @@ public:
   hardware_interface::return_type read(const rclcpp::Time& time, const rclcpp::Duration& period) override;
 
   /**
-   * Write data from to hardware.
+   * Write data to hardware.
    */
   EPICK_DRIVER_PUBLIC
   hardware_interface::return_type write(const rclcpp::Time& time, const rclcpp::Duration& period) override;

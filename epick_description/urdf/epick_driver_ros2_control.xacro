@@ -32,21 +32,21 @@
       </hardware>
 
       <gpio name="gripper">
-        <!-- 
-          Commmand interface to control the gripper: 
+        <!--
+          Command interface to control the gripper:
           1.0 = grip
           0.0 = release
         -->
         <command_interface name="grip_cmd"/>
 
-        <!-- 
+        <!--
           State interface that follow the value of the command interface:
           1.0 = successful grip
           0.0 = successful release
         -->
         <state_interface name="grip_cmd"/>
 
-        <!-- 
+        <!--
           Return the object detection status:
           0.0 = unknown
           1.0 = object detected at minimum pressure
