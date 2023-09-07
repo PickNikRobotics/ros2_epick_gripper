@@ -26,9 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Launch file to start the Epick gripper.
-"""
+"Launch file to start the Epick gripper."
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -48,8 +46,9 @@ from launch.substitutions import (
 
 def launch_setup(context, *args, **kwargs):
     """
-    This function is called when the launch file is loaded.
+    Launch function.
 
+    Declare all parameters and extract their values, then start the nodes.
     'param: context' is the context object passed in by the launch framework.
     'param: *args' and 'param: **kwargs' are the arguments passed in by the
     launch file.
@@ -117,6 +116,8 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     """
+    Launch file entry point.
+
     A Python launch file is meant to help implement the markup based frontends like YAML
     and XML, and so it is declarative in nature rather than imperative. For this reason,
     it is not possible to directly access the content of LaunchConfiguration parameters,
