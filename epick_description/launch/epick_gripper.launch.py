@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"Launch file to start the Epick gripper."
+"""Launch file to start the Epick gripper."""
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
