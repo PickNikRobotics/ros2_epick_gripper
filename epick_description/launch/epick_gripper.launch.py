@@ -26,6 +26,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""
+Launch file to start the Epick gripper.
+"""
+
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
+
+import xacro
+
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
@@ -35,13 +44,16 @@ from launch.substitutions import (
     LaunchConfiguration,
     PathJoinSubstitution,
 )
-from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
-
-import xacro
 
 
 def launch_setup(context, *args, **kwargs):
+    """
+    This function is called when the launch file is loaded.
+
+    'param: context' is the context object passed in by the launch framework.
+    'param: *args' and 'param: **kwargs' are the arguments passed in by the
+    launch file.
+    """
     # Declare all parameters.
     description_package_param = LaunchConfiguration("description_package")
     description_file_param = LaunchConfiguration("description_file")
