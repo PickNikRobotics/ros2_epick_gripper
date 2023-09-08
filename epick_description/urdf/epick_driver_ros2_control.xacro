@@ -15,7 +15,7 @@
         <!-- Gripper parameters /////////////////////////////////////////// -->
 
         <!-- Set use_dummy to true to connect to a dummy driver for testing purposes. -->
-        <param name="use_dummy">${use_fake_hardware}</param>
+        <param name="use_dummy">false</param>
 
         <!-- The address of the gripper. -->
         <param name="slave_address">0x9</param>
