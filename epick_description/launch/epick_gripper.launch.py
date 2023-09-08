@@ -75,6 +75,7 @@ def launch_setup(context, *args, **kwargs):
     # The Controller Manager (CM) connects the controllers’ and hardware-abstraction
     # sides of the ros2_control framework. It also serves as the entry-point for users
     # through ROS services.
+    # https://control.ros.org/master/doc/getting_started/getting_started.html#architecture
     controller_manager = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -123,6 +124,8 @@ def generate_launch_description():
     it is not possible to directly access the content of LaunchConfiguration parameters,
     which are asyncio futures. To access the content of a LaunchConfiguration, we must
     provide a context by wrapping the initialization method into an OpaqueFunction.
+    https://answers.ros.org/question/397123/how-to-access-the-runtime-value-of-a-launchconfiguration-instance-within-custom-launch-code-injected-via-an-opaquefunction-in-ros2
+    https://github.com/Serafadam/interbotix_ros_manipulators/blob/xsarm_control_galactic/interbotix_ros_xsarms/interbotix_xsarm_control/launch/xsarm_control.launch.py
     """
     declared_arguments = [
         DeclareLaunchArgument(
