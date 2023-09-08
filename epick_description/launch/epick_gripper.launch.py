@@ -26,27 +26,33 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from launch import LaunchDescription
-from launch.actions import (
-    DeclareLaunchArgument,
-    IncludeLaunchDescription,
-    OpaqueFunction,
-    RegisterEventHandler,
-)
-from launch.conditions import IfCondition
-from launch.event_handlers import OnProcessExit
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import (
-    LaunchConfiguration,
-    PathJoinSubstitution,
-)
+"""Launch file to start the Epick gripper."""
+
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 import xacro
 
+from launch import LaunchDescription
+from launch.actions import (
+    DeclareLaunchArgument,
+    OpaqueFunction,
+)
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+)
+
 
 def launch_setup(context, *args, **kwargs):
+    """
+    Launch function.
+
+    Declare all parameters and extract their values, then start the nodes.
+    'param: context' is the context object passed in by the launch framework.
+    'param: *args' and 'param: **kwargs' are the arguments passed in by the
+    launch file.
+    """
     # Declare all parameters.
     description_package_param = LaunchConfiguration("description_package")
     description_file_param = LaunchConfiguration("description_file")
@@ -66,8 +72,9 @@ def launch_setup(context, *args, **kwargs):
 
     robot_description_content = xacro.process_file(description_file).toxml()
 
-    # The Controller Manager (CM) connects the controllers’ and hardware-abstraction sides of the ros2_control
-    # framework. It also serves as the entry-point for users through ROS services.
+    # The Controller Manager (CM) connects the controllers’ and hardware-abstraction
+    # sides of the ros2_control framework. It also serves as the entry-point for users
+    # through ROS services.
     # https://control.ros.org/master/doc/getting_started/getting_started.html#architecture
     controller_manager = Node(
         package="controller_manager",
@@ -89,9 +96,9 @@ def launch_setup(context, *args, **kwargs):
         arguments=["epick_controller", "-c", "/controller_manager"],
     )
 
-    # robot_state_publisher uses the URDF specified by the parameter robot_description and the joint positions
-    # from the topic /joint_states to calculate the forward kinematics of the robot and publish the results via
-    # tf.
+    # robot_state_publisher uses the URDF specified by the parameter robot_description
+    # and the joint positions from the topic /joint_states to calculate the forward
+    # kinematics of the robot and publish the results via tf.
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -110,10 +117,13 @@ def launch_setup(context, *args, **kwargs):
 
 def generate_launch_description():
     """
-    A Python launch file is meant to help implement the markup based frontends like YAML and XML, and so it is
-    declarative in nature rather than imperative. For this reason, it is not possible to directly access the content of
-    LaunchConfiguration parameters, which are asyncio futures. To access the content of a LaunchConfiguration, we must
-    provide a context by wrapping the initialization method into an OpaqueFunction. See more info:
+    Launch file entry point.
+
+    A Python launch file is meant to help implement the markup based frontends like YAML
+    and XML, and so it is declarative in nature rather than imperative. For this reason,
+    it is not possible to directly access the content of LaunchConfiguration parameters,
+    which are asyncio futures. To access the content of a LaunchConfiguration, we must
+    provide a context by wrapping the initialization method into an OpaqueFunction.
     https://answers.ros.org/question/397123/how-to-access-the-runtime-value-of-a-launchconfiguration-instance-within-custom-launch-code-injected-via-an-opaquefunction-in-ros2
     https://github.com/Serafadam/interbotix_ros_manipulators/blob/xsarm_control_galactic/interbotix_ros_xsarms/interbotix_xsarm_control/launch/xsarm_control.launch.py
     """
