@@ -132,22 +132,35 @@ TEST(TestEpickGripperHardwareInterface, grip)
   auto hardware = std::make_unique<epick_driver::EpickGripperHardwareInterface>(
       std::make_unique<TestDriverFactory>(std::move(driver)));
 
+  // clang-format off
   hardware_interface::HardwareInfo info{
     "EpickGripperHardwareInterface",
     "system",
     "epick_driver/EpickGripperHardwareInterface",
     {},  // parameters.
-    {},  // joints.
+    {
+      {
+        "gripper",
+        "joint",
+        {},
+        { { "position", "", "", "", "double", 1 } },
+        { {} }
+      }
+    },
     {},  // Sensors.
-    {    // GPIOs
-      { "gripper",
+    {
+      {
+        "gripper",
         "GPIO",
         { { "grip_cmd", "", "", "", "double", 1 } },
         { { "grip_cmd", "", "", "", "double", 1 }, { "object_detection_status", "", "", "", "double", 1 } },
-        { {} } } },
+        { {} }
+      }
+    },
     {},  // Transmission.
     ""   // original xml.
   };
+  // clang-format on
 
   // Load the component.
   hardware_interface::ResourceManager rm;
@@ -159,6 +172,8 @@ TEST(TestEpickGripperHardwareInterface, grip)
   rm.set_component_state("EpickGripperHardwareInterface", active_state);
 
   EXPECT_THAT(rm.command_interface_keys(), Contains(Eq("gripper/grip_cmd")));
+  EXPECT_THAT(rm.state_interface_keys(), Contains(Eq("gripper/grip_cmd")));
+  EXPECT_THAT(rm.state_interface_keys(), Contains(Eq("gripper/position")));
 
   // The gripper/grip_cmd GPIO interface is intended to be used as a boolean.
   // Unfortunately, because of limitations of ros2_controls, it is implemented
@@ -169,35 +184,46 @@ TEST(TestEpickGripperHardwareInterface, grip)
   // The gripper/grip_cmd GPIO state interface follows the value of the
   // corresponding gripper/grip_cmd GPIO command interface with a small delay.
 
-  // Claim the grip_cmd command interface.
-  hardware_interface::LoanedCommandInterface gripper_command_interface = rm.claim_command_interface("gripper/grip_cmd");
-  ASSERT_TRUE(is_false(gripper_command_interface.get_value()));
+  // Claim the gripper/grip_cmd gpio command interface.
+  hardware_interface::LoanedCommandInterface gripper_gpio_command_interface =
+      rm.claim_command_interface("gripper/grip_cmd");
+  ASSERT_TRUE(is_false(gripper_gpio_command_interface.get_value()));
 
-  // Claim the grip_cmd state interface.
-  hardware_interface::LoanedStateInterface gripper_state_interface = rm.claim_state_interface("gripper/grip_cmd");
-  ASSERT_TRUE(is_false(gripper_state_interface.get_value()));
+  // Claim the gripper/grip_cmd gpio state interface.
+  hardware_interface::LoanedStateInterface gripper_gpio_state_interface = rm.claim_state_interface("gripper/grip_cmd");
+  ASSERT_TRUE(is_false(gripper_gpio_state_interface.get_value()));
+
+  // Claim the gripper/position joint state interface.
+  hardware_interface::LoanedStateInterface gripper_joint_state_interface = rm.claim_state_interface("gripper/position");
+  ASSERT_TRUE(is_false(gripper_joint_state_interface.get_value()));
 
   // Ask the gripper to grip.
-  gripper_command_interface.set_value(1.0);
+  gripper_gpio_command_interface.set_value(1.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
   auto gripper_gripping = [&]() {
     rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
-    return is_true(gripper_state_interface.get_value());
+    return is_true(gripper_gpio_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_gripping, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to grip.";
 
+  // Test the content of the optional joint.
+  ASSERT_TRUE(is_true(gripper_joint_state_interface.get_value()));
+
   // Ask the gripper to release.
-  gripper_command_interface.set_value(0.0);
+  gripper_gpio_command_interface.set_value(0.0);
   rm.write(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
 
   auto gripper_released = [&]() {
     rm.read(rclcpp::Time{}, rclcpp::Duration::from_seconds(0));
-    return is_false(gripper_state_interface.get_value());
+    return is_false(gripper_gpio_state_interface.get_value());
   };
   ASSERT_TRUE(wait_for_condition(gripper_released, std::chrono::milliseconds(500)))
       << "Timeout exceeded waiting for the gripper to release.";
+
+  // Test the content of the optional joint.
+  ASSERT_TRUE(is_false(gripper_joint_state_interface.get_value()));
 
   // Deactivate the hardware.
   rclcpp_lifecycle::State inactive_state{ lifecycle_msgs::msg::State::PRIMARY_STATE_INACTIVE,

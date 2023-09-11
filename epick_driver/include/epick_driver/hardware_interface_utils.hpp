@@ -56,6 +56,26 @@ get_gpios_state_interface(std::string gpio_name, std::string interface_name,
                           const hardware_interface::HardwareInfo& info);
 
 /**
+ * Look for a joint command interface in the hardware info.
+ * @param joint_name The component name.
+ * @param interface_name The interface name.
+ * @return the interface info of the requested interface, if any.
+ */
+std::optional<hardware_interface::InterfaceInfo>
+get_joints_command_interface(std::string joint_name, std::string interface_name,
+                             const hardware_interface::HardwareInfo& info);
+
+/**
+ * Look for a joint state interface in the hardware info.
+ * @param joint_name The component name.
+ * @param interface_name The interface name.
+ * @return the interface info of the requested interface, if any.
+ */
+std::optional<hardware_interface::InterfaceInfo>
+get_joints_state_interface(std::string joint_name, std::string interface_name,
+                           const hardware_interface::HardwareInfo& info);
+
+/**
  * All command and state interfaces work with double values. We can
  * use double value to represent boolean values:
  * 0.0 = true
