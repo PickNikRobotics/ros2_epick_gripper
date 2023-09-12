@@ -31,9 +31,6 @@ add_executable(activate
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(activate
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(activate epick_driver::epick_driver)
 ament_target_dependencies(activate epick_driver)
 
 add_executable(deactivate
@@ -41,9 +38,6 @@ add_executable(deactivate
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(deactivate
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(deactivate epick_driver::epick_driver)
 ament_target_dependencies(deactivate epick_driver)
 
 add_executable(get_status
@@ -51,9 +45,6 @@ add_executable(get_status
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(get_status
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(get_status epick_driver::epick_driver)
 ament_target_dependencies(get_status epick_driver)
 
 add_executable(grip
@@ -61,9 +52,6 @@ add_executable(grip
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(grip
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(grip epick_driver::epick_driver)
 ament_target_dependencies(grip epick_driver)
 
 add_executable(release
@@ -71,9 +59,6 @@ add_executable(release
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(release
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(release epick_driver::epick_driver)
 ament_target_dependencies(release epick_driver)
 
 add_executable(break
@@ -81,9 +66,6 @@ add_executable(break
     src/command_line_utility.hpp
     src/command_line_utility.cpp
 )
-target_include_directories(break
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(break epick_driver::epick_driver)
 ament_target_dependencies(break epick_driver)
 
 ament_package()

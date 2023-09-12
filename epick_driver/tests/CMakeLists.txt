@@ -33,6 +33,9 @@ target_include_directories(test_epick_gripper_hardware_interface
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(test_epick_gripper_hardware_interface epick_driver)
+ament_target_dependencies(test_epick_gripper_hardware_interface
+    ros2_control_test_assets
+)
 
 ###############################################################################
 # test_default_serial_factory
