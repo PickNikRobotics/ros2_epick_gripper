@@ -46,7 +46,7 @@ constexpr auto kGripperCommandAction = "gripper_cmd";
 namespace epick_moveit_plugin
 {
 /**
- * \brief Controller allocator plugin to allow the EpickGripperActionController to be
+ * \brief Controller allocator plugin to allow the EpickGripperActionController to execute trajectories using MoveIt in the same way as the ros2_controllers GripperActionController
  */
 class EpickGripperControllerAllocator : public moveit_ros_control_interface::ControllerHandleAllocator
 {
