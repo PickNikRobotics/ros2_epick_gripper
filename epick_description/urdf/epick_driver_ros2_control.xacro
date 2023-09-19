@@ -40,7 +40,8 @@
         <command_interface name="grip_cmd"/>
 
         <!--
-          State interface that follow the value of the command interface:
+          State interface that follows the value of the gripper/grip_cmd
+          command interface:
           1.0 = successful grip
           0.0 = successful release
         -->
@@ -55,6 +56,20 @@
         -->
         <state_interface name="object_detection_status"/>
       </gpio>
+
+      <!--
+        This is optional configuration if you want to publish the state of the
+        gripper as a joint state interface.
+      -->
+      <joint name="gripper">
+        <!--
+          State interface that follows the value of the gripper/grip_cmd
+          command interface:
+          1.0 = successful grip
+          0.0 = successful release
+        -->
+        <state_interface name="position"/>
+      </joint>
 
     </ros2_control>
 

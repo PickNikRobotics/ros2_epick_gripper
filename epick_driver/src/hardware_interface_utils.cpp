@@ -89,4 +89,46 @@ bool is_false(double value)
   return value < 0.5;
 }
 
+std::optional<hardware_interface::InterfaceInfo>
+get_joints_command_interface(std::string joint_name, std::string interface_name,
+                             const hardware_interface::HardwareInfo& info)
+{
+  auto joint_component = std::find_if(info.joints.begin(), info.joints.end(),
+                                      [&joint_name](const auto& gpio) { return gpio.name == joint_name; });
+
+  if (joint_component != info.joints.end())
+  {
+    auto hardware_info =
+        std::find_if(joint_component->command_interfaces.begin(), joint_component->command_interfaces.end(),
+                     [&interface_name](const auto& cmd) { return cmd.name == interface_name; });
+
+    if (hardware_info != joint_component->command_interfaces.end())
+    {
+      return *hardware_info;
+    }
+  }
+  return std::nullopt;
+}
+
+std::optional<hardware_interface::InterfaceInfo>
+get_joints_state_interface(std::string joint_name, std::string interface_name,
+                           const hardware_interface::HardwareInfo& info)
+{
+  auto joint_component = std::find_if(info.joints.begin(), info.joints.end(),
+                                      [&joint_name](const auto& gpio) { return gpio.name == joint_name; });
+
+  if (joint_component != info.joints.end())
+  {
+    auto hardware_info =
+        std::find_if(joint_component->state_interfaces.begin(), joint_component->state_interfaces.end(),
+                     [&interface_name](const auto& cmd) { return cmd.name == interface_name; });
+
+    if (hardware_info != joint_component->state_interfaces.end())
+    {
+      return *hardware_info;
+    }
+  }
+  return std::nullopt;
+}
+
 }  // namespace epick_driver::hardware_interface_utils
