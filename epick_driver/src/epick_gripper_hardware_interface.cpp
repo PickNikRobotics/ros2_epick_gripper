@@ -45,17 +45,18 @@ namespace epick_driver
 {
 const auto kLogger = rclcpp::get_logger("EpickGripperHardwareInterface");
 
-constexpr auto kGripperGPIO = "gripper";
+constexpr auto kGripperPrefixName = "gripper";
 
-constexpr auto kGripCommandInterface = "grip_cmd";
+constexpr auto kGripCommandInterfaceName = "grip_cmd";
+constexpr auto kGripStateInterfacename = "grip_cmd";
 
-constexpr auto kGripStateInterface = "grip_cmd";
-constexpr auto kObjectDetectionStateInterface = "object_detection_status";
+constexpr auto kObjectDetectionStateInterfaceName = "object_detection_status";
 
 constexpr auto kGripperCommsLoopPeriod = std::chrono::milliseconds{ 10 };
 
 using epick_driver::hardware_interface_utils::get_gpios_command_interface;
 using epick_driver::hardware_interface_utils::get_gpios_state_interface;
+using epick_driver::hardware_interface_utils::get_joints_state_interface;
 using epick_driver::hardware_interface_utils::is_false;
 using epick_driver::hardware_interface_utils::is_true;
 
@@ -141,23 +142,30 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
   std::vector<hardware_interface::StateInterface> state_interfaces;
   try
   {
-    if (get_gpios_state_interface(kGripperGPIO, kObjectDetectionStateInterface, info_).has_value())
+    if (get_gpios_state_interface(kGripperPrefixName, kObjectDetectionStateInterfaceName, info_).has_value())
     {
-      state_interfaces.emplace_back(hardware_interface::StateInterface(kGripperGPIO, kObjectDetectionStateInterface,
-                                                                       &gripper_status_.object_detection_status));
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          kGripperPrefixName, kObjectDetectionStateInterfaceName, &gripper_status_.object_detection_status));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kObjectDetectionStateInterface);
+      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperPrefixName, kObjectDetectionStateInterfaceName);
     }
-    if (get_gpios_state_interface(kGripperGPIO, kGripStateInterface, info_).has_value())
+    if (get_gpios_state_interface(kGripperPrefixName, kGripStateInterfacename, info_).has_value())
     {
       state_interfaces.emplace_back(
-          hardware_interface::StateInterface(kGripperGPIO, kGripStateInterface, &gripper_status_.grip_cmd));
+          hardware_interface::StateInterface(kGripperPrefixName, kGripStateInterfacename, &gripper_status_.grip_cmd));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperGPIO, kGripStateInterface);
+      RCLCPP_ERROR(kLogger, "State interface %s/%s not found.", kGripperPrefixName, hardware_interface::HW_IF_POSITION);
+    }
+
+    // This joint state is optional.
+    if (get_joints_state_interface(kGripperPrefixName, hardware_interface::HW_IF_POSITION, info_).has_value())
+    {
+      state_interfaces.emplace_back(hardware_interface::StateInterface(
+          kGripperPrefixName, hardware_interface::HW_IF_POSITION, &gripper_status_.grip_cmd));
     }
   }
   catch (const std::exception& ex)
@@ -175,14 +183,14 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   std::vector<hardware_interface::CommandInterface> command_interfaces;
   try
   {
-    if (get_gpios_command_interface(kGripperGPIO, kGripCommandInterface, info_).has_value())
+    if (get_gpios_command_interface(kGripperPrefixName, kGripCommandInterfaceName, info_).has_value())
     {
       command_interfaces.emplace_back(
-          hardware_interface::CommandInterface(kGripperGPIO, kGripCommandInterface, &gripper_cmds_.grip_cmd));
+          hardware_interface::CommandInterface(kGripperPrefixName, kGripCommandInterfaceName, &gripper_cmds_.grip_cmd));
     }
     else
     {
-      RCLCPP_ERROR(kLogger, "Command interface %s/%s not found.", kGripperGPIO, kGripCommandInterface);
+      RCLCPP_ERROR(kLogger, "Command interface %s/%s not found.", kGripperPrefixName, kGripCommandInterfaceName);
     }
   }
   catch (const std::exception& ex)

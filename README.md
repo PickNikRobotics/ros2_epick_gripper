@@ -4,7 +4,6 @@
 [![Format](https://github.com/PickNikRobotics/ros2_epick_gripper/actions/workflows/ci-format.yml/badge.svg)](https://github.com/PickNikRobotics/ros2_epick_gripper/actions/workflows/ci-format.yml)
 [![Linters](https://github.com/PickNikRobotics/ros2_epick_gripper/actions/workflows/ci-ros-lint.yml/badge.svg)](https://github.com/PickNikRobotics/ros2_epick_gripper/actions/workflows/ci-ros-lint.yml)
 
-
 This repository contains the ROS 2 driver, controller, and description packages for working with a Robotiq EPick Gripper.
 
 ## Hardware Interface
@@ -71,6 +70,20 @@ Below is a sample configuration that outlines various parameters for this interf
         -->
         <state_interface name="object_detection_status"/>
       </gpio>
+
+      <!--
+        This is optional configuration if you want to publish the state of the
+        gripper as a joint state interface.
+      -->
+      <joint name="gripper">
+        <!--
+          State interface that follows the value of the gripper/grip_cmd
+          command interface:
+          1.0 = successful grip
+          0.0 = successful release
+        -->
+        <state_interface name="position"/>
+      </joint>
 
     </ros2_control>
 
