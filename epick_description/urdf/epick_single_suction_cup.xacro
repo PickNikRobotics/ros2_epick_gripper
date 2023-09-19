@@ -34,10 +34,12 @@
                        suction_cup_height:=0.015
                        extension_radius:=0.0
                        extension_length:=0.0
-                       tcp_stroke_compensation:=0.0">
+                       tcp_stroke_compensation:=0.0
+                       use_fake_hardware:=true">
 
-
-    <xacro:epick_driver_ros2_control name="epick_driver_ros2_control" />
+    <xacro:epick_driver_ros2_control 
+      name="epick_driver_ros2_control" 
+      use_fake_hardware="${use_fake_hardware}"/>
 
     <!-- Body -->
     <!-- inherits prefix, parent and origin_*, exposes body_link, body_length, body_color -->
