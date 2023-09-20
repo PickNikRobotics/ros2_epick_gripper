@@ -73,4 +73,11 @@ uint8_t get_msb(uint16_t value);
  */
 uint8_t get_lsb(uint16_t value);
 
+/**
+ * Convert a string to lowercase.
+ * @param str The string to convert.
+ * @return The lowercase string.
+ */
+std::string to_lower(const std::string& str);
+
 }  // namespace epick_driver::data_utils

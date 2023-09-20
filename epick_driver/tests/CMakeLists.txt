@@ -60,3 +60,14 @@ target_include_directories(test_default_driver_factory
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 target_link_libraries(test_default_driver_factory epick_driver)
+
+###############################################################################
+# test_data_utils
+
+ament_add_gmock(test_data_utils
+    test_data_utils.cpp
+)
+target_include_directories(test_data_utils
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(test_data_utils epick_driver)

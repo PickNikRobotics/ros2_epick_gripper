@@ -30,6 +30,7 @@
 
 #include <epick_driver/default_driver_factory.hpp>
 
+#include <epick_driver/data_utils.hpp>
 #include <epick_driver/default_driver.hpp>
 #include <epick_driver/default_driver_utils.hpp>
 #include <epick_driver/fake/fake_driver.hpp>
@@ -63,6 +64,8 @@ constexpr auto kReleaseTimeoutParamDefault = 0.5;
 
 constexpr auto kUseDummyParamName = "use_dummy";
 constexpr auto kUseDummyParamDefault = "false";
+
+using data_utils::to_lower;
 
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
@@ -124,7 +127,7 @@ std::unique_ptr<Driver> DefaultDriverFactory::create_driver(const hardware_inter
 {
   // We give the user an option to startup a dummy gripper for testing purposes.
   if (info.hardware_parameters.count(kUseDummyParamName) &&
-      info.hardware_parameters.at(kUseDummyParamName) != kUseDummyParamDefault)
+      to_lower(info.hardware_parameters.at(kUseDummyParamName)) != to_lower(kUseDummyParamDefault))
   {
     RCLCPP_INFO(kLogger, "You are connected to a dummy driver, not a real hardware.");
     return std::make_unique<FakeDriver>();
