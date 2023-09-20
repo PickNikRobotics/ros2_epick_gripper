@@ -1,11 +1,9 @@
 <?xml version="1.0"?>
 <robot name="example_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find epick_description)/urdf/epick_single_suction_cup.xacro" ns="robotiq"/>
-  <xacro:include filename="$(find epick_description)/urdf/epick_driver_ros2_control.xacro" />
+  <xacro:include filename="$(find epick_description)/urdf/epick_single_suction_cup.xacro"/>
 
   <link name="world"/>
-  <xacro:robotiq.epick_single_suction_cup parent="world"/>
-  <xacro:epick_driver_ros2_control name="epick_driver_ros2_control" />
+  <xacro:epick_single_suction_cup parent="world" use_fake_hardware="false"/>
 
 </robot>
