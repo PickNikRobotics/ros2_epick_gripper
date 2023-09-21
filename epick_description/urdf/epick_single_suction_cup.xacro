@@ -37,8 +37,8 @@
                        tcp_stroke_compensation:=0.0
                        use_fake_hardware:=true">
 
-    <xacro:epick_driver_ros2_control 
-      name="epick_driver_ros2_control" 
+    <xacro:epick_driver_ros2_control
+      name="epick_driver_ros2_control"
       use_fake_hardware="${use_fake_hardware}"/>
 
     <!-- Body -->
