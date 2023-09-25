@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-  <xacro:macro name="epick_driver_ros2_control" params="name use_fake_hardware:=true">
+  <xacro:macro name="epick_driver_ros2_control"
+               params="name use_fake_hardware:=true
+                       usb_port:=/dev/ttyUSB0
+                       baud_rate:=115200
+                       timeout:=0.2
+                       slave_address:=0x9
+                       mode:=AdvancedMode
+                       grip_max_vacuum_pressure:=-60
+                       grip_min_vacuum_pressure:=-10
+                       grip_timeout:=25.0
+                       release_timeout:=2.0">
 
     <ros2_control name="${name}" type="system">
       <hardware>
@@ -8,9 +18,9 @@
 
        <!-- Serial connection parameters ////////////////////////////////// -->
 
-        <param name="usb_port">/dev/ttyUSB0</param>
-        <param name="baud_rate">115200</param>
-        <param name="timeout">0.2</param>
+        <param name="usb_port">${usb_port}</param>
+        <param name="baud_rate">${baud_rate}</param>
+        <param name="timeout">${timeout}</param>
 
         <!-- Gripper parameters /////////////////////////////////////////// -->
 
@@ -18,16 +28,16 @@
         <param name="use_dummy">${use_fake_hardware}</param>
 
         <!-- The address of the gripper. -->
-        <param name="slave_address">0x9</param>
+        <param name="slave_address">${slave_address}</param>
 
         <!-- The gripper operation mode: AutomaticMode or AdvancedMode. -->
-        <param name="mode">AdvancedMode</param>
+        <param name="mode">${mode}</param>
 
         <!-- The following parameters are only required for the AdvancedMode. -->
-        <param name="grip_max_vacuum_pressure">-60</param>
-        <param name="grip_min_vacuum_pressure">-10</param>
-        <param name="grip_timeout">25.0</param>
-        <param name="release_timeout">2.0</param>
+        <param name="grip_max_vacuum_pressure">${grip_max_vacuum_pressure}</param>
+        <param name="grip_min_vacuum_pressure">${grip_min_vacuum_pressure}</param>
+        <param name="grip_timeout">${grip_timeout}</param>
+        <param name="release_timeout">${release_timeout}</param>
 
       </hardware>
 
