@@ -28,14 +28,13 @@
 
 #include <epick_controllers/epick_gripper_action_controller.hpp>
 
-#include <rclcpp/logging.hpp>
-#include <hardware_interface/loaned_command_interface.hpp>
-#include <hardware_interface/loaned_state_interface.hpp>
-
 #include <algorithm>
 #include <chrono>
 #include <limits>
-#include <optional>
+
+#include <rclcpp/logging.hpp>
+#include <hardware_interface/loaned_command_interface.hpp>
+#include <hardware_interface/loaned_state_interface.hpp>
 
 namespace epick_controllers
 {
