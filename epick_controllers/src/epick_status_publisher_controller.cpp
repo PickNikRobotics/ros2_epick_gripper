@@ -35,7 +35,6 @@ namespace state
 enum StateInterfaces : size_t
 {
   OBJECT_DETECTION_STATUS = 0
-
 };
 }
 

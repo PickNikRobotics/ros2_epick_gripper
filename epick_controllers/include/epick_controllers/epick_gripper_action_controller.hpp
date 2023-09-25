@@ -28,11 +28,11 @@
 
 #pragma once
 
-#include <memory>
-#include <optional>
-
 #include <realtime_tools/realtime_buffer.h>
 #include <realtime_tools/realtime_server_goal_handle.h>
+
+#include <memory>
+#include <optional>
 
 #include <control_msgs/action/gripper_command.hpp>
 #include <controller_interface/controller_interface.hpp>
