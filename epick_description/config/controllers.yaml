@@ -5,5 +5,7 @@ controller_manager:
   ros__parameters:
     update_rate: 30 # Hz
 
-    epick_controller:
-      type: epick_controllers/EpickController
+    epick_gripper_action_controller:
+      type: epick_controllers/EpickGripperActionController
+    epick_status_publisher_controller:
+      type: epick_controllers/EpickStatusPublisherController

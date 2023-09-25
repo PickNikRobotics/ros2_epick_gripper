@@ -1,0 +1,7 @@
+<library path="epick_gripper_controller_allocator">
+    <!-- The name defined here must match the name of the controller plugin as defined in epick_controllers/controller_plugins.xml.
+         This is how we tell MoveIt's controller manager to load this controller allocator for this specific type of controller. -->
+    <class name="epick_controllers/EpickGripperActionController" type="epick_moveit_plugin::EpickGripperControllerAllocator" base_class_type="moveit_ros_control_interface::ControllerHandleAllocator">
+        <description></description>
+    </class>
+</library>

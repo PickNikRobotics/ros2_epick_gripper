@@ -29,12 +29,12 @@
 #pragma once
 
 #include <controller_interface/controller_interface.hpp>
-#include <std_srvs/srv/set_bool.hpp>
 #include <std_msgs/msg/float64.hpp>
+#include <epick_msgs/msg/object_detection_status.hpp>
 
 namespace epick_controllers
 {
-class EpickController : public controller_interface::ControllerInterface
+class EpickStatusPublisherController : public controller_interface::ControllerInterface
 {
 public:
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
@@ -50,11 +50,6 @@ public:
   CallbackReturn on_init() override;
 
 private:
-  // When we send a true, the gripper will begin to grip, when false the gripper will release.
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr grip_srv_;
-
-  // The logic of the server to control the gripper.
-  bool grip_cmd(std_srvs::srv::SetBool::Request::SharedPtr request,
-                std_srvs::srv::SetBool::Response::SharedPtr response);
+  rclcpp::Publisher<epick_msgs::msg::ObjectDetectionStatus>::SharedPtr object_detection_status_pub_;
 };
 }  // namespace epick_controllers

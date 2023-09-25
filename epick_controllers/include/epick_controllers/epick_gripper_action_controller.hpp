@@ -28,15 +28,38 @@
 
 #pragma once
 
+#include <realtime_tools/realtime_buffer.h>
+#include <realtime_tools/realtime_server_goal_handle.h>
+
+#include <memory>
+#include <optional>
+
+#include <control_msgs/action/gripper_command.hpp>
 #include <controller_interface/controller_interface.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include <std_srvs/srv/set_bool.hpp>
 #include <std_msgs/msg/float64.hpp>
 
 namespace epick_controllers
 {
-class EpickController : public controller_interface::ControllerInterface
+class EpickGripperActionController : public controller_interface::ControllerInterface
 {
 public:
+  using GripperCommandAction = control_msgs::action::GripperCommand;
+  using GoalHandle = rclcpp_action::ServerGoalHandle<GripperCommandAction>;
+  using RealtimeGoalHandle = realtime_tools::RealtimeServerGoalHandle<control_msgs::action::GripperCommand>;
+  using RealtimeGoalHandleBuffer = realtime_tools::RealtimeBuffer<std::shared_ptr<RealtimeGoalHandle>>;
+
+  struct Commands
+  {
+    /**
+     * @brief Represents the binary flag send to the gripper hardware interface to actuate the vacuum gripper.
+     * @details If grip_cmd == 0.0, the gripper releases any held object. If grip_cmd == 1.0, the gripper activates its
+     * vacuum pump and attempts to grasp an object.
+     */
+    double grip_cmd;
+  };
+
   controller_interface::InterfaceConfiguration command_interface_configuration() const override;
 
   controller_interface::InterfaceConfiguration state_interface_configuration() const override;
@@ -50,11 +73,34 @@ public:
   CallbackReturn on_init() override;
 
 private:
-  // When we send a true, the gripper will begin to grip, when false the gripper will release.
-  rclcpp::Service<std_srvs::srv::SetBool>::SharedPtr grip_srv_;
+  rclcpp_action::GoalResponse goal_callback(const rclcpp_action::GoalUUID& uuid,
+                                            std::shared_ptr<const GripperCommandAction::Goal> goal);
 
-  // The logic of the server to control the gripper.
-  bool grip_cmd(std_srvs::srv::SetBool::Request::SharedPtr request,
-                std_srvs::srv::SetBool::Response::SharedPtr response);
+  rclcpp_action::CancelResponse cancel_callback(const std::shared_ptr<GoalHandle> goal_handle);
+
+  void accepted_callback(std::shared_ptr<GoalHandle> goal_handle);
+
+  void preempt_active_goal();
+
+  void set_hold_position();
+
+  void check_for_success(const double current_regulate_state, const double current_regulate_command);
+
+  std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface>> regulate_command_interface_;
+
+  std::optional<std::reference_wrapper<hardware_interface::LoanedStateInterface>> is_regulating_state_interface_;
+
+  std::shared_ptr<rclcpp_action::Server<GripperCommandAction>> action_server_;
+
+  std::shared_ptr<rclcpp::TimerBase> goal_handle_timer_;
+
+  RealtimeGoalHandleBuffer rt_active_goal_;
+
+  GripperCommandAction::Result::SharedPtr pre_alloc_result_;
+
+  realtime_tools::RealtimeBuffer<Commands> commands_buffer_;
+
+  Commands commands_;
+  Commands commands_rt_;
 };
 }  // namespace epick_controllers

@@ -93,7 +93,13 @@ def launch_setup(context, *args, **kwargs):
     epick_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["epick_controller", "-c", "/controller_manager"],
+        arguments=["epick_gripper_action_controller", "-c", "/controller_manager"],
+    )
+
+    epick_status_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["epick_status_publisher_controller", "-c", "/controller_manager"],
     )
 
     # robot_state_publisher uses the URDF specified by the parameter robot_description
@@ -110,6 +116,7 @@ def launch_setup(context, *args, **kwargs):
     nodes_to_start = [
         controller_manager,
         epick_controller_spawner,
+        epick_status_controller_spawner,
         robot_state_publisher_node,
     ]
     return nodes_to_start

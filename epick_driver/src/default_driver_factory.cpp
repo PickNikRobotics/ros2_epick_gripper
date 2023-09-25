@@ -63,7 +63,7 @@ constexpr auto kReleaseTimeoutParamName = "release_timeout";
 constexpr auto kReleaseTimeoutParamDefault = 0.5;
 
 constexpr auto kUseDummyParamName = "use_dummy";
-constexpr auto kUseDummyParamDefault = "false";
+constexpr auto kUseDummyParamDefault = "False";  // TODO(kineticsystem): make this so it's not case sensitive
 
 using data_utils::to_lower;
 
