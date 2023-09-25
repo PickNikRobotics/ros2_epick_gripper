@@ -62,7 +62,7 @@ constexpr auto kReleaseTimeoutParamName = "release_timeout";
 constexpr auto kReleaseTimeoutParamDefault = 0.5;
 
 constexpr auto kUseDummyParamName = "use_dummy";
-constexpr auto kUseDummyParamDefault = "False";  // TODO: make this so it's not case sensitive
+constexpr auto kUseDummyParamDefault = "False";  // TODO(kineticsystem): make this so it's not case sensitive
 
 std::unique_ptr<epick_driver::Driver>
 epick_driver::DefaultDriverFactory::create(const hardware_interface::HardwareInfo& info) const
