@@ -41,7 +41,7 @@ namespace
 /**
  * @brief Convert a double to a bool using the same logic the EpickGripperHardwareInterface uses to convert
  * the boolean gripper command and state values into doubles when storing them in the ros2_control interfaces.
- * 
+ *
  * @param value Value to convert
  * @return Returns true if the value is greater than or equal to 0.5, and false if it is less than 0.5.
  */
@@ -49,7 +49,7 @@ bool toBool(double value)
 {
   return value >= 0.5;
 }
-}
+}  // namespace
 
 namespace epick_controllers
 {
