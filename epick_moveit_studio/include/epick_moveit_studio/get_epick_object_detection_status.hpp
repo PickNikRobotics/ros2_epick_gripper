@@ -50,7 +50,7 @@ inline epick_msgs::msg::ObjectDetectionStatus convertFromString<epick_msgs::msg:
   {
     return epick_msgs::build<Status>().status(Status::OBJECT_DETECTED_AT_MIN_PRESSURE);
   }
-  else if (str == "OBJECT_DETECTED_AT_MIN_PRESSURE")
+  else if (str == "OBJECT_DETECTED_AT_MAX_PRESSURE")
   {
     return epick_msgs::build<Status>().status(Status::OBJECT_DETECTED_AT_MAX_PRESSURE);
   }
