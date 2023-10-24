@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>epick_moveit_studio</name>
+  <version>0.0.1</version>
+  <description>
+    epick_moveit_studio
+  </description>
+  <maintainer email="joseph.schornak@picknik.ai">Joe Schornak</maintainer>
+  <author email="joseph.schornak@picknik.ai">Joe Schornak</author>
+
+  <license>BSD-3-Clause</license>
+
+  <url type="website">https://github.com/PickNikRobotics/</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>builtin_interfaces</buildtool_depend>
+
+  <build_depend>ament_lint_auto</build_depend>
+
+  <depend>epick_msgs</depend>
+  <depend>moveit_studio_behavior_interface</depend>
+  <depend>pluginlib</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

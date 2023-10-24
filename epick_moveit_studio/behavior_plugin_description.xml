@@ -1,0 +1,5 @@
+<library path="epick_behaviors">
+  <class type="epick_moveit_studio::BehaviorLoader"
+         base_class_type="moveit_studio::behaviors::SharedResourcesNodeLoaderBase">
+  </class>
+</library>

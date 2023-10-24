@@ -1,0 +1,14 @@
+<root>
+    <TreeNodesModel>
+        <Action ID="GetEpickObjectDetectionStatus">
+            <metadata subcategory="Robotiq Epick Gripper"/>
+            <description>
+                <p>
+                    Captures an ObjectDetectionStatus message and makes it available on an output port.
+                </p>
+            </description>
+            <input_port name="topic_name" default="">ObjectDetectionStatus topic the behavior subscribes to.</input_port>
+            <output_port name="message_out" default="{point_cloud}">Contains the message that was received on the topic.</output_port>
+        </Action>
+    </TreeNodesModel>
+</root>
