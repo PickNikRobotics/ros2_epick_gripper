@@ -36,6 +36,21 @@
 #include <hardware_interface/loaned_command_interface.hpp>
 #include <hardware_interface/loaned_state_interface.hpp>
 
+namespace
+{
+/**
+ * @brief Convert a double to a bool using the same logic the EpickGripperHardwareInterface uses to convert
+ * the boolean gripper command and state values into doubles when storing them in the ros2_control interfaces.
+ *
+ * @param value Value to convert
+ * @return Returns true if the value is greater than or equal to 0.5, and false if it is less than 0.5.
+ */
+bool toBool(double value)
+{
+  return value >= 0.5;
+}
+}  // namespace
+
 namespace epick_controllers
 {
 constexpr auto kGripCommandInterface = "gripper/grip_cmd";
@@ -212,7 +227,8 @@ void EpickGripperActionController::check_for_success(const double current_regula
     return;
   }
 
-  if (std::abs(current_regulate_command - current_regulate_state) < std::numeric_limits<double>::epsilon())
+  // The action has succeeded if the gripper's state becomes equal to the commanded value.
+  if (toBool(current_regulate_command) == toBool(current_regulate_state))
   {
     RCLCPP_INFO(get_node()->get_logger(), "success!");
 
