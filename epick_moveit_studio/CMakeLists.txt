@@ -13,6 +13,7 @@ find_package(moveit_studio_behavior_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 
 add_library(epick_behaviors SHARED
+  src/compare_epick_object_detection_status.cpp
   src/get_epick_object_detection_status.cpp
   src/behavior_loader.cpp
 )

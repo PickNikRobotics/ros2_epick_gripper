@@ -1,5 +1,17 @@
 <root>
     <TreeNodesModel>
+        <Action ID="CompareEpickObjectDetectionStatus">
+            <metadata subcategory="Robotiq Epick Gripper"/>
+            <description>
+                <p>
+                    Compare two ObjectDetectionStatus messages.
+                </p>
+            </description>
+            <input_port name="value1" default="">First ObjectDetectionStatus message to compare.</input_port>
+            <input_port name="value2" default="">Second ObjectDetectionStatus message to compare.</input_port>
+        </Action>
+    </TreeNodesModel>
+    <TreeNodesModel>
         <Action ID="GetEpickObjectDetectionStatus">
             <metadata subcategory="Robotiq Epick Gripper"/>
             <description>

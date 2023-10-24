@@ -60,6 +60,7 @@ TEST(EpickBehaviors, LoadBehaviorPlugins)
   }
 
   // Test that ClassLoader is able to find and instantiate each behavior using the package's plugin description info.
+  EXPECT_NO_THROW((void)factory.instantiateTreeNode(kTestBehaviorName, "CompareEpickObjectDetectionStatus", BT::NodeConfiguration()));
   EXPECT_NO_THROW((void)factory.instantiateTreeNode(kTestBehaviorName, "GetEpickObjectDetectionStatus", BT::NodeConfiguration()));
 }
 

@@ -26,29 +26,19 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <behaviortree_cpp/bt_factory.h>
-#include <moveit_studio_behavior_interface/behavior_context.hpp>
-#include <moveit_studio_behavior_interface/shared_resources_node_loader.hpp>
-#include <pluginlib/class_list_macros.hpp>
+#pragma once
 
-// Include headers for your custom Behaviors
-#include <epick_moveit_studio/compare_epick_object_detection_status.hpp>
-#include <epick_moveit_studio/get_epick_object_detection_status.hpp>
+#include <behaviortree_cpp/action_node.h>
 
 namespace epick_moveit_studio
 {
-class BehaviorLoader : public moveit_studio::behaviors::SharedResourcesNodeLoaderBase
+class CompareEpickObjectDetectionStatus final : public BT::SyncActionNode
 {
 public:
-  void registerBehaviors(BT::BehaviorTreeFactory& factory,
-                         const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources) override
-  {
-      moveit_studio::behaviors::registerBehavior<CompareEpickObjectDetectionStatus>(factory, "CompareEpickObjectDetectionStatus");
-      moveit_studio::behaviors::registerBehavior<GetEpickObjectDetectionStatus>(factory, "GetEpickObjectDetectionStatus", shared_resources);
-  }
+  CompareEpickObjectDetectionStatus(const std::string& name, const BT::NodeConfiguration& config);
+
+  static BT::PortsList providedPorts();
+
+  BT::NodeStatus tick() override;
 };
-
-}  // epick_moveit_studio
-
-PLUGINLIB_EXPORT_CLASS(epick_moveit_studio::BehaviorLoader,
-                       moveit_studio::behaviors::SharedResourcesNodeLoaderBase);
+}  // namespace epick_moveit_studio

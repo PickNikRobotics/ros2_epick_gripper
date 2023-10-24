@@ -26,29 +26,53 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <behaviortree_cpp/bt_factory.h>
-#include <moveit_studio_behavior_interface/behavior_context.hpp>
-#include <moveit_studio_behavior_interface/shared_resources_node_loader.hpp>
-#include <pluginlib/class_list_macros.hpp>
-
-// Include headers for your custom Behaviors
+#include <behaviortree_cpp/action_node.h>
+#include <behaviortree_cpp/basic_types.h>
 #include <epick_moveit_studio/compare_epick_object_detection_status.hpp>
-#include <epick_moveit_studio/get_epick_object_detection_status.hpp>
+
+#include <epick_msgs/msg/detail/object_detection_status__struct.hpp>
+#include <epick_msgs/msg/object_detection_status.hpp>
+
+namespace
+{
+  constexpr auto kPortIDValue1 = "value1";
+  constexpr auto kPortIDValue2 = "value2";
+}
 
 namespace epick_moveit_studio
 {
-class BehaviorLoader : public moveit_studio::behaviors::SharedResourcesNodeLoaderBase
+CompareEpickObjectDetectionStatus::CompareEpickObjectDetectionStatus(const std::string& name, const BT::NodeConfiguration& config)
+  : BT::SyncActionNode(name, config)
 {
-public:
-  void registerBehaviors(BT::BehaviorTreeFactory& factory,
-                         const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources) override
+}
+
+BT::PortsList CompareEpickObjectDetectionStatus::providedPorts()
+{
+  return BT::PortsList
   {
-      moveit_studio::behaviors::registerBehavior<CompareEpickObjectDetectionStatus>(factory, "CompareEpickObjectDetectionStatus");
-      moveit_studio::behaviors::registerBehavior<GetEpickObjectDetectionStatus>(factory, "GetEpickObjectDetectionStatus", shared_resources);
+    BT::InputPort<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue1),
+    BT::InputPort<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue2),
+  };
+}
+
+BT::NodeStatus CompareEpickObjectDetectionStatus::tick()
+{
+  const auto value1 = getInput<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue1);
+  const auto value2 = getInput<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue2);
+
+  if (!value1.has_value() || !value2.has_value())
+  {
+    return BT::NodeStatus::FAILURE;
   }
-};
 
-}  // epick_moveit_studio
+  if (value1.value().status == value2.value().status)
+  {
+    return BT::NodeStatus::SUCCESS;
+  }
+  else
+  {
+    return BT::NodeStatus::FAILURE;
+  }
+}
+}  // namespace epick_moveit_studio
 
-PLUGINLIB_EXPORT_CLASS(epick_moveit_studio::BehaviorLoader,
-                       moveit_studio::behaviors::SharedResourcesNodeLoaderBase);
