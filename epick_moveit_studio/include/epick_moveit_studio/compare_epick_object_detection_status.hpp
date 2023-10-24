@@ -29,6 +29,42 @@
 #pragma once
 
 #include <behaviortree_cpp/action_node.h>
+#include <behaviortree_cpp/exceptions.h>
+#include <epick_msgs/msg/object_detection_status.hpp>
+
+namespace BT
+{
+/**
+ * @brief Template specialization of convertToString to split a string into an epick_msgs::msg::ObjectDetectionStatus.
+ * @param str Input string to convert.
+ * @return epick_msgs::msg::ObjectDetectionStatus
+ */
+template <>
+inline epick_msgs::msg::ObjectDetectionStatus convertFromString<epick_msgs::msg::ObjectDetectionStatus>(BT::StringView str)
+{
+  using Status = epick_msgs::msg::ObjectDetectionStatus;
+  if (str == "OBJECT_DETECTED_AT_MIN_PRESSURE")
+  {
+    return epick_msgs::build<Status>().status(Status::OBJECT_DETECTED_AT_MIN_PRESSURE);
+  }
+  else if (str == "OBJECT_DETECTED_AT_MAX_PRESSURE")
+  {
+    return epick_msgs::build<Status>().status(Status::OBJECT_DETECTED_AT_MAX_PRESSURE);
+  }
+  else if (str == "NO_OBJECT_DETECTED")
+  {
+    return epick_msgs::build<Status>().status(Status::NO_OBJECT_DETECTED);
+  }
+  else if (str == "UNKNOWN")
+  {
+    return epick_msgs::build<Status>().status(Status::UNKNOWN);
+  }
+  else
+  {
+    throw BT::RuntimeError(std::string("Invalid input: ").append(str));
+  }
+}
+}  // namespace BT
 
 namespace epick_moveit_studio
 {
