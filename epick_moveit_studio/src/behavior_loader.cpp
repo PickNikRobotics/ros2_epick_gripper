@@ -27,6 +27,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <behaviortree_cpp/bt_factory.h>
+#include <memory>
 #include <moveit_studio_behavior_interface/behavior_context.hpp>
 #include <moveit_studio_behavior_interface/shared_resources_node_loader.hpp>
 #include <pluginlib/class_list_macros.hpp>
@@ -43,12 +44,13 @@ public:
   void registerBehaviors(BT::BehaviorTreeFactory& factory,
                          const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources) override
   {
-      moveit_studio::behaviors::registerBehavior<CompareEpickObjectDetectionStatus>(factory, "CompareEpickObjectDetectionStatus");
-      moveit_studio::behaviors::registerBehavior<GetEpickObjectDetectionStatus>(factory, "GetEpickObjectDetectionStatus", shared_resources);
+    moveit_studio::behaviors::registerBehavior<CompareEpickObjectDetectionStatus>(factory,
+                                                                                  "CompareEpickObjectDetectionStatus");
+    moveit_studio::behaviors::registerBehavior<GetEpickObjectDetectionStatus>(factory, "GetEpickObjectDetectionStatus",
+                                                                              shared_resources);
   }
 };
 
-}  // epick_moveit_studio
+}  // namespace epick_moveit_studio
 
-PLUGINLIB_EXPORT_CLASS(epick_moveit_studio::BehaviorLoader,
-                       moveit_studio::behaviors::SharedResourcesNodeLoaderBase);
+PLUGINLIB_EXPORT_CLASS(epick_moveit_studio::BehaviorLoader, moveit_studio::behaviors::SharedResourcesNodeLoaderBase);

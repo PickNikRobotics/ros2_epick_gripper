@@ -35,12 +35,14 @@
 namespace BT
 {
 /**
- * @brief Template specialization of convertToString to split a string into an epick_msgs::msg::ObjectDetectionStatus.
+ * @brief Template specialization of convertToString to parse a string as an epick_msgs::msg::ObjectDetectionStatus.
+ * @details This allows setting one of the input ports of CompareEpickObjectDetectionStatus by typing a string.
  * @param str Input string to convert.
  * @return epick_msgs::msg::ObjectDetectionStatus
  */
 template <>
-inline epick_msgs::msg::ObjectDetectionStatus convertFromString<epick_msgs::msg::ObjectDetectionStatus>(BT::StringView str)
+inline epick_msgs::msg::ObjectDetectionStatus
+convertFromString<epick_msgs::msg::ObjectDetectionStatus>(BT::StringView str)
 {
   using Status = epick_msgs::msg::ObjectDetectionStatus;
   if (str == "OBJECT_DETECTED_AT_MIN_PRESSURE")
@@ -61,13 +63,26 @@ inline epick_msgs::msg::ObjectDetectionStatus convertFromString<epick_msgs::msg:
   }
   else
   {
-    throw BT::RuntimeError(std::string("Invalid input: ").append(str));
+    throw BT::RuntimeError(std::string("To convert into a ObjectDetectionStatus message, the input string must be one "
+                                       "of [OBJECT_DETECTED_AT_MIN_PRESSURE, OBJECT_DETECTED_AT_MAX_PRESSURE, "
+                                       "NO_OBJECT_DETECTED, UNKNOWN]. Cannot parse the provided string: ")
+                               .append(str));
   }
 }
 }  // namespace BT
 
 namespace epick_moveit_studio
 {
+/**
+ * @brief Behavior to compare ObjectDetectionStatus messages.
+ * @details When ticked, gets two epick_msgs::msg::ObjectDetectionStatus messages from the "value1" and "value2" input
+ * data ports. The behavior succeeds if they are identical and fails if they are different.
+ *
+ * | Data Port Name | Port Type | Object Type                            |
+ * | -------------- | --------- | -------------------------------------- |
+ * | value1         | input     | epick_msgs::msg::ObjectDetectionStatus |
+ * | value2         | input     | epick_msgs::msg::ObjectDetectionStatus |
+ */
 class CompareEpickObjectDetectionStatus final : public BT::SyncActionNode
 {
 public:

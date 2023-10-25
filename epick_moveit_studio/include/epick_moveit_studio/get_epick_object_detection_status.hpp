@@ -34,21 +34,22 @@
 namespace epick_moveit_studio
 {
 /**
- * @brief Capture a point cloud. The name of the topic containing the point cloud is set through the
- * "topic_name" parameter, and the resulting point cloud is available on the "message_out" output
- * port.
+ * @brief Capture a epick_msgs::msg::ObjectDetectionStatus message.
+ * @details The topic to monitor is set through the "topic_name" parameter, and the resulting message is available on
+ * the "message_out" output port.
  *
  * @details
- * | Data Port Name | Port Type | Object Type                   |
- * | -------------- | --------- | ----------------------------- |
- * | topic_name     | input     | std::string                   |
- * | message_out    | output    | sensor_msgs::msg::PointCloud2 |
+ * | Data Port Name | Port Type | Object Type                            |
+ * | -------------- | --------- | -------------------------------------- |
+ * | topic_name     | input     | std::string                            |
+ * | message_out    | output    | epick_msgs::msg::ObjectDetectionStatus |
  */
-class GetEpickObjectDetectionStatus final : public moveit_studio::behaviors::GetMessageFromTopicBehaviorBase<epick_msgs::msg::ObjectDetectionStatus>
+class GetEpickObjectDetectionStatus final
+  : public moveit_studio::behaviors::GetMessageFromTopicBehaviorBase<epick_msgs::msg::ObjectDetectionStatus>
 {
 public:
   GetEpickObjectDetectionStatus(const std::string& name, const BT::NodeConfiguration& config,
-                const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
+                                const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
 
 private:
   fp::Result<std::chrono::duration<double>> getWaitForMessageTimeout() override;

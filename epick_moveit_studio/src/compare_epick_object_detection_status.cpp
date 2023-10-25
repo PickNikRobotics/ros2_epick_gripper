@@ -35,21 +35,21 @@
 
 namespace
 {
-  constexpr auto kPortIDValue1 = "value1";
-  constexpr auto kPortIDValue2 = "value2";
-}
+constexpr auto kPortIDValue1 = "value1";
+constexpr auto kPortIDValue2 = "value2";
+}  // namespace
 
 namespace epick_moveit_studio
 {
-CompareEpickObjectDetectionStatus::CompareEpickObjectDetectionStatus(const std::string& name, const BT::NodeConfiguration& config)
+CompareEpickObjectDetectionStatus::CompareEpickObjectDetectionStatus(const std::string& name,
+                                                                     const BT::NodeConfiguration& config)
   : BT::SyncActionNode(name, config)
 {
 }
 
 BT::PortsList CompareEpickObjectDetectionStatus::providedPorts()
 {
-  return BT::PortsList
-  {
+  return BT::PortsList{
     BT::InputPort<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue1),
     BT::InputPort<epick_msgs::msg::ObjectDetectionStatus>(kPortIDValue2),
   };
@@ -75,4 +75,3 @@ BT::NodeStatus CompareEpickObjectDetectionStatus::tick()
   }
 }
 }  // namespace epick_moveit_studio
-
