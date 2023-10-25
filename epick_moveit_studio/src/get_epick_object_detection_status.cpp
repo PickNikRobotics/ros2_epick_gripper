@@ -31,11 +31,11 @@
 #include <epick_msgs/msg/object_detection_status.hpp>
 #include <moveit_studio_behavior_interface/impl/get_message_from_topic_impl.hpp>
 
-// namespace
-// {
-// /** @brief Maximum duration to wait for a point cloud to be published before failing. */
-// constexpr auto kWaitForPointCloudDuration = std::chrono::seconds{ 5 };
-// }  // namespace
+namespace
+{
+/** @brief Maximum duration to wait for a message to be published before failing. */
+constexpr auto kWaitDuration = std::chrono::seconds{ 1 };
+}  // namespace
 
 namespace epick_moveit_studio
 {
@@ -45,10 +45,10 @@ GetEpickObjectDetectionStatus::GetEpickObjectDetectionStatus(const std::string& 
 {
 }
 
-// fp::Result<std::chrono::duration<double>> GetEpickObjectDetectionStatus::getWaitForMessageTimeout()
-// {
-//   return kWaitForPointCloudDuration;
-// }
+fp::Result<std::chrono::duration<double>> GetEpickObjectDetectionStatus::getWaitForMessageTimeout()
+{
+  return kWaitDuration;
+}
 
 }  // namespace epick_moveit_studio
 

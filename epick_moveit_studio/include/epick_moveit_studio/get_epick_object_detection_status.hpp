@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <epick_msgs/msg/object_detection_status.hpp>
 #include <moveit_studio_behavior_interface/get_message_from_topic.hpp>
 
 namespace epick_moveit_studio
@@ -50,8 +51,7 @@ public:
                 const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
 
 private:
-  /** @brief Override getWaitForMessageTimeout to allow failing if no point cloud is received within the expected duration. */
-  // fp::Result<std::chrono::duration<double>> getWaitForMessageTimeout() override;
+  fp::Result<std::chrono::duration<double>> getWaitForMessageTimeout() override;
 
   /** @brief Classes derived from AsyncBehaviorBase must implement getFuture() so that it returns a shared_future class member */
   std::shared_future<fp::Result<bool>>& getFuture() override
