@@ -29,8 +29,6 @@
 #include <behaviortree_cpp/action_node.h>
 #include <behaviortree_cpp/basic_types.h>
 #include <epick_moveit_studio/compare_epick_object_detection_status.hpp>
-
-#include <epick_msgs/msg/detail/object_detection_status__struct.hpp>
 #include <epick_msgs/msg/object_detection_status.hpp>
 
 namespace

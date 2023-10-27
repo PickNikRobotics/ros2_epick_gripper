@@ -21,7 +21,7 @@ target_include_directories(epick_behaviors
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   PUBLIC $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(epick_behaviors PUBLIC moveit_studio_behavior_interface::shared_resources_node moveit_studio_behavior_interface::get_message_from_topic)
+target_link_libraries(epick_behaviors PUBLIC moveit_studio_behavior_interface::async_behavior_base)
 ament_target_dependencies(epick_behaviors PUBLIC
   epick_msgs
   moveit_studio_behavior_interface
