@@ -1,3 +1,4 @@
+find_package(ament_cmake_gmock REQUIRED)
 find_package(ament_cmake_gtest REQUIRED)
 
 ament_add_gtest(test_load_behaviors
@@ -5,3 +6,6 @@ ament_add_gtest(test_load_behaviors
 )
 ament_target_dependencies(test_load_behaviors moveit_studio_behavior_interface pluginlib)
 target_link_libraries(test_load_behaviors moveit_studio_behavior_interface::shared_resources_node)
+
+ament_add_gmock(test_compare_epick_object_detection_status test_compare_epick_object_detection_status.cpp)
+target_link_libraries(test_compare_epick_object_detection_status epick_behaviors)

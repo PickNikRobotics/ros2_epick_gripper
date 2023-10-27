@@ -54,14 +54,15 @@ TEST(EpickBehaviors, LoadBehaviorPlugins)
 
   BT::BehaviorTreeFactory factory;
   {
-    auto plugin_instance =
-        class_loader.createUniqueInstance("epick_moveit_studio::BehaviorLoader");
+    auto plugin_instance = class_loader.createUniqueInstance("epick_moveit_studio::BehaviorLoader");
     ASSERT_NO_THROW(plugin_instance->registerBehaviors(factory, shared_resources));
   }
 
   // Test that ClassLoader is able to find and instantiate each behavior using the package's plugin description info.
-  EXPECT_NO_THROW((void)factory.instantiateTreeNode(kTestBehaviorName, "CompareEpickObjectDetectionStatus", BT::NodeConfiguration()));
-  EXPECT_NO_THROW((void)factory.instantiateTreeNode(kTestBehaviorName, "GetEpickObjectDetectionStatus", BT::NodeConfiguration()));
+  EXPECT_NO_THROW((void)factory.instantiateTreeNode(kTestBehaviorName, "CompareEpickObjectDetectionStatus",
+                                                    BT::NodeConfiguration()));
+  EXPECT_NO_THROW(
+      (void)factory.instantiateTreeNode(kTestBehaviorName, "GetEpickObjectDetectionStatus", BT::NodeConfiguration()));
 }
 
 int main(int argc, char** argv)

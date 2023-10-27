@@ -39,9 +39,11 @@ constexpr auto kWaitDuration = std::chrono::seconds{ 1 };
 
 namespace epick_moveit_studio
 {
-GetEpickObjectDetectionStatus::GetEpickObjectDetectionStatus(const std::string& name, const BT::NodeConfiguration& config,
-                             const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources)
-  : moveit_studio::behaviors::GetMessageFromTopicBehaviorBase<epick_msgs::msg::ObjectDetectionStatus>(name, config, shared_resources)
+GetEpickObjectDetectionStatus::GetEpickObjectDetectionStatus(
+    const std::string& name, const BT::NodeConfiguration& config,
+    const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources)
+  : moveit_studio::behaviors::GetMessageFromTopicBehaviorBase<epick_msgs::msg::ObjectDetectionStatus>(name, config,
+                                                                                                      shared_resources)
 {
 }
 
