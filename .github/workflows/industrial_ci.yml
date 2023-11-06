@@ -10,6 +10,8 @@ jobs:
           - { ROS_DISTRO: humble, ROS_REPO: testing }
           - { ROS_DISTRO: humble, ROS_REPO: main }
     env:
+      # Remove the epick_moveit_studio package from the workspace before running CI, since its dependencies are not available in CI for this repo.
+      TARGET_WORKSPACE: '. -epick_moveit_studio'
       UPSTREAM_WORKSPACE: ros2_robotiq_gripper.humble.repos
     runs-on: ubuntu-latest
     steps:

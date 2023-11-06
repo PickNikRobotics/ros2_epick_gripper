@@ -1,0 +1,26 @@
+<root>
+    <TreeNodesModel>
+        <Action ID="CompareEpickObjectDetectionStatus">
+            <metadata subcategory="Robotiq EPick Gripper"/>
+            <description>
+                <p>
+                    Compare two ObjectDetectionStatus messages.
+                </p>
+            </description>
+            <input_port name="value1" default="{status}">First ObjectDetectionStatus message to compare.</input_port>
+            <input_port name="value2" default="OBJECT_DETECTED_AT_MAX_PRESSURE">Second ObjectDetectionStatus message to compare.</input_port>
+        </Action>
+    </TreeNodesModel>
+    <TreeNodesModel>
+        <Action ID="GetEpickObjectDetectionStatus">
+            <metadata subcategory="Robotiq EPick Gripper"/>
+            <description>
+                <p>
+                    Captures an ObjectDetectionStatus message and makes it available on an output port.
+                </p>
+            </description>
+            <input_port name="topic_name" default="/object_detection_status">ObjectDetectionStatus topic the behavior subscribes to.</input_port>
+            <output_port name="message_out" default="{status}">Contains the message that was received on the topic.</output_port>
+        </Action>
+    </TreeNodesModel>
+</root>
