@@ -35,7 +35,7 @@
 namespace BT
 {
 /**
- * @brief Template specialization of convertToString to parse a string as an epick_msgs::msg::ObjectDetectionStatus.
+ * @brief Template specialization of convertFromString to parse a string as an epick_msgs::msg::ObjectDetectionStatus.
  * @details This allows setting one of the input ports of CompareEpickObjectDetectionStatus by typing a string.
  * @param str Input string to convert.
  * @return epick_msgs::msg::ObjectDetectionStatus
