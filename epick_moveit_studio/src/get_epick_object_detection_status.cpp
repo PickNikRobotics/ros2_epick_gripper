@@ -47,7 +47,7 @@ GetEpickObjectDetectionStatus::GetEpickObjectDetectionStatus(
 {
 }
 
-fp::Result<std::chrono::duration<double>> GetEpickObjectDetectionStatus::getWaitForMessageTimeout()
+tl::expected<std::chrono::duration<double>, std::string> GetEpickObjectDetectionStatus::getWaitForMessageTimeout()
 {
   return kWaitDuration;
 }

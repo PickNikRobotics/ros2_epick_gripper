@@ -52,15 +52,15 @@ public:
                                 const std::shared_ptr<moveit_studio::behaviors::BehaviorContext>& shared_resources);
 
 private:
-  fp::Result<std::chrono::duration<double>> getWaitForMessageTimeout() override;
+  tl::expected<std::chrono::duration<double>, std::string> getWaitForMessageTimeout() override;
 
   /** @brief Classes derived from AsyncBehaviorBase must implement getFuture() so that it returns a shared_future class member */
-  std::shared_future<fp::Result<bool>>& getFuture() override
+  std::shared_future<tl::expected<bool, std::string>>& getFuture() override
   {
     return future_;
   }
 
   /** @brief Classes derived from AsyncBehaviorBase must have this shared_future as a class member */
-  std::shared_future<fp::Result<bool>> future_;
+  std::shared_future<tl::expected<bool, std::string>> future_;
 };
 }  // namespace epick_moveit_studio
