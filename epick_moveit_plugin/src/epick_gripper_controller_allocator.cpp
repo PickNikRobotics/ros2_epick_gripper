@@ -32,9 +32,9 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include <moveit_ros_control_interface/ControllerHandle.h>
+#include <moveit_ros_control_interface/ControllerHandle.hpp>
 #include <pluginlib/class_list_macros.hpp>
-#include <moveit_simple_controller_manager/gripper_controller_handle.h>
+#include <moveit_simple_controller_manager/gripper_command_controller_handle.hpp>
 #include <rclcpp/node.hpp>
 #include <memory>
 
@@ -56,7 +56,7 @@ public:
                                                              const std::string& name,
                                                              const std::vector<std::string>& /* resources */) override
   {
-    return std::make_shared<moveit_simple_controller_manager::GripperControllerHandle>(node, name,
+    return std::make_shared<moveit_simple_controller_manager::GripperCommandControllerHandle>(node, name,
                                                                                        kGripperCommandAction);
   }
 };
