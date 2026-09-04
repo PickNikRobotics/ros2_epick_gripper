@@ -6,7 +6,7 @@
   <description>URDF and xacro description package for the Robotiq EPick vacuum gripper</description>
   <maintainer email="g.remigi@kineticsystem.org">giovanni</maintainer>
   <maintainer email="henningkayser@picknik.ai">Henning Kayser</maintainer>
-  <license>BSD</license>
+  <license>BSD-3-Clause</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
