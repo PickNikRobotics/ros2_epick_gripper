@@ -56,7 +56,7 @@ public:
                                                              const std::string& name,
                                                              const std::vector<std::string>& /* resources */) override
   {
-    return std::make_shared<moveit_simple_controller_manager::GripperControllerHandle>(node, name,
+    return std::make_shared<moveit_simple_controller_manager::GripperCommandControllerHandle>(node, name,
                                                                                        kGripperCommandAction);
   }
 };
