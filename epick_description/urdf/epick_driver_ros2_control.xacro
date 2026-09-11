@@ -10,7 +10,8 @@
                        grip_max_vacuum_pressure:=-60
                        grip_min_vacuum_pressure:=-10
                        grip_timeout:=25.0
-                       release_timeout:=2.0">
+                       release_timeout:=2.0
+                       publish_gripper_joint_state:=true">
 
     <ros2_control name="${name}" type="system">
       <hardware>
@@ -70,16 +71,25 @@
       <!--
         This is optional configuration if you want to publish the state of the
         gripper as a joint state interface.
+
+        It names a URDF joint, and ros2_control 4.x validates every
+        ros2_control joint against the URDF. A name with no matching joint
+        makes parse_control_resources_from_urdf() throw, which aborts
+        ros2_control_node at startup. Robots whose URDF has no joint literally
+        called "gripper" (a suction cup has none) must pass
+        publish_gripper_joint_state:=false.
       -->
-      <joint name="gripper">
-        <!--
-          State interface that follows the value of the gripper/grip_cmd
-          command interface:
-          1.0 = successful grip
-          0.0 = successful release
-        -->
-        <state_interface name="position"/>
-      </joint>
+      <xacro:if value="${publish_gripper_joint_state}">
+        <joint name="gripper">
+          <!--
+            State interface that follows the value of the gripper/grip_cmd
+            command interface:
+            1.0 = successful grip
+            0.0 = successful release
+          -->
+          <state_interface name="position"/>
+        </joint>
+      </xacro:if>
 
     </ros2_control>
 
