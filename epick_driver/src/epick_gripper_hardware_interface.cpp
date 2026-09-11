@@ -170,8 +170,8 @@ std::vector<hardware_interface::StateInterface> EpickGripperHardwareInterface::e
   }
   catch (const std::exception& ex)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    set_lifecycle_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                                hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return {};
   }
   return state_interfaces;
@@ -195,8 +195,8 @@ std::vector<hardware_interface::CommandInterface> EpickGripperHardwareInterface:
   }
   catch (const std::exception& ex)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    set_lifecycle_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                                hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return {};
   }
   return command_interfaces;
@@ -259,8 +259,8 @@ hardware_interface::return_type EpickGripperHardwareInterface::read([[maybe_unus
   }
   catch (const std::exception& ex)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    set_lifecycle_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                                hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return hardware_interface::return_type::ERROR;
   }
   return hardware_interface::return_type::OK;
@@ -279,8 +279,8 @@ hardware_interface::return_type EpickGripperHardwareInterface::write([[maybe_unu
   }
   catch (const std::exception& ex)
   {
-    set_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
-                                      hardware_interface::lifecycle_state_names::UNCONFIGURED));
+    set_lifecycle_state(rclcpp_lifecycle::State(lifecycle_msgs::msg::State::PRIMARY_STATE_UNCONFIGURED,
+                                                hardware_interface::lifecycle_state_names::UNCONFIGURED));
     return hardware_interface::return_type::ERROR;
   }
   return hardware_interface::return_type::OK;
